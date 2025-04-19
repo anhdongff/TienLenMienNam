@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "655535492821",
+    "project_id": "tienlenmiennam-d2c29",
+    "storage_bucket": "tienlenmiennam-d2c29.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:655535492821:android:e408ed52f563bb4f891c5c",
+        "android_client_info": {
+          "package_name": "com.gamebai.tienlenmiennam"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBv4-TVV4K2RotzRGjMH8sIl5fAwYSRAIw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

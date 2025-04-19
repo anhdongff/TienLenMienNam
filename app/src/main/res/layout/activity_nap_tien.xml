@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nap_tien"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="horizontal"
+    tools:context=".main.NapTienActivity">
+
+    <Button
+        android:id="@+id/button_nap_20k"
+        android:layout_width="180dp"
+        android:layout_height="116dp"
+        android:text="2000$\n20.000đ"
+        android:textSize="24sp"
+        app:cornerRadius="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView5"
+        app:layout_constraintVertical_bias="0.128" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableRight="@drawable/zalopay_logo"
+        android:drawablePadding="10sp"
+        android:gravity="center"
+        android:text="@string/thanh_toan_qua_zalo_pay"
+        android:textColor="@color/black"
+        android:textSize="48sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.043" />
+
+    <Button
+        android:id="@+id/button_nap_10k"
+        android:layout_width="180dp"
+        android:layout_height="116dp"
+        android:text="1000$\n10.000đ"
+        android:textSize="24sp"
+        app:cornerRadius="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/button_nap_20k"
+        app:layout_constraintHorizontal_bias="0.512"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView5"
+        app:layout_constraintVertical_bias="0.128" />
+
+    <Button
+        android:id="@+id/button_nap_500k"
+        android:layout_width="180dp"
+        android:layout_height="116dp"
+        android:text="50000$\n500.000đ"
+        android:textSize="24sp"
+        app:cornerRadius="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.506"
+        app:layout_constraintStart_toEndOf="@+id/button_nap_200k"
+        app:layout_constraintTop_toBottomOf="@+id/button_nap_50k"
+        app:layout_constraintVertical_bias="0.316" />
+
+    <Button
+        android:id="@+id/button_nap_200k"
+        android:layout_width="180dp"
+        android:layout_height="116dp"
+        android:text="20000$\n200.000đ"
+        android:textSize="24sp"
+        app:cornerRadius="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_nap_20k"
+        app:layout_constraintVertical_bias="0.316" />
+
+    <Button
+        android:id="@+id/button_nap_100k"
+        android:layout_width="180dp"
+        android:layout_height="116dp"
+        android:text="10000$\n100.000đ"
+        android:textSize="24sp"
+        app:cornerRadius="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/button_nap_200k"
+        app:layout_constraintHorizontal_bias="0.515"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_nap_10k"
+        app:layout_constraintVertical_bias="0.316" />
+
+    <Button
+        android:id="@+id/button_nap_50k"
+        android:layout_width="180dp"
+        android:layout_height="116dp"
+        android:text="5000$\n50.000đ"
+        android:textSize="24sp"
+        app:cornerRadius="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.506"
+        app:layout_constraintStart_toEndOf="@+id/button_nap_20k"
+        app:layout_constraintTop_toBottomOf="@+id/textView5"
+        app:layout_constraintVertical_bias="0.128" />
+</androidx.constraintlayout.widget.ConstraintLayout>
