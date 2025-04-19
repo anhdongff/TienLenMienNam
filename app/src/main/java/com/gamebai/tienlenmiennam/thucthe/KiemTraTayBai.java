@@ -119,10 +119,14 @@ public class KiemTraTayBai {
             if(this.checkSap()) return TayBai.Sap;
         }
         if(tayBai==TayBai.Thong.ordinal()){
-            if(doDai==3){
+            if(doDai>=3){
                 if(this.checkThong(doDai)){
-                    if(laBai.get(laBai.size()-1).lonHon(laCuoi)) return TayBai.Thong;
-                    else return TayBai.KhongHopLe;
+                    if(laBai.size()>doDai*2){
+                        return TayBai.Thong;
+                    }else{
+                        if(laBai.get(laBai.size()-1).lonHon(laCuoi)) return TayBai.Thong;
+                        else return TayBai.KhongHopLe;
+                    }
                 }
                 if(this.checkTuQuy()) return TayBai.TuQuy;
             }
