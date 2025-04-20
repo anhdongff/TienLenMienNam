@@ -15,6 +15,9 @@ annotation = "1.6.0"
 lifecycleLivedataKtx = "2.6.1"
 lifecycleViewmodelKtx = "2.6.1"
 retrofit = "2.9.0"
+tensorflowLiteSupport = "2.10.0"
+tensorflowTensorflowLite = "2.10.0"
+tensorflowTensorflowLiteGpu = "2.10.0"
 
 [libraries]
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
@@ -35,6 +38,9 @@ annotation = { group = "androidx.annotation", name = "annotation", version.ref =
 lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
 lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+tensorflow-lite-support = { module = "org.tensorflow:tensorflow-lite-support", version.ref = "tensorflowLiteSupport" }
+tensorflow-tensorflow-lite = { module = "org.tensorflow:tensorflow-lite", version.ref = "tensorflowTensorflowLite" }
+tensorflow-tensorflow-lite-gpu = { module = "org.tensorflow:tensorflow-lite-gpu", version.ref = "tensorflowTensorflowLiteGpu" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

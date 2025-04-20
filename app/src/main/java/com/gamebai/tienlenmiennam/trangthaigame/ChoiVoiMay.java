@@ -13,6 +13,7 @@ import android.view.MotionEvent;
 import android.widget.Toast;
 
 import com.gamebai.tienlenmiennam.R;
+import com.gamebai.tienlenmiennam.aingu.Model4096;
 import com.gamebai.tienlenmiennam.hotro.PhuongThucBitmap;
 import com.gamebai.tienlenmiennam.hotro.ThongSo;
 import com.gamebai.tienlenmiennam.hotro.ThuThapDuLieu;
@@ -37,6 +38,9 @@ import java.util.List;
 import java.util.Random;
 
 public class ChoiVoiMay extends TrangThaiCoBan implements TrangThaiGame, PhuongThucBitmap {
+    private int danhDung;
+    private int tongLuotDanh;
+
     public enum GiaiDoan{
         CHO_NGUOI_CHOI,CHUAN_BI,BAT_DAU, CHIA_BAI, LAT_BAI, CHO_CHON, DANH_BAI, KET_THUC;
         public static GiaiDoan timGiaiDoan(int chiSo){
@@ -73,6 +77,10 @@ public class ChoiVoiMay extends TrangThaiCoBan implements TrangThaiGame, PhuongT
     private int nguoiThang,nguoiDanhCuoi,nguoiDangDanh,doDaiTayBaiCuoi,thoiGianMayDanh;
     private float thoiGianDemNguoc,thoiGianHienCanhBao;
     private long thoiDiemThoatGame;
+    /**
+     * aingu
+     */
+    Model4096 model;
     public ChoiVoiMay(Game game,MainActivity mainActivity){
         super(game);
         this.mainActivity=mainActivity;
@@ -251,8 +259,14 @@ public class ChoiVoiMay extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                 *ThongSo.ThongSoManHinh.TI_LE_CHIEU_RONG_MAN_HINH,
                 (nutThoat.getHitbox().height()+maPhong.getHitBox().height())/2);
         /**
+         * Khởi tạo model
+         */
+        model=new Model4096(mainActivity);
+        /**
          * start game
          */
+        danhDung=0;
+        tongLuotDanh=0;
         hopLe=true;
         giaiDoan=GiaiDoan.BAT_DAU;
     }
@@ -895,217 +909,13 @@ public class ChoiVoiMay extends TrangThaiCoBan implements TrangThaiGame, PhuongT
             /**
              * AI ngu
              */
-            if(tayBaiCuoi==TayBai.KhongCo){
-                boolean a=nguoiChois[nguoiDangDanh].timDoiThong(LaBai.getTempInstance(2,-1),
-                        3,thongTinBoBai,true);
-                boolean b=nguoiChois[nguoiDangDanh].timTuQuy(LaBai.getTempInstance(2,-1),true);
-                if(!a&&!b){
-                    if(nguoiChois[nguoiDangDanh].chonBoDaiNhat(thongTinBoBai))
-                        for(int i=0;i<nguoiChois[nguoiDangDanh].soLa();i++){
-                            if(nguoiChois[nguoiDangDanh].isCoTheChon(i)){
-                                kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
-                                nguoiChois[nguoiDangDanh].setDuocChon(i, true);
-                            }
-                        }else if(nguoiChois[nguoiDangDanh].timSapKhac2(LaBai.getTempInstance(2,-1),true)){
-                        int dem=0;
-                        for(int i=0;i<nguoiChois[nguoiDangDanh].soLa();i++){
-                            if(nguoiChois[nguoiDangDanh].isCoTheChon(i)){
-                                kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
-                                nguoiChois[nguoiDangDanh].setDuocChon(i, true);
-                                dem++;
-                                if(dem>=3) break;
-                            }
-                        }
-                    }else if(nguoiChois[nguoiDangDanh].timDoiKhac2(LaBai.getTempInstance(2,-1),true)){
-                        int dem=0;
-                        for(int i=0;i<nguoiChois[nguoiDangDanh].soLa();i++){
-                            if(nguoiChois[nguoiDangDanh].isCoTheChon(i)){
-                                kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
-                                nguoiChois[nguoiDangDanh].setDuocChon(i, true);
-                                dem++;
-                                if(dem>=2) break;
-                            }
-                        }
-                    }else{
-                        kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(0));
-                        nguoiChois[nguoiDangDanh].setDuocChon(0, true);
-                    }
-                }else{
-                    kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(0));
-                    nguoiChois[nguoiDangDanh].setDuocChon(0, true);
-                }
-            }
-            if(tayBaiCuoi==TayBai.Le){
-                if(laCuoi.getSo()==14){
-                    if(nguoiChois[nguoiDangDanh].timDoiThongNhoNhat(LaBai.getTempInstance(2,-1),
-                            3,
-                            thongTinBoBai)){
-                        int dem=0;
-                        for(int i=0;i<nguoiChois[nguoiDangDanh].soLa();i++){
-                            if(nguoiChois[nguoiDangDanh].isCoTheChon(i)){
-                                kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
-                                nguoiChois[nguoiDangDanh].setDuocChon(i, true);
-                                dem++;
-                            }
-                            if(dem>=6) break;
-                        }
-                    }else if(nguoiChois[nguoiDangDanh].timTuQuy(LaBai.getTempInstance(2,-1),true)){
-                        int dem=0;
-                        for(int i=0;i<nguoiChois[nguoiDangDanh].soLa();i++){
-                            if(nguoiChois[nguoiDangDanh].isCoTheChon(i)){
-                                kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
-                                nguoiChois[nguoiDangDanh].setDuocChon(i, true);
-                                dem++;
-                            }
-                            if(dem>=4) break;
-                        }
-                    }else{
-                        nguoiChois[nguoiDangDanh].timLa(laCuoi,true);
-                        for(int i=0;i<nguoiChois[nguoiDangDanh].soLa();i++){
-                            if(nguoiChois[nguoiDangDanh].isCoTheChon(i)){
-                                kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
-                                nguoiChois[nguoiDangDanh].setDuocChon(i, true);
-                                break;
-                            }
-                        }
-                    }
-                }else{
-                    if(!nguoiChois[nguoiDangDanh].timLaLe(laCuoi,thongTinBoBai))
-                        nguoiChois[nguoiDangDanh].timLa(laCuoi,true);
-                    for(int i=0;i<nguoiChois[nguoiDangDanh].soLa();i++){
-                        if(nguoiChois[nguoiDangDanh].isCoTheChon(i)){
-                            kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
-                            nguoiChois[nguoiDangDanh].setDuocChon(i, true);
-                            break;
-                        }
-                    }
-                }
-            }
-            if(tayBaiCuoi==TayBai.Doi){
-                if(laCuoi.getSo()==14){
-                    if(nguoiChois[nguoiDangDanh].timDoiThongNhoNhat(LaBai.getTempInstance(2,-1),
-                            4,
-                            thongTinBoBai)){
-                        int dem=0;
-                        for(int i=0;i<nguoiChois[nguoiDangDanh].soLa();i++){
-                            if(nguoiChois[nguoiDangDanh].isCoTheChon(i)){
-                                kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
-                                nguoiChois[nguoiDangDanh].setDuocChon(i, true);
-                                dem++;
-                            }
-                            if(dem>=8) break;
-                        }
-                    }else{
-                        nguoiChois[nguoiDangDanh].timDoi(laCuoi,true);
-                        int dem=0;
-                        for(int i=0;i<nguoiChois[nguoiDangDanh].soLa();i++){
-                            if(nguoiChois[nguoiDangDanh].isCoTheChon(i)){
-                                kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
-                                nguoiChois[nguoiDangDanh].setDuocChon(i, true);
-                                dem++;
-                                if(dem>=2) break;
-                            }
-                        }
-                    }
-                }else{
-                    nguoiChois[nguoiDangDanh].timDoi(laCuoi,true);
-                    int dem=0;
-                    for(int i=0;i<nguoiChois[nguoiDangDanh].soLa();i++){
-                        if(nguoiChois[nguoiDangDanh].isCoTheChon(i)){
-                            kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
-                            nguoiChois[nguoiDangDanh].setDuocChon(i, true);
-                            dem++;
-                            if(dem>=2) break;
-                        }
-                    }
-                }
-            }
-            if(tayBaiCuoi==TayBai.Sap){
-                nguoiChois[nguoiDangDanh].timSap(laCuoi,true);
-                int dem=0;
-                for(int i=0;i<nguoiChois[nguoiDangDanh].soLa();i++){
-                    if(nguoiChois[nguoiDangDanh].isCoTheChon(i)){
-                        kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
-                        nguoiChois[nguoiDangDanh].setDuocChon(i, true);
-                        dem++;
-                        if(dem>=3) break;
-                    }
-                }
-            }
-            if(tayBaiCuoi==TayBai.TuQuy){
-                if(nguoiChois[nguoiDangDanh].timDoiThongNhoNhat(LaBai.getTempInstance(2,-1),
-                        4,
-                        thongTinBoBai)){
-                    int dem=0;
-                    for(int i=0;i<nguoiChois[nguoiDangDanh].soLa();i++){
-                        if(nguoiChois[nguoiDangDanh].isCoTheChon(i)){
-                            kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
-                            nguoiChois[nguoiDangDanh].setDuocChon(i, true);
-                            dem++;
-                        }
-                        if(dem>=8) break;
-                    }
-                }else{
-                    nguoiChois[nguoiDangDanh].timTuQuy(laCuoi,true);
-                    int dem=0;
-                    for(int i=0;i<nguoiChois[nguoiDangDanh].soLa();i++){
-                        if(nguoiChois[nguoiDangDanh].isCoTheChon(i)){
-                            kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
-                            nguoiChois[nguoiDangDanh].setDuocChon(i, true);
-                            dem++;
-                        }
-                        if(dem>=4) break;
-                    }
-                }
-            }
-            if(tayBaiCuoi==TayBai.Bo){
-                nguoiChois[nguoiDangDanh].timBoNhoNhat(laCuoi, doDaiTayBaiCuoi, thongTinBoBai);
-                int dem=0;
-                for(int i=0;i<nguoiChois[nguoiDangDanh].soLa();i++){
-                    if(nguoiChois[nguoiDangDanh].isCoTheChon(i)){
-                        kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
-                        nguoiChois[nguoiDangDanh].setDuocChon(i, true);
-                        dem++;
-                    }
-                    if(dem>=doDaiTayBaiCuoi) break;
-                }
-            }
-            if(tayBaiCuoi==TayBai.Thong){
-                if(nguoiChois[nguoiDangDanh].timDoiThongNhoNhat(LaBai.getTempInstance(2,-1),
-                        doDaiTayBaiCuoi+1,
-                        thongTinBoBai)){
-                    int dem=0;
-                    for(int i=0;i<nguoiChois[nguoiDangDanh].soLa();i++){
-                        if(nguoiChois[nguoiDangDanh].isCoTheChon(i)){
-                            kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
-                            nguoiChois[nguoiDangDanh].setDuocChon(i, true);
-                            dem++;
-                        }
-                        if(dem>=2*(doDaiTayBaiCuoi+1)) break;
-                    }
-                }else if(nguoiChois[nguoiDangDanh].timDoiThongNhoNhat(laCuoi,
-                        doDaiTayBaiCuoi,
-                        thongTinBoBai)){
-                    int dem=0;
-                    for(int i=0;i<nguoiChois[nguoiDangDanh].soLa();i++){
-                        if(nguoiChois[nguoiDangDanh].isCoTheChon(i)){
-                            kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
-                            nguoiChois[nguoiDangDanh].setDuocChon(i, true);
-                            dem++;
-                        }
-                        if(dem>=doDaiTayBaiCuoi*2) break;
-                    }
-                }else{
-                    nguoiChois[nguoiDangDanh].timTuQuy(LaBai.getTempInstance(2,-1),true);
-                    int dem=0;
-                    for(int i=0;i<nguoiChois[nguoiDangDanh].soLa();i++){
-                        if(nguoiChois[nguoiDangDanh].isCoTheChon(i)){
-                            kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
-                            nguoiChois[nguoiDangDanh].setDuocChon(i, true);
-                            dem++;
-                        }
-                        if(dem>=4) break;
-                    }
+            float[] duDoan=model.duDoan(Model4096
+                    .chuanHoaDuLieu(nguoiChois[nguoiDangDanh].trangThaiGame));
+            System.out.println(Arrays.toString(duDoan));
+            for(int i=0;i<nguoiChois[nguoiDangDanh].soLa();i++){
+                if (duDoan[i]>0.5) {
+                    kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
+                    nguoiChois[nguoiDangDanh].setDuocChon(i, true);
                 }
             }
             kiemTraBaiDanh.sort();
@@ -1113,6 +923,235 @@ public class ChoiVoiMay extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                     doDaiTayBaiCuoi,
                     laCuoi,
                     nguoiChois[nguoiDangDanh].chiChat2);
+            if(tayBaiMoi==TayBai.KhongHopLe) {
+                resetMayChon();
+                kiemTraBaiDanh.laBai.clear();
+                /**
+                 * AI rule-based
+                 */
+                if (tayBaiCuoi == TayBai.KhongCo) {
+                    boolean a = nguoiChois[nguoiDangDanh].timDoiThong(LaBai.getTempInstance(2, -1),
+                            3, thongTinBoBai, true);
+                    boolean b = nguoiChois[nguoiDangDanh].timTuQuy(LaBai.getTempInstance(2, -1), true);
+                    if (!a && !b) {
+                        if (nguoiChois[nguoiDangDanh].chonBoDaiNhat(thongTinBoBai))
+                            for (int i = 0; i < nguoiChois[nguoiDangDanh].soLa(); i++) {
+                                if (nguoiChois[nguoiDangDanh].isCoTheChon(i)) {
+                                    kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
+                                    nguoiChois[nguoiDangDanh].setDuocChon(i, true);
+                                }
+                            }
+                        else if (nguoiChois[nguoiDangDanh].timSapKhac2(LaBai.getTempInstance(2, -1), true)) {
+                            int dem = 0;
+                            for (int i = 0; i < nguoiChois[nguoiDangDanh].soLa(); i++) {
+                                if (nguoiChois[nguoiDangDanh].isCoTheChon(i)) {
+                                    kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
+                                    nguoiChois[nguoiDangDanh].setDuocChon(i, true);
+                                    dem++;
+                                    if (dem >= 3) break;
+                                }
+                            }
+                        } else if (nguoiChois[nguoiDangDanh].timDoiKhac2(LaBai.getTempInstance(2, -1), true)) {
+                            int dem = 0;
+                            for (int i = 0; i < nguoiChois[nguoiDangDanh].soLa(); i++) {
+                                if (nguoiChois[nguoiDangDanh].isCoTheChon(i)) {
+                                    kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
+                                    nguoiChois[nguoiDangDanh].setDuocChon(i, true);
+                                    dem++;
+                                    if (dem >= 2) break;
+                                }
+                            }
+                        } else {
+                            kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(0));
+                            nguoiChois[nguoiDangDanh].setDuocChon(0, true);
+                        }
+                    } else {
+                        kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(0));
+                        nguoiChois[nguoiDangDanh].setDuocChon(0, true);
+                    }
+                }
+                if (tayBaiCuoi == TayBai.Le) {
+                    if (laCuoi.getSo() == 14) {
+                        if (nguoiChois[nguoiDangDanh].timDoiThongNhoNhat(LaBai.getTempInstance(2, -1),
+                                3,
+                                thongTinBoBai)) {
+                            int dem = 0;
+                            for (int i = 0; i < nguoiChois[nguoiDangDanh].soLa(); i++) {
+                                if (nguoiChois[nguoiDangDanh].isCoTheChon(i)) {
+                                    kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
+                                    nguoiChois[nguoiDangDanh].setDuocChon(i, true);
+                                    dem++;
+                                }
+                                if (dem >= 6) break;
+                            }
+                        } else if (nguoiChois[nguoiDangDanh].timTuQuy(LaBai.getTempInstance(2, -1), true)) {
+                            int dem = 0;
+                            for (int i = 0; i < nguoiChois[nguoiDangDanh].soLa(); i++) {
+                                if (nguoiChois[nguoiDangDanh].isCoTheChon(i)) {
+                                    kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
+                                    nguoiChois[nguoiDangDanh].setDuocChon(i, true);
+                                    dem++;
+                                }
+                                if (dem >= 4) break;
+                            }
+                        } else {
+                            nguoiChois[nguoiDangDanh].timLa(laCuoi, true);
+                            for (int i = 0; i < nguoiChois[nguoiDangDanh].soLa(); i++) {
+                                if (nguoiChois[nguoiDangDanh].isCoTheChon(i)) {
+                                    kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
+                                    nguoiChois[nguoiDangDanh].setDuocChon(i, true);
+                                    break;
+                                }
+                            }
+                        }
+                    } else {
+                        if (!nguoiChois[nguoiDangDanh].timLaLe(laCuoi, thongTinBoBai))
+                            nguoiChois[nguoiDangDanh].timLa(laCuoi, true);
+                        for (int i = 0; i < nguoiChois[nguoiDangDanh].soLa(); i++) {
+                            if (nguoiChois[nguoiDangDanh].isCoTheChon(i)) {
+                                kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
+                                nguoiChois[nguoiDangDanh].setDuocChon(i, true);
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (tayBaiCuoi == TayBai.Doi) {
+                    if (laCuoi.getSo() == 14) {
+                        if (nguoiChois[nguoiDangDanh].timDoiThongNhoNhat(LaBai.getTempInstance(2, -1),
+                                4,
+                                thongTinBoBai)) {
+                            int dem = 0;
+                            for (int i = 0; i < nguoiChois[nguoiDangDanh].soLa(); i++) {
+                                if (nguoiChois[nguoiDangDanh].isCoTheChon(i)) {
+                                    kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
+                                    nguoiChois[nguoiDangDanh].setDuocChon(i, true);
+                                    dem++;
+                                }
+                                if (dem >= 8) break;
+                            }
+                        } else {
+                            nguoiChois[nguoiDangDanh].timDoi(laCuoi, true);
+                            int dem = 0;
+                            for (int i = 0; i < nguoiChois[nguoiDangDanh].soLa(); i++) {
+                                if (nguoiChois[nguoiDangDanh].isCoTheChon(i)) {
+                                    kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
+                                    nguoiChois[nguoiDangDanh].setDuocChon(i, true);
+                                    dem++;
+                                    if (dem >= 2) break;
+                                }
+                            }
+                        }
+                    } else {
+                        nguoiChois[nguoiDangDanh].timDoi(laCuoi, true);
+                        int dem = 0;
+                        for (int i = 0; i < nguoiChois[nguoiDangDanh].soLa(); i++) {
+                            if (nguoiChois[nguoiDangDanh].isCoTheChon(i)) {
+                                kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
+                                nguoiChois[nguoiDangDanh].setDuocChon(i, true);
+                                dem++;
+                                if (dem >= 2) break;
+                            }
+                        }
+                    }
+                }
+                if (tayBaiCuoi == TayBai.Sap) {
+                    nguoiChois[nguoiDangDanh].timSap(laCuoi, true);
+                    int dem = 0;
+                    for (int i = 0; i < nguoiChois[nguoiDangDanh].soLa(); i++) {
+                        if (nguoiChois[nguoiDangDanh].isCoTheChon(i)) {
+                            kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
+                            nguoiChois[nguoiDangDanh].setDuocChon(i, true);
+                            dem++;
+                            if (dem >= 3) break;
+                        }
+                    }
+                }
+                if (tayBaiCuoi == TayBai.TuQuy) {
+                    if (nguoiChois[nguoiDangDanh].timDoiThongNhoNhat(LaBai.getTempInstance(2, -1),
+                            4,
+                            thongTinBoBai)) {
+                        int dem = 0;
+                        for (int i = 0; i < nguoiChois[nguoiDangDanh].soLa(); i++) {
+                            if (nguoiChois[nguoiDangDanh].isCoTheChon(i)) {
+                                kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
+                                nguoiChois[nguoiDangDanh].setDuocChon(i, true);
+                                dem++;
+                            }
+                            if (dem >= 8) break;
+                        }
+                    } else {
+                        nguoiChois[nguoiDangDanh].timTuQuy(laCuoi, true);
+                        int dem = 0;
+                        for (int i = 0; i < nguoiChois[nguoiDangDanh].soLa(); i++) {
+                            if (nguoiChois[nguoiDangDanh].isCoTheChon(i)) {
+                                kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
+                                nguoiChois[nguoiDangDanh].setDuocChon(i, true);
+                                dem++;
+                            }
+                            if (dem >= 4) break;
+                        }
+                    }
+                }
+                if (tayBaiCuoi == TayBai.Bo) {
+                    nguoiChois[nguoiDangDanh].timBoNhoNhat(laCuoi, doDaiTayBaiCuoi, thongTinBoBai);
+                    int dem = 0;
+                    for (int i = 0; i < nguoiChois[nguoiDangDanh].soLa(); i++) {
+                        if (nguoiChois[nguoiDangDanh].isCoTheChon(i)) {
+                            kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
+                            nguoiChois[nguoiDangDanh].setDuocChon(i, true);
+                            dem++;
+                        }
+                        if (dem >= doDaiTayBaiCuoi) break;
+                    }
+                }
+                if (tayBaiCuoi == TayBai.Thong) {
+                    if (nguoiChois[nguoiDangDanh].timDoiThongNhoNhat(LaBai.getTempInstance(2, -1),
+                            doDaiTayBaiCuoi + 1,
+                            thongTinBoBai)) {
+                        int dem = 0;
+                        for (int i = 0; i < nguoiChois[nguoiDangDanh].soLa(); i++) {
+                            if (nguoiChois[nguoiDangDanh].isCoTheChon(i)) {
+                                kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
+                                nguoiChois[nguoiDangDanh].setDuocChon(i, true);
+                                dem++;
+                            }
+                            if (dem >= 2 * (doDaiTayBaiCuoi + 1)) break;
+                        }
+                    } else if (nguoiChois[nguoiDangDanh].timDoiThongNhoNhat(laCuoi,
+                            doDaiTayBaiCuoi,
+                            thongTinBoBai)) {
+                        int dem = 0;
+                        for (int i = 0; i < nguoiChois[nguoiDangDanh].soLa(); i++) {
+                            if (nguoiChois[nguoiDangDanh].isCoTheChon(i)) {
+                                kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
+                                nguoiChois[nguoiDangDanh].setDuocChon(i, true);
+                                dem++;
+                            }
+                            if (dem >= doDaiTayBaiCuoi * 2) break;
+                        }
+                    } else {
+                        nguoiChois[nguoiDangDanh].timTuQuy(LaBai.getTempInstance(2, -1), true);
+                        int dem = 0;
+                        for (int i = 0; i < nguoiChois[nguoiDangDanh].soLa(); i++) {
+                            if (nguoiChois[nguoiDangDanh].isCoTheChon(i)) {
+                                kiemTraBaiDanh.laBai.add(nguoiChois[nguoiDangDanh].getLaBai(i));
+                                nguoiChois[nguoiDangDanh].setDuocChon(i, true);
+                                dem++;
+                            }
+                            if (dem >= 4) break;
+                        }
+                    }
+                }
+                kiemTraBaiDanh.sort();
+                tayBaiMoi = kiemTraBaiDanh.baiDanhHopLe(tayBaiCuoi.ordinal(),
+                        doDaiTayBaiCuoi,
+                        laCuoi,
+                        nguoiChois[nguoiDangDanh].chiChat2);
+
+            }else{
+                danhDung++;
+            }
             /**
              * dành cho mục đích sửa lỗi
              */
@@ -1121,6 +1160,8 @@ public class ChoiVoiMay extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                 kiemTraBaiDanh.laBai.clear();
                 return;
             }
+            tongLuotDanh++;
+            System.out.println(danhDung+"/"+tongLuotDanh);
 //            if(tayBaiMoi==TayBai.KhongHopLe){
 //                System.out.println("\nMáy "+nguoiDangDanh+"Đánh lỗi");
 //                System.out.print("\t"+tayBaiCuoi+"\t"+doDaiTayBaiCuoi+"\t");laCuoi.xuat();System.out.print("\t");

@@ -7,7 +7,10 @@ plugins {
 android{
     namespace = "com.gamebai.tienlenmiennam"
     compileSdk = 35
-
+    androidResources {
+        noCompress  += "tflite"
+//        ignoreAssetsPattern = "!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~"
+    }
     defaultConfig {
         applicationId = "com.gamebai.tienlenmiennam"
         minSdk = 24
@@ -67,4 +70,8 @@ dependencies {
 
     // Add the dependencies for any other desired Firebase products
     // https://firebase.google.com/docs/android/setup#available-libraries
+    // TensorFlow Lite dependencies
+    implementation ("org.tensorflow:tensorflow-lite:2.10.0")
+    implementation ("org.tensorflow:tensorflow-lite-support:0.4.3")
+    implementation ("org.tensorflow:tensorflow-lite-gpu:2.10.0")
 }
