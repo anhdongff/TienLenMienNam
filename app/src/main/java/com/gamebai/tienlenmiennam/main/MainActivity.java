@@ -892,8 +892,9 @@ public class MainActivity extends AppCompatActivity {
                                                                 data.put(NguoiChoi.TEN_TRUONG_TIEN,700);
                                                                 firestore.collection(NguoiChoi.TEN_COLLECTION)
                                                                         .document(user.getUid())
-                                                                        .set(data).addOnSuccessListener(task2->
-                                                                                theoDoiDangNhap())
+                                                                        .set(data).addOnSuccessListener(task2->{
+                                                                                manHinhDangTai.hienThi();
+                                                                                theoDoiDangNhap();})
                                                                         .addOnFailureListener(task2->{
                                                                             Toast.makeText(this,
                                                                                     getString(R.string.loi)
