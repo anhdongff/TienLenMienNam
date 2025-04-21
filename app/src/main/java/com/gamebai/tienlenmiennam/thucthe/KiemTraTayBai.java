@@ -112,7 +112,8 @@ public class KiemTraTayBai {
             if(laCuoi.getSo()==14){
                 if(this.checkThong(doDai)) return TayBai.Thong;
                 if(this.checkTuQuy()) return TayBai.TuQuy;
-                if(!chiChat2&&this.checkLe()) return TayBai.Le;
+                if(!chiChat2&&this.checkLe()
+                        &&laBai.get(0).lonHon(laCuoi)) return TayBai.Le;
             }else if(this.checkLe()) return TayBai.Le;
         }
         if(tayBai==TayBai.Sap.ordinal()){
