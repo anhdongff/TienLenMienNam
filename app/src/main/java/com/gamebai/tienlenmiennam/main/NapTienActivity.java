@@ -59,7 +59,7 @@ public class NapTienActivity extends AppCompatActivity {
         firestoreDatabase=FirebaseFirestore.getInstance();
         auth=FirebaseAuth.getInstance();
         apiService= RetrofitClient.getInstance().create(ApiService.class);
-        ZaloPaySDK.init(2553, Environment.SANDBOX);
+        ZaloPaySDK.init(2554, Environment.SANDBOX);
         buttonNap10k=findViewById(R.id.button_nap_10k);
         buttonNap10k.setOnClickListener(v->{
             manHinhDangTai.hienThi();
