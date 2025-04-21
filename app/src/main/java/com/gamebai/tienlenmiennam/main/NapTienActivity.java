@@ -53,6 +53,9 @@ public class NapTienActivity extends AppCompatActivity {
         });
         manHinhDangTai=new ManHinhDangTai(this,null);
         manHinhDangTai.hienThi();
+        /**
+         * khởi tạo về database và zalopay sdk
+         */
         firestoreDatabase=FirebaseFirestore.getInstance();
         auth=FirebaseAuth.getInstance();
         apiService= RetrofitClient.getInstance().create(ApiService.class);
@@ -98,6 +101,9 @@ public class NapTienActivity extends AppCompatActivity {
                     Snackbar.LENGTH_SHORT).show();
             finish();
         }
+        /**
+         * lấy token của user để xác thực trong middleware XacThucNguoiDung
+         */
         user.getIdToken(false).addOnSuccessListener(tokenResult -> {
             NoiDungGiaoDichZaloPay noiDungGiaoDichZaloPay=
                     new NoiDungGiaoDichZaloPay(soTien,"Gói "+soTien/10+"$");
@@ -109,6 +115,9 @@ public class NapTienActivity extends AppCompatActivity {
                             manHinhDangTai.an();
                             if(response.isSuccessful()){
                                 if(response.body().getReturnCode()==1){
+                                    /**
+                                     * link phía dưới là deeplink để mở lại activity này, được định nghĩa trong manifest
+                                     */
                                     ZaloPaySDK.getInstance().payOrder(NapTienActivity.this,
                                             response.body().getZpTransToken(),"tienlenmiennam://naptien",
                                             new PayOrderListener(){
@@ -205,6 +214,11 @@ public class NapTienActivity extends AppCompatActivity {
                     Snackbar.LENGTH_SHORT).show();
         });
     }
+
+    /**
+     * Đón intent khi activity đã được tạo, được override để đón intent của zalo
+     * @param intent
+     */
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);

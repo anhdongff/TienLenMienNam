@@ -189,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * khởi tạo lại view đăng nhập
+     * Khởi tạo, bind các component trong layout đăng nhập
      */
     private void khoiTaoViewDangNhap() {
         dialogDangMo=false;
@@ -203,6 +203,9 @@ public class MainActivity extends AppCompatActivity {
         textViewQuenMatKhau=findViewById(R.id.textView3);
         textViewQuenMatKhau.setOnClickListener(v -> quenMatKhau());
     }
+    /**
+     * Khởi tạo, bind các component trong layout sảnh chờ
+     */
     private void khoiTaoViewSanhCho(){
         buttonChoiVoiMay=findViewById(R.id.buttonChoiVoiMay);
         buttonChoiVoiMay.setOnClickListener(v -> choiVoiMay());
@@ -224,6 +227,9 @@ public class MainActivity extends AppCompatActivity {
             taoPhongGame();});
         buttonTimPhongTheoIdPhong=findViewById(R.id.buttonTimPhongTheoIdPhong);
         buttonTimPhongTheoIdPhong.setOnClickListener(v->{
+            /**
+             * tạo dialog nhập mã phòng
+             */
             AlertDialog.Builder builder=new AlertDialog.Builder(this);
             editTextMaPhong=new EditText(this);
             editTextMaPhong.setHint(getString(R.string.game_ma_phong));
@@ -312,46 +318,6 @@ public class MainActivity extends AppCompatActivity {
                             Snackbar.LENGTH_SHORT).show();
                 });
     }
-
-//    private void napTien(int soTien) {
-//        FirebaseUser user=auth.getCurrentUser();
-//        if(user==null) {
-//            manHinhDangTai.an();
-//            Snackbar.make(findViewById(R.id.sanhCho),R.string.dang_nhap_het_han,
-//                    Snackbar.LENGTH_SHORT).show();
-//            dangXuat();
-//            return;
-//        }
-//        user.getIdToken(false).addOnSuccessListener(tokenResult -> {
-//            NoiDungGiaoDichZaloPay noiDungGiaoDichZaloPay=new NoiDungGiaoDichZaloPay(
-//                    user.getDisplayName(),soTien,"Nạp 1000$");
-//            apiService.taoDonGiaoDichZaloPay("Bearer "+tokenResult.getToken(),noiDungGiaoDichZaloPay)
-//                    .enqueue(new Callback<PhanHoiGiaoDichZaloPay>() {
-//                        @Override
-//                        public void onResponse(Call<PhanHoiGiaoDichZaloPay> call, Response<PhanHoiGiaoDichZaloPay> response) {
-//                            manHinhDangTai.an();
-//                            if(response.isSuccessful()){
-//                                if(response.body().getReturnCode()==1){
-//                                    ZaloPaySDK.getInstance().payOrder(MainActivity.this,response.body().getZpTransToken());
-//                                }
-//                            }
-//                        }
-//                        @Override
-//                        public void onFailure(Call<PhanHoiGiaoDichZaloPay> call, Throwable t) {
-//                            manHinhDangTai.an();
-//                            Snackbar.make(findViewById(R.id.sanhCho),
-//                                    getString(R.string.loi) + " " + t.getMessage(),
-//                                    Snackbar.LENGTH_SHORT).show();
-//                        }
-//                    });
-//        }).addOnFailureListener(task->{
-//            manHinhDangTai.an();
-//            Snackbar.make(findViewById(R.id.sanhCho),
-//                    getString(R.string.loi) + " " + task.getMessage(),
-//                    Snackbar.LENGTH_SHORT).show();
-//        });
-//    }
-
     private void quenMatKhau() {
         if(emailDangNhap.getText().toString().trim().isEmpty()){
             Snackbar.make(findViewById(R.id.main),R.string.thieu_email,Snackbar.LENGTH_SHORT).show();
@@ -407,8 +373,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
-
     private void dangKy() {
+        /**
+         * Thay đổi layout, bind lại các các component có trong layout
+         */
         setContentView(R.layout.dang_ky);
         EditText emailDangKy=findViewById(R.id.editTextTextEmail);
         EditText matKhauDangKy=findViewById(R.id.editTextTextPasswordDangKy);
@@ -449,7 +417,7 @@ public class MainActivity extends AppCompatActivity {
         buttonHuy.setOnClickListener(v->{
             setContentView(R.layout.activity_main);
             /**
-             * khởi tạo lại các thành phần của view
+             * khởi tạo lại các thành phần của view đăng nập
              */
             khoiTaoViewDangNhap();
         });
@@ -508,7 +476,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
     private void guiEmailXacThuc() {
         FirebaseUser user = auth.getCurrentUser();
         if (user != null && !user.isEmailVerified()) {
@@ -655,8 +622,14 @@ public class MainActivity extends AppCompatActivity {
         khoiTaoTaiKhoanMoi();
     }
 
+    /**
+     * gọi đến api tìm phòng theo id phòng
+     */
     private void timPhongTheoIdPhongGame() {
         FirebaseUser user=auth.getCurrentUser();
+        /**
+         * kiểm tra người chơi
+         */
         if(user==null) {
             manHinhDangTai.an();
             Snackbar.make(findViewById(R.id.sanhCho),R.string.dang_nhap_het_han,
@@ -664,6 +637,9 @@ public class MainActivity extends AppCompatActivity {
             dangXuat();
             return;
         }
+        /**
+         * kiểm tra idGame
+         */
         if(!nguoiChoi.getIdGame().equals("-1")){
             manHinhDangTai.an();
             Snackbar.make(findViewById(R.id.sanhCho),R.string.game_cho_tran_dau_ket_thuc,
@@ -671,6 +647,9 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         user.getIdToken(false).addOnSuccessListener(task->{
+            /**
+             * tạo tokenID để xác thực trong middleware XacThucTaiKhoan trên server
+             */
             String token="Bearer "+task.getToken();
             apiService.timPhongTheoIdPhong(token,editTextMaPhong.getText().toString()).enqueue(
                     new Callback<>() {
@@ -708,8 +687,14 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * gọi đến api tạo phòng
+     */
     private void taoPhongGame() {
         FirebaseUser user=auth.getCurrentUser();
+        /**
+         * kiểm tra người chơi
+         */
         if(user==null) {
             manHinhDangTai.an();
             Snackbar.make(findViewById(R.id.sanhCho),R.string.dang_nhap_het_han,
@@ -717,6 +702,9 @@ public class MainActivity extends AppCompatActivity {
             dangXuat();
             return;
         }
+        /**
+         * kiểm tra idGame
+         */
         if(!nguoiChoi.getIdGame().equals("-1")){
             manHinhDangTai.an();
             Snackbar.make(findViewById(R.id.sanhCho),R.string.game_cho_tran_dau_ket_thuc,
@@ -724,6 +712,9 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         user.getIdToken(false).addOnSuccessListener(task->{
+            /**
+             * tạo tokenID để xác thực trong middleware XacThucTaiKhoan trên server
+             */
             String token="Bearer "+task.getToken();
             apiService.taoPhong(token).enqueue(new Callback<>() {
                 @Override
@@ -759,12 +750,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-//    private String getBearerTokenId(){
-//        String temp=auth.getCurrentUser().getIdToken(false).getResult().getToken();
-//        if(temp==null||temp.isEmpty()) return null;
-//        return "Bearer "+temp;
-//    }
+    /**
+     * gọi đến api tìm trận
+     */
     private void timTranGame() {
+        /**
+         * kiểm tra người chơi
+         */
         FirebaseUser user=auth.getCurrentUser();
         if(user==null) {
             manHinhDangTai.an();
@@ -773,12 +765,18 @@ public class MainActivity extends AppCompatActivity {
             dangXuat();
             return;
         }
+        /**
+         * kiểm tra tiền
+         */
         if(nguoiChoi.getTien()<130){
             manHinhDangTai.an();
             Snackbar.make(findViewById(R.id.sanhCho),R.string.game_khong_du_tien,
                     Snackbar.LENGTH_SHORT).show();
             return;
         }
+        /**
+         * kiểm tra idGame
+         */
         if(!nguoiChoi.getIdGame().equals("-1")){
             manHinhDangTai.an();
             Snackbar.make(findViewById(R.id.sanhCho),R.string.game_cho_tran_dau_ket_thuc,
@@ -786,6 +784,9 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         user.getIdToken(false).addOnSuccessListener(task->{
+            /**
+             * tạo tokenID để xác thực trong middleware XacThucTaiKhoan trên server
+             */
             String token="Bearer "+task.getToken();
             apiService.timTran(token).enqueue(new Callback<>() {
                 @Override
@@ -843,7 +844,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(gamePanel);
         game.setTrangThaiGame(ThongSo.TrangThaiGame.TRANG_THAI_CHOI_VOI_MAY,"");
     }
+
+    /**
+     * vào game online
+     * @param idPhong mã phòng được trả về từ các api tìm trận
+     */
     private void choiOnline(String idPhong) {
+        /**
+         * bỏ theo dõi thay đổi tài khoản
+         */
         if (taiKhoanListener != null) {
             taiKhoanListener.remove();
         }
@@ -863,6 +872,9 @@ public class MainActivity extends AppCompatActivity {
                     .get().addOnCompleteListener(task ->{
                         if(task.isSuccessful()){
                             if(task.getResult().isEmpty()){
+                                /**
+                                 * nếu tài khoản mới tạo chưa hề có thông tin gì
+                                 */
                                 if (!dialogDangMo) {
                                     dialogDangMo = true;
                                     AlertDialog.Builder builder=new AlertDialog.Builder(this);
@@ -977,32 +989,6 @@ public class MainActivity extends AppCompatActivity {
                                     dangXuat();
                                 }
                             });
-//            /**
-//             * test online status checking
-//             */
-//            DatabaseReference userOnlineReference= realtimeDatabase
-//                    .getReference("usersonline/"+auth.getCurrentUser().getUid());
-//            DatabaseReference ConnectionReference=realtimeDatabase.getReference(".info/connected");
-//            ConnectionReference.addValueEventListener(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                    if(snapshot.getValue(Boolean.class)!=null){
-//                        userOnlineReference.updateChildren(Collections.singletonMap("status","online"));
-//                        userOnlineReference.onDisconnect()
-//                                .updateChildren(Collections.singletonMap("status","offline"))
-//                                .addOnFailureListener(task->{
-//                                    Toast.makeText(MainActivity.this,getString(R.string.loi),Toast.LENGTH_SHORT).show();
-//                                });
-//                    }
-//                }
-//
-//                @Override
-//                public void onCancelled(@NonNull DatabaseError error) {
-//                    Toast.makeText(MainActivity.this,getString(R.string.loi)+" "
-//                            +error.getMessage(),Toast.LENGTH_SHORT).show();
-//                }
-//            });
-//            testApi();
                 }).addOnFailureListener(task->{
                     Snackbar.make(findViewById(R.id.main),
                             R.string.dang_nhap_that_bai,Snackbar.LENGTH_SHORT).show();
@@ -1010,10 +996,6 @@ public class MainActivity extends AppCompatActivity {
                 });
         kiemTraIdGame();
     }
-
-    /**
-     * kiểm tra xem người chơi có trận đấu đang diễn ra hay không
-     */
     private void kiemTraIdGame() {
 //        FirebaseUser user=auth.getCurrentUser();
 //        if(user==null) {
@@ -1039,6 +1021,9 @@ public class MainActivity extends AppCompatActivity {
         vaoSanhCho();
     }
 
+    /**
+     * khởi tạo, tải thông tin lên view sảnh chờ
+     */
     public void vaoSanhCho() {
         FirebaseUser user=auth.getCurrentUser();
         if(user==null) {
@@ -1048,8 +1033,14 @@ public class MainActivity extends AppCompatActivity {
             dangXuat();
             return;
         }
+        /**
+         * khởi tạo lại, bind lại các component trong sảnh chờ
+         */
         setContentView(R.layout.sanh_cho);
         khoiTaoViewSanhCho();
+        /**
+         * tải thông tin top đại gia lên view sảnh chờ
+         */
         firestore.collection(NguoiChoi.TEN_COLLECTION)
                 .orderBy(NguoiChoi.TEN_TRUONG_TIEN, Query.Direction.DESCENDING).limit(5)
                 .get().addOnSuccessListener(task->{
@@ -1086,12 +1077,18 @@ public class MainActivity extends AppCompatActivity {
                 }).addOnFailureListener(task->{
                     Snackbar.make(findViewById(R.id.main),
                             getString(R.string.loi)+" "+task.getMessage(),Snackbar.LENGTH_SHORT).show();
+                    /**
+                     * ẩn đi nếu gặp lỗi
+                     */
                     textViewFirst.setVisibility(View.INVISIBLE);
                     textViewSecond.setVisibility(View.INVISIBLE);
                     textViewThird.setVisibility(View.INVISIBLE);
                     textViewFouth.setVisibility(View.INVISIBLE);
                     textViewFifth.setVisibility(View.INVISIBLE);
                 });
+        /**
+         * tải thông tin tài khoản lên view sảnh chờ, theo dõi thông tin này nếu có thay đổi trên server thì sẽ thay đổi theo
+         */
         taiKhoanListener= firestore.collection(NguoiChoi.TEN_COLLECTION)
                 .document(user.getUid())
                 .addSnapshotListener((value, error) -> {
@@ -1115,17 +1112,8 @@ public class MainActivity extends AppCompatActivity {
                     manHinhDangTai.an();
                 });
     }
-
     /**
-     *
-     */
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    /**
-     * tải thông tin đăng nhập nếu trước đó đã bấm "lưu thông tin đăng nhập", thời điểm lần cuối bấm gì đó
+     * tải thông tin đăng nhập nếu trước đó đã bấm "lưu thông tin đăng nhập"
      */
     private void taiThongTin() {
         SharedPreferences sharedPreferences = getSharedPreferences("thongTinDangNhap", MODE_PRIVATE);
@@ -1133,7 +1121,7 @@ public class MainActivity extends AppCompatActivity {
                 &&Internet.coKetNoi(this)){
             checkBoxLuuThongTinDangNhap.setChecked(true);
             FirebaseUser user=auth.getCurrentUser();
-            if(user!=null&&Internet.coKetNoi(this)){
+            if(user!=null){
                 hoanThanhDangNhap();
                 sharedPreferences=getSharedPreferences("thoiGian",MODE_PRIVATE);
                 lanCuoiResetMatKhau=sharedPreferences.getLong("lanCuoiResetMatKhau",0);
@@ -1148,7 +1136,9 @@ public class MainActivity extends AppCompatActivity {
             manHinhDangTai.an();
         }
     }
-
+    /**
+     * lưu thông tin đăng nhập nếu checkbox đã được chọn, các lần sau sẽ t động đăng nhập
+     */
     private void luuThongTinDangNhap() {
         SharedPreferences sharedPreferences=getSharedPreferences("thongTinDangNhap",MODE_PRIVATE);
         SharedPreferences.Editor editor=sharedPreferences.edit();
@@ -1187,6 +1177,9 @@ public class MainActivity extends AppCompatActivity {
         auth.signOut();
         nguoiChoi=null;
         lanCuoiDangNhap=0;
+        /**
+         * huỷ các listener trong game trường hợp bị log acc
+         */
         game.huyTheoDoiNguoiChoiOnline();
         if (dangNhapListener != null) {
             dangNhapListener.remove();
@@ -1196,33 +1189,21 @@ public class MainActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_main);
         /**
-         * khởi tạo lại các thành phần của view
+         * khởi tạo lại các thành phần của view đăng nhập
          */
         khoiTaoViewDangNhap();
     }
-//    private void testApi(){
-//        ApiService apiService= RetrofitClient.getInstance().create(ApiService.class);
-//        String token="Bearer "+auth.getCurrentUser().getIdToken(false).getResult().getToken();
-//        apiService.userOnline(token)
-//                .enqueue(new Callback<Void>() {
-//                    @Override
-//                    public void onResponse(Call<Void> call, Response<Void> response) {
-//                        if(response.isSuccessful()){
-//                            Toast.makeText(getContext(),
-//                                    "Success "+response.code(),Toast.LENGTH_SHORT).show();
-//                        }else {
-//                            Toast.makeText(getContext(),
-//                                    "Fail "+response.code(),Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onFailure(Call<Void> call, Throwable t) {
-//                        Toast.makeText(getContext(),
-//                                "Fail "+t.getMessage(),Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-//    }
+
+    /**
+     * Yêu cầu quyền ghi vào bộ nhớ
+     * @param requestCode The request code passed in {@link
+     * android.app.Activity, String[], int)}
+     * @param permissions The requested permissions. Never null.
+     * @param grantResults The grant results for the corresponding permissions
+     *     which is either {@link android.content.pm.PackageManager#PERMISSION_GRANTED}
+     *     or {@link android.content.pm.PackageManager#PERMISSION_DENIED}. Never null.
+     *
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
