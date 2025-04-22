@@ -17,6 +17,8 @@ import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Typeface;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.MotionEvent;
 import android.widget.Toast;
 
@@ -559,14 +561,20 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                 }
                 break;
             case DANH_BAI:
-                for(NutLaBai nutLaBai: baiTrenTay){
-                    nutLaBai.ve(c);
+                synchronized (baiTrenTay){
+                    for(NutLaBai nutLaBai: baiDanhCu) {
+                        nutLaBai.ve(c, paintDaDanh);
+                    }
                 }
-                for(NutLaBai nutLaBai: baiDanhCu) {
-                    nutLaBai.ve(c, paintDaDanh);
+                synchronized (baiDanhCu){
+                    for(NutLaBai nutLaBai: baiDanhCu) {
+                        nutLaBai.ve(c, paintDaDanh);
+                    }
                 }
-                for(NutLaBai nutLaBai: baiDanhMoi){
-                    nutLaBai.ve(c);
+                synchronized (baiDanhMoi){
+                    for(NutLaBai nutLaBai: baiDanhMoi){
+                        nutLaBai.ve(c);
+                    }
                 }
                 veAvartar(c);
                 veDemLaBai(c);
@@ -787,7 +795,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                     BoBai.ChiSoSoHuu.NGUOI_CHOI_4.getViTriAvartarX(),
                     BoBai.ChiSoSoHuu.NGUOI_CHOI_4.getViTriAvartarY(),
                     temp);
-            chuTien.setNoiDung(nguoiChois[3].getTenDangNhap());
+            chuTien.setNoiDung(nguoiChois[3].getTien()+"$");
             chuTien.setViTri(BoBai.ChiSoSoHuu.NGUOI_CHOI_4.getViTriAvartarX()
                             +ThongSo.Avatar.getKichThuocRongAvatar()/2,
                     BoBai.ChiSoSoHuu.NGUOI_CHOI_4.getViTriAvartarY()
@@ -882,6 +890,10 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                                 /**
                                  * chỉ số
                                  */
+                                this.laCuoi= LaBai.getTempInstance(2,-1);
+                                this.tayBaiCuoi=TayBai.KhongCo;
+                                this.doDaiTayBaiCuoi =0;
+                                dauLuot=true;
                                 demLaBaiDiChuyen=0;
                                 demLaDenDich=0;
                                 demSoFrame=0;
@@ -989,7 +1001,8 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                         }
                     }else{
                         if (thoiGianDemNguoc<=-ThongSo.TranDau.THOI_GIAN_YEU_CAU_DANH_BAI) {
-                            if (!daCapNhatThoiGianKetThuc&&!daYeuCauDanh) {
+                            if (!daCapNhatThoiGianKetThuc&&!daCapNhatNguoiDangDanh
+                                    &&!daYeuCauDanh) {
                                 daYeuCauDanh =true;
                                 realtimeDatabase.getReference(TEN_BANG+"/"+maPhong+"/"
                                                 +TEN_TRUONG_YEU_CAU_DANH_BAI).get()
@@ -1392,6 +1405,15 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                             }
                             thoiDiemThoatGame=System.currentTimeMillis()
                                     + ThongSo.TranDau.THOI_GIAN_CHO_THOAT_GAME_MILISECOND;
+                            /**
+                             * hết tiền thì cook
+                             */
+                            if(nguoiChois[0].getTien()+nguoiChois[0].thuNhap<130){
+                                new Handler(Looper.getMainLooper())
+                                        .postDelayed(()->{
+                                            thoat();
+                                        }, 3000);
+                            }
                             giaiDoan= KET_THUC;
                         }).addOnFailureListener(e -> {
                             Toast.makeText(mainActivity,mainActivity.getString(R.string.game_ket_thuc),
@@ -1615,6 +1637,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 new Thread(()->{
                     nguoiDangDanh=snapshot.getValue(Long.class).intValue();
+                    System.out.println("SoNguoiChoi khi dang tai nguoiDangDanh: "+soNguoiChoi);
                     for(int i=0;i<soNguoiChoi;i++){
                         if(nguoiChois[i].soThuTu==nguoiDangDanh) {
                             nguoiDangDanh=i;
@@ -1782,6 +1805,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                     if (!daTaiGiaiDoan) {
                         giaiDoan= ChoiVoiMay.GiaiDoan.timGiaiDoan(snapshot.getValue(Long.class).intValue());
                         daTaiGiaiDoan=true;
+                        System.out.println("giaiDoan dang tai:"+giaiDoan.ordinal());
                         taiNguoiChoiKhac();
                         taiTayBaiMoi();
                         taiKetThucDemNguoc();
@@ -1821,6 +1845,10 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                             int temp=snapshot.child(NguoiChoi.TEN_TRUONG_SO_THU_TU)
                                     .getValue(Long.class).intValue()-nguoiChois[0].soThuTu;
                             if(temp<0) temp+=soNguoiChoi;
+                            System.out.println("so thu tu:"+nguoiChois[0].soThuTu+" soNguoiChoi:"+soNguoiChoi);
+                            System.out.println("nguoi choi "+(demNguoiChoiDaThem+1)+": soThuTu "
+                                    +snapshot.child(NguoiChoi.TEN_TRUONG_SO_THU_TU)+"soThuTuLocal:"+temp);
+                            System.out.println(nguoiChois[0].getUid()+"/"+snapshot.getKey());
                             nguoiChois[temp]=new NguoiChoi(BoBai.ChiSoSoHuu.timTheoSoHuu(temp+1));
                             nguoiChois[temp].setUid(snapshot.getKey());
                             nguoiChois[temp].soThuTu=snapshot.child(NguoiChoi.TEN_TRUONG_SO_THU_TU)
@@ -1845,6 +1873,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                         }
                     }else{
                         if(giaiDoan==CHO_NGUOI_CHOI){
+                            System.out.println("cho nguoi choi sau khi tai xong nguoi choi khac: "+soNguoiChoi);
                             for(int i=0;i<soNguoiChoi;i++){
                                 if(nguoiChois[i].getUid().equals(snapshot.getKey())) return;
                             }

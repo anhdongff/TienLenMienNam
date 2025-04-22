@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
         firestore =FirebaseFirestore.getInstance();
         realtimeDatabase=FirebaseDatabase.getInstance(
                 "https://tienlenmiennam-d2c29-default-rtdb.asia-southeast1.firebasedatabase.app/");
-        realtimeDatabase.setPersistenceEnabled(true);
+        realtimeDatabase.setPersistenceEnabled(false);
         /**
          * tải thông tin đăng nhập nếu đã lưu trước đó
          */
@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
         /**
          * Retrofit
          */
-        apiService= RetrofitClient.getInstance().create(ApiService.class);
+        apiService= RetrofitClient.getAPIInstance().create(ApiService.class);
         /**
          * game
          */
@@ -638,6 +638,15 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         /**
+         * kiểm tra tiền
+         */
+        if(nguoiChoi.getTien()<130){
+            manHinhDangTai.an();
+            Snackbar.make(findViewById(R.id.sanhCho),R.string.game_khong_du_tien,
+                    Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+        /**
          * kiểm tra idGame
          */
         if(!nguoiChoi.getIdGame().equals("-1")){
@@ -700,6 +709,15 @@ public class MainActivity extends AppCompatActivity {
             Snackbar.make(findViewById(R.id.sanhCho),R.string.dang_nhap_het_han,
                     Snackbar.LENGTH_SHORT).show();
             dangXuat();
+            return;
+        }
+        /**
+         * kiểm tra tiền
+         */
+        if(nguoiChoi.getTien()<130){
+            manHinhDangTai.an();
+            Snackbar.make(findViewById(R.id.sanhCho),R.string.game_khong_du_tien,
+                    Snackbar.LENGTH_SHORT).show();
             return;
         }
         /**
