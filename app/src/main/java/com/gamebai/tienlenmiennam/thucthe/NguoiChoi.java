@@ -686,12 +686,10 @@ public class NguoiChoi {
         }
         if(tayBai==TayBai.Thong.ordinal()){
             if(doDai==3){
-                boolean b=false,c=false;
+                boolean b,c;
                 boolean a=this.timDoiThong(LaBai.getTempInstance(2,-1), doDai+1, boBai, true);
-                if(!a){
-                    b=this.timDoiThong(canChan, doDai, boBai, true);
-                    c=this.timDoiThong(canChan, doDai, boBai, true);
-                }
+                b=this.timDoiThong(canChan, doDai, boBai, true);
+                c=this.timTuQuy(LaBai.getTempInstance(2,-1), true);
                 if(a||b||c) check=true;
             }else{
                 boolean a=this.timDoiThong(LaBai.getTempInstance(2,-1), doDai+1, boBai,true);
