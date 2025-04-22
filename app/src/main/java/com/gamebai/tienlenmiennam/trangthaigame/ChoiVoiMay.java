@@ -300,10 +300,10 @@ public class ChoiVoiMay extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                     nutThoat.setDuocBam(false);
                 }
                 else {
-                    nutThoat.setDuocBam(true);
-                    Toast.makeText(mainActivity,mainActivity
-                                    .getString(R.string.game_se_thoat),
-                            Toast.LENGTH_SHORT).show();
+//                    nutThoat.setDuocBam(true);
+//                    Toast.makeText(mainActivity,mainActivity
+//                                    .getString(R.string.game_se_thoat),
+//                            Toast.LENGTH_SHORT).show();
                 }
                 /**
                  *

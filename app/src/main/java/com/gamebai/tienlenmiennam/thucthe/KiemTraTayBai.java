@@ -20,7 +20,7 @@ public class KiemTraTayBai {
     }
     public boolean checkBo(int doDai){
         boolean check=true;
-        if(this.laBai.size()<3) return false;
+        if(this.laBai.size()<3||laBai.get(laBai.size()-1).getSo()==14) return false;
         if(doDai!=0){
             if(this.laBai.size()!=doDai) check= false;
             else for(int i = 0; i<this.laBai.size()-1; i++){
@@ -52,7 +52,8 @@ public class KiemTraTayBai {
     }
     public boolean checkThong(int doDai){
         boolean check=true;
-        if(this.laBai.size()<6||this.laBai.size()%2==1) return false;
+        if(this.laBai.size()<6||this.laBai.size()%2==1
+                ||laBai.get(laBai.size()-1).getSo()==14) return false;
         if(doDai!=0){
             if(this.laBai.size()<doDai*2) return false;
             for(int i = 0; i<this.laBai.size(); i+=2){
