@@ -1376,6 +1376,7 @@ public class FarmData extends TrangThaiCoBan implements TrangThaiGame, PhuongThu
         /**
          * lưu lại trạng thái và quyết định
          */
+        nguoiChois[nguoiDangDanh].quyetDinh=new float[52];
         ThuThapDuLieu.luuVaoFile("may.csv",
                 nguoiChois[nguoiDangDanh].trangThaiGame,nguoiChois[nguoiDangDanh].quyetDinh);
         nguoiChois[nguoiDangDanh].boLuot=true;
