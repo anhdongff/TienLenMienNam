@@ -47,8 +47,8 @@ public class NguoiChoi {
     public int soLaBai,soThuTu;
     public BoBai.ChiSoSoHuu chiSoSoHuu;
     ArrayList<LaBai> baiDanhCu;
-    public int[] trangThaiGame;
-    public int[] quyetDinh;
+    public float[] trangThaiGame;
+    public float[] quyetDinh;
     public NguoiChoi(BoBai.ChiSoSoHuu chiSoSoHuu) {
         khoiTaoThongSoTranDau(chiSoSoHuu);
     }
@@ -122,7 +122,7 @@ public class NguoiChoi {
      * @param a bộ bài
      */
     public void sauChiaBai(BoBai a) {
-        trangThaiGame=new int[56];
+        trangThaiGame=new float[52];
         int dem=0;
         for (int i = 2; i < 15; i++) {
             for (int j = 0; j < 4; j++) {
@@ -136,10 +136,10 @@ public class NguoiChoi {
                 dem++;
             }
         }
-        trangThaiGame[55]=13;
-        trangThaiGame[54]=13;
-        trangThaiGame[53]=13;
-        trangThaiGame[52]=13;
+//        trangThaiGame[55]=13;
+//        trangThaiGame[54]=13;
+//        trangThaiGame[53]=13;
+//        trangThaiGame[52]=13;
     }
     public int soLa(){return this.trenTay.size();}
     public LaBai getLaBai(int index){return this.trenTay.get(index);}
@@ -710,10 +710,10 @@ public class NguoiChoi {
      * lưu lại các lá bài được chọn để đánh
      */
     public void luuLaiQuyetDinh(){
-        quyetDinh=new int[13];
+        quyetDinh=new float[52];
         for(LaBai x:trenTay){
             if(x.isDuocChon()){
-                quyetDinh[trenTay.indexOf(x)]=1;
+                quyetDinh[(x.getSo()-2)*4+x.getChat()]=1;
             }
         }
     }
@@ -726,13 +726,13 @@ public class NguoiChoi {
      */
     public void thayDoiTrangThai(ArrayList<LaBai> moiDanh,int viTri){
         for(LaBai x:baiDanhCu){
-            trangThaiGame[(x.getSo()-2)*4+x.getChat()]=-1;
+            trangThaiGame[(x.getSo()-2)*4+x.getChat()]= (float) 1 /3;
         }
         baiDanhCu.clear();
         for(LaBai x:moiDanh){
-             trangThaiGame[(x.getSo()-2)*4+x.getChat()]=-2;
+             trangThaiGame[(x.getSo()-2)*4+x.getChat()]= (float) 2 /3;
         }
-        trangThaiGame[52+viTri]-=moiDanh.size();
+//        trangThaiGame[52+viTri]-=moiDanh.size();
         baiDanhCu.addAll(moiDanh);
     }
 }

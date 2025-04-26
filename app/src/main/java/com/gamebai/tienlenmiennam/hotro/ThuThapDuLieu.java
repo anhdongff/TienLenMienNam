@@ -8,12 +8,12 @@ import java.io.File;
 import java.io.FileWriter;
 
 public class ThuThapDuLieu {
-    public static void luuVaoFile(String tenFile, int[] trangThai,int[] ketQua) {
+    public static void luuVaoFile(String tenFile, float[] trangThai,float[] ketQua) {
         File file=new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),tenFile);
         try {
             FileWriter fileWriter = new FileWriter(file,true);
             StringBuilder sb=new StringBuilder();
-            for (int j : trangThai) {
+            for (float j : trangThai) {
                 sb.append(j).append(",");
             }
             for (int i = 0; i < ketQua.length; i++) {
@@ -34,12 +34,13 @@ public class ThuThapDuLieu {
         try {
             FileWriter fileWriter = new FileWriter(file,true);
             for (int i = 0; i < 15; i++) {
-                sb.append(i).append("{");
+//                sb.append(i).append("{");
                 for (int j = 0; j < 4; j++) {
                     if(j!=3) sb.append(boBai.laBaiBanDau[i][j]).append(",");
                     else sb.append(boBai.laBaiBanDau[i][j]);
                 }
-                sb.append("},\n");
+//                sb.append("},\n");
+                sb.append("\n");
             }
             sb.append("\n");
             fileWriter.write(sb.toString());

@@ -310,29 +310,19 @@ public class FarmData extends TrangThaiCoBan implements TrangThaiGame, PhuongThu
                     NutLaBai nutLaBai=boBai.get(i);
                     if (!nutLaBai.isDaDenDich()||
                             nutLaBai.getChiSoSoHuu()==BoBai.ChiSoSoHuu.NGUOI_CHOI_1) {
-                        c.rotate(nutLaBai.getGocQuay(),nutLaBai.getHitbox().centerX(),nutLaBai.getHitbox().centerY());
-//                    c.rotate(nutLaBai.getGocQuay(),nutLaBai.getHitbox().left,nutLaBai.getHitbox().top);
-//                        c.drawBitmap(LaBai.LUNG_BAI.getHinhAnh(),
-//                                nutLaBai.getHitbox().left,
-//                                nutLaBai.getHitbox().top,
-//                                null);
-                        nutLaBai.veLungBai(c);
-//                    Paint paint=new Paint();paint.setColor(Color.GREEN);
-//                    paint.setStyle(Paint.Style.STROKE);
-//                    paint.setStrokeWidth(5);
-//                    c.drawRect(nutLaBai.getHitbox(),paint);
-                        c.rotate(-nutLaBai.getGocQuay(),nutLaBai.getHitbox().centerX(),nutLaBai.getHitbox().centerY());
-//                    c.rotate(-nutLaBai.getGocQuay(),nutLaBai.getHitbox().left,nutLaBai.getHitbox().top);
+//                        c.rotate(nutLaBai.getGocQuay(),nutLaBai.getHitbox().centerX(),nutLaBai.getHitbox().centerY());
+//                        nutLaBai.veLungBai(c);
+//                        c.rotate(-nutLaBai.getGocQuay(),nutLaBai.getHitbox().centerX(),nutLaBai.getHitbox().centerY());
                     }
                 }
                 veAvartar(c);
                 demSoFrame++;
                 break;
             case LAT_BAI:
-                for(NutLaBai nutLaBai: baiTrenTay){
-                    if(nutLaBai.isKickHoat()) nutLaBai.ve(c);
-                    else nutLaBai.veLungBai(c);
-                }
+//                for(NutLaBai nutLaBai: baiTrenTay){
+//                    if(nutLaBai.isKickHoat()) nutLaBai.ve(c);
+//                    else nutLaBai.veLungBai(c);
+//                }
                 veAvartar(c);
                 veDemLaBai(c);
 //                baiTrenTay.get(2).setDiemDich(new PointF((MainActivity.chieuRongManHinh-ThongSo.KichThuocLaBai.getKichThuocLaBaiRong())/2,
@@ -379,12 +369,12 @@ public class FarmData extends TrangThaiCoBan implements TrangThaiGame, PhuongThu
                 for(NutLaBai nutLaBai: baiTrenTay){
                     nutLaBai.ve(c);
                 }
-                for(NutLaBai nutLaBai: baiDanhCu) {
-                    nutLaBai.ve(c, paintDaDanh);
-                }
-                for(NutLaBai nutLaBai: baiDanhMoi){
-                    nutLaBai.ve(c);
-                }
+//                for(NutLaBai nutLaBai: baiDanhCu) {
+//                    nutLaBai.ve(c, paintDaDanh);
+//                }
+//                for(NutLaBai nutLaBai: baiDanhMoi){
+//                    nutLaBai.ve(c);
+//                }
                 veAvartar(c);
                 veDemLaBai(c);
                 break;
@@ -1013,14 +1003,13 @@ public class FarmData extends TrangThaiCoBan implements TrangThaiGame, PhuongThu
                             NutLaBai tempNut;
                             tempNut=baiTrenTay.remove(i);
                             baiDanhMoi.add(tempNut);
-//                            System.out.println(temp.x+" "+temp.y);
                             temp.x+= ThongSo.LaBai.getKichThuocLaBaiRong();
                             i--;
                         }
                     }
                 }
             }
-            xepLaiBaiTrenTay(baiTrenTay.size());
+//            xepLaiBaiTrenTay(baiTrenTay.size());
         }
         else{
             resetMayChon();

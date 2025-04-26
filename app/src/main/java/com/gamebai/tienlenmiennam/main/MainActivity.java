@@ -271,6 +271,7 @@ public class MainActivity extends AppCompatActivity {
         textViewThird=findViewById(R.id.textViewThird);
         textViewFouth=findViewById(R.id.textViewFouth);
         textViewFifth=findViewById(R.id.textViewFifth);
+        textViewFirst.setOnClickListener(v->farmData());
     }
 
     /**
