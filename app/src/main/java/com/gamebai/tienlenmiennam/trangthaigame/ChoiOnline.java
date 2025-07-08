@@ -1005,12 +1005,8 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                                     &&!daYeuCauDanh) {
                                 daYeuCauDanh =true;
                                 realtimeDatabase.getReference(TEN_BANG+"/"+maPhong+"/"
-                                                +TEN_TRUONG_YEU_CAU_DANH_BAI).get()
-                                        .addOnSuccessListener(snapshot -> {
-                                            if(!snapshot.exists()||!snapshot.getValue(Boolean.class)){
-                                                snapshot.getRef().setValue(true);
-                                            }
-                                        });
+                                                +TEN_TRUONG_NGUOI_CHOI+"/"+nguoiChois[0].getUid(
+                                        +"/"+NguoiChoi.TEN_TRUONG_YEU_CAU_DANH_BAI).updateChildren(new HashMap<String,Object>());
                             }
                         }
                     }
