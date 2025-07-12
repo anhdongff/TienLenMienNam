@@ -83,15 +83,31 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
     public static final String TEN_TRUONG_NGUOI_DANH_CUOI_THEO_SO_THU_TU="NguoiDanhCuoi";
     public static final String TEN_TRUONG_TAY_BAI_CU="TayBaiCu";
     public static final String TEN_TRUONG_TAY_BAI_MOI="TayBaiMoi";
-    public static final String TEN_TRUONG_YEU_CAU_DANH_BAI="YeuCauDanhBai";
+    public static final String TEN_TRUONG_LAN_CUOI_YEU_CAU_DANH_BAI="LanCuoiYeuCauDanhBai";
+    private static final String TEN_TRUONG_SO_LUOT_DANH = "LuotDanhThu";
     private BoBai thongTinBoBai;
     private KiemTraTayBai kiemTraBaiDanh;
     private LaBai laCuoi;
     private TayBai tayBaiCuoi;
     private ArrayList<Integer> tayBaiMoi;
     private boolean hopLe,hoanThanhNhanBai;
-    private boolean daCapNhatNguoiDangDanh,daCapNhatThoiGianKetThuc;
+    /**
+     * kiểm tra chỉ số người đang đánh đã được cap nhật chưa
+     */
+    private boolean daCapNhatNguoiDangDanh;
+    /**
+     * kiểm tra thời gian kết thúc đếm ngược đã được cập nhật chưa
+     */
+    private boolean daCapNhatThoiGianKetThuc;
+    /**
+     * kiểm tra số lượt đã đánh đã được cập nhật chưa
+     */
+    private boolean daCapNhatSoLuotDanh;
     private int nguoiThang,nguoiDanhCuoi,nguoiDangDanh,doDaiTayBaiCuoi,soNguoiChoi;
+    /**
+     * đếm số lượt đã đánh trong game, gắn với trường LuotDanhThu
+     */
+    int soLuotDanh;
     private float thoiGianDemNguoc,thoiGianHienCanhBao;
     private long thoiDiemThoatGame,doLechThoiGianVoiServer=0;
     /**
@@ -114,6 +130,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
     private DatabaseReference doLechThoiGianReference;
 //    private DatabaseReference chiChat2Reference;
     private DatabaseReference nguoiChoiReference;
+    private DatabaseReference soLuotDanhReference;
     /**
      * realtime listener
      */
@@ -127,6 +144,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
     private ValueEventListener doLechThoiGianListener;
 //    private ValueEventListener chiChat2Listener;
     private ValueEventListener nguoiChoiListener;
+    private ValueEventListener soLuotDanhListener;
     /**
      * kiểm tra các listener đã hoàn thành lấy dữ liệu lần đầu chưa
      */
@@ -135,15 +153,16 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
     private boolean daTaiNguoiChoiKhac;
     private int demNguoiChoiDaThem;
     private boolean daTaiGiaiDoan;
-    private boolean taiLaiGame;
+    private boolean dangTaiGame;
     private boolean daTaiRiengTu;
     private boolean daTaiKetThucDemNguoc;
-    private boolean daTaiTayBaiMoi;
+    private boolean daTaiBaiDanhMoi;
     private boolean daTaiBaiDanhCu;
     private boolean daTaiBaiTrenTay;
     private boolean daTaiNguoiDangDanh;
     private boolean daBatDauNhanBai;
     private boolean daTaiDoLechThoiGian;
+    private boolean daTaiSoLuotDanh;
     private boolean dauLuot;
     private boolean daYeuCauDanh;
 
@@ -343,7 +362,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
         /**
          * cờ kiểm tra tải
          */
-        taiLaiGame=false;
+        dangTaiGame =false;
         daKetNoi=false;
         daTaiNguoiChoi=false;
         daTaiNguoiChoiKhac=false;
@@ -351,7 +370,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
         daTaiGiaiDoan=false;
         daTaiRiengTu=false;
         daTaiKetThucDemNguoc=false;
-        daTaiTayBaiMoi=false;
+        daTaiBaiDanhMoi =false;
         daTaiBaiDanhCu=false;
         daTaiBaiTrenTay=false;
         daTaiNguoiDangDanh=false;
@@ -860,7 +879,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
     public void capNhat(double delta,boolean isCanvasNull) {
         if(!hoanTatTaiLai())
             return;
-        else taiLaiGame=false;
+        else dangTaiGame =false;
         switch (giaiDoan){
             case CHO_NGUOI_CHOI:
                 ketThucDemNguoc=0;
@@ -1002,11 +1021,15 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                     }else{
                         if (thoiGianDemNguoc<=-ThongSo.TranDau.THOI_GIAN_YEU_CAU_DANH_BAI) {
                             if (!daCapNhatThoiGianKetThuc&&!daCapNhatNguoiDangDanh
-                                    &&!daYeuCauDanh) {
+                                    &&!daYeuCauDanh&&!daCapNhatSoLuotDanh) {
                                 daYeuCauDanh =true;
+                                HashMap<String,Object> hashMap=new HashMap<>();
+                                hashMap.put(NguoiChoi.YeuCauDanhBai.TEN_TRUONG_LUOT_DANH_THU,soLuotDanh);
+                                hashMap.put(NguoiChoi.YeuCauDanhBai.TEN_TRUONG_THOI_GIAN,thoiGianHienTai());
                                 realtimeDatabase.getReference(TEN_BANG+"/"+maPhong+"/"
                                                 +TEN_TRUONG_NGUOI_CHOI+"/"+nguoiChois[0].getUid()
-                                        +"/"+NguoiChoi.TEN_TRUONG_YEU_CAU_DANH_BAI).updateChildren(new HashMap<String,Object>());
+                                        +"/"+NguoiChoi.TEN_TRUONG_YEU_CAU_DANH_BAI)
+                                        .updateChildren(hashMap);
                             }
                         }
                     }
@@ -1035,7 +1058,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                 /**
                  * đảm bảo thời gian kết thúc đã được cập nhật
                  */
-                if(done&&daCapNhatThoiGianKetThuc&&daCapNhatNguoiDangDanh) raBai();
+                if(done&&daCapNhatThoiGianKetThuc&&daCapNhatNguoiDangDanh&&daCapNhatSoLuotDanh) raBai();
                 break;
             case KET_THUC:
                 if(System.currentTimeMillis()-thoiDiemThoatGame>=0){
@@ -1272,10 +1295,9 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
      * chuyển người chơi đánh bài
      */
     private void raBai() {
-        daYeuCauDanh =false;
-        /**
-         * chặt hai kể cả khi đã bỏ lượt
-         */
+//        /**
+//         * chặt hai kể cả khi đã bỏ lượt
+//         */
 //        if(chuoiChat2){
 //            for(int i=0;i<soNguoiChoi;i++){
 //                if(nguoiChois[i].boLuot) nguoiChois[i].chiChat2=true;
@@ -1326,8 +1348,10 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
         thoiGianDemNguoc= (float) (ketThucDemNguoc - thoiGianHienTai()) /1000;
         vienDemNguoc.tinhDuongVe(thoiGianDemNguoc);
         chuDemNguoc.setNoiDung(String.valueOf((int)thoiGianDemNguoc));
+        daYeuCauDanh=false;
         daCapNhatNguoiDangDanh=false;
         daCapNhatThoiGianKetThuc=false;
+        daCapNhatSoLuotDanh=false;
         giaiDoan= CHO_CHON;
     }
     /**
@@ -1455,6 +1479,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
     }
     /**
      * tải lại dữ liệu phòng chơi
+     * ĐÂY LÀ PHƯƠNG THỨC TẢI PHÒNG GAME KHI VÀO PHÒNG LÚC GAME CHƯA BẮT ĐẦU
      */
     public void taiLai() {
         /**
@@ -1467,7 +1492,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
             tiepTucVongLap=true;
         }
         chuMaPhong.setNoiDung(mainActivity.getString(R.string.game_ma_phong)+" "+maPhong);
-        taiLaiGame=true;
+        dangTaiGame =true;
         daKetNoi=false;
         daTaiNguoiChoi=false;
         daTaiNguoiChoiKhac=false;
@@ -1475,11 +1500,12 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
         daTaiGiaiDoan=false;
         daTaiRiengTu=false;
         daTaiKetThucDemNguoc=false;
-        daTaiTayBaiMoi=false;
+        daTaiBaiDanhMoi =true;//các cờ giá trị true nghĩa là chúng sẽ không được tải khi vào phòng
         daTaiBaiDanhCu=true;
         daTaiBaiTrenTay=true;
         daTaiNguoiDangDanh=false;
         daTaiDoLechThoiGian=false;
+        daTaiSoLuotDanh=false;
         theoDoiOnline();
         /**
          * 1 số biến local
@@ -1523,9 +1549,9 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
         if(doLechThoiGianListener!=null&& doLechThoiGianReference !=null) {
             doLechThoiGianReference.removeEventListener(doLechThoiGianListener);
         }
-//        if(chiChat2Listener!=null&&chiChat2Reference!=null) {
-//            chiChat2Reference.removeEventListener(chiChat2Listener);
-//        }
+        if(soLuotDanhListener!=null&&soLuotDanhReference!=null) {
+            soLuotDanhReference.removeEventListener(soLuotDanhListener);
+        }
     }
 
     /**
@@ -1633,7 +1659,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 new Thread(()->{
                     nguoiDangDanh=snapshot.getValue(Long.class).intValue();
-                    System.out.println("SoNguoiChoi khi dang tai nguoiDangDanh: "+soNguoiChoi);
+                    //System.out.println("SoNguoiChoi khi dang tai nguoiDangDanh: "+soNguoiChoi);
                     for(int i=0;i<soNguoiChoi;i++){
                         if(nguoiChois[i].soThuTu==nguoiDangDanh) {
                             nguoiDangDanh=i;
@@ -1641,10 +1667,6 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                             daTaiNguoiDangDanh=true;
                             break;
                         }
-                    }
-                    if(nguoiDangDanh==-1) {//kết thúc
-                        daCapNhatNguoiDangDanh=true;
-                        daTaiNguoiDangDanh=true;
                     }
                 }).start();
             }
@@ -1690,6 +1712,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                             taiDoLechThoiGianVoiServer();
                             taiNguoiChoi();
                             taiRiengTu();
+                            taiSoLuotDanh();
                         }
                     }).start();
                 }
@@ -1704,6 +1727,28 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
             }
         };
         ketNoiReference.addValueEventListener(theoDoiNguoiChoiOnlineListener);
+    }
+
+    private void taiSoLuotDanh() {
+        soLuotDanhReference=realtimeDatabase
+                .getReference(TEN_BANG+"/"+maPhong+"/"+TEN_TRUONG_SO_LUOT_DANH);
+        soLuotDanhListener=new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                soLuotDanh=snapshot.getValue(Long.class).intValue();
+                daTaiSoLuotDanh=true;
+                daCapNhatSoLuotDanh=true;
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(mainActivity, mainActivity.getString(R.string.loi)
+                        + " " + error.getMessage(), Toast.LENGTH_LONG).show();
+                huyDangKyListener(true);
+                mainActivity.finish();
+            }
+        };
+        soLuotDanhReference.addValueEventListener(soLuotDanhListener);
     }
 
     /**
@@ -1920,7 +1965,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                                         .getValue(Boolean.class).booleanValue();
                                 nguoiChois[i].chiChat2=snapshot.child(NguoiChoi.TEN_TRUONG_CHUOI_CHAT_2)
                                         .getValue(Boolean.class).booleanValue();
-                                if (!taiLaiGame) {
+                                if (!dangTaiGame) {
                                     if(!boLuotCu&&nguoiChois[i].boLuot) {
                                         boLuot();
                                     }
@@ -2032,13 +2077,13 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                     ketThucDemNguoc=snapshot.getValue(Long.class);
                     daCapNhatThoiGianKetThuc=true;
                     if(!daTaiKetThucDemNguoc){
-                        if (giaiDoan!=CHO_NGUOI_CHOI) {
-                            /**
-                             * khởi tạo thời gian chờ khi kết nối lại ở giai đoạn khác chờ chọn
-                             */
-                            daCapNhatThoiGianKetThuc=false;
-                            thoiGianDemNguoc=ketThucDemNguoc-thoiGianHienTai();
-                        }
+//                        if (giaiDoan!=CHO_NGUOI_CHOI) {
+//                            /**
+//                             * khởi tạo thời gian chờ khi kết nối lại ở giai đoạn khác chờ chọn
+//                             */
+//                            daCapNhatThoiGianKetThuc=false;
+//                            thoiGianDemNguoc=ketThucDemNguoc-thoiGianHienTai();
+//                        }bị thừa nhưng chưa xoá vì có thể tái sử dụng
                         daTaiKetThucDemNguoc=true;
                     }
                 }).start();
@@ -2071,21 +2116,26 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                         for(DataSnapshot x:snapshot.getChildren()){
                             tayBaiMoi.add(x.getValue(Long.class).intValue());
                         }
-                        if(!daTaiTayBaiMoi){
-                            daTaiBaiDanhCu=false;
-                            daTaiBaiTrenTay=false;
-                            daTaiTayBaiMoi=true;
-                            taiLaiBai();
-                        }else{
-                            /**
-                             * lưu người đánh cuối
-                             */
-                            nguoiDanhCuoi=nguoiDangDanh;
-                            danh();
-                        }
+//                        if(!daTaiBaiDanhMoi){
+//                            daTaiBaiDanhCu=false;
+//                            daTaiBaiTrenTay=false;
+//                            daTaiBaiDanhMoi =true;
+//                            taiLaiBai();
+//                        }else{
+//                            /**
+//                             * lưu người đánh cuối
+//                             */
+//                            nguoiDanhCuoi=nguoiDangDanh;
+//                            danh();
+//                        }
+                        /**
+                         * lưu người đánh cuối
+                         */
+                        nguoiDanhCuoi=nguoiDangDanh;
+                        danh();
                     }
                     else{
-                        daTaiTayBaiMoi=true;
+                        daTaiBaiDanhMoi =true;
                     }
                 }).start();
             }
@@ -2141,7 +2191,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
         daTaiGiaiDoan&&
         daTaiRiengTu&&
         daTaiKetThucDemNguoc&&
-        daTaiTayBaiMoi&&
+                daTaiBaiDanhMoi &&
         daTaiBaiDanhCu&&
         daTaiBaiTrenTay&&
         daTaiNguoiDangDanh&&

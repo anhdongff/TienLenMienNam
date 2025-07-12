@@ -1,6 +1,7 @@
 package com.gamebai.tienlenmiennam.thucthe;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class NguoiChoi {
     private boolean active;
@@ -35,6 +36,9 @@ public class NguoiChoi {
     public static String TEN_TRUONG_DANH_DAU_TIEN="DanhDauTien";
     public static String TEN_TRUONG_SAN_SANG="SanSang";
     public static String TEN_TRUONG_CHUOI_CHAT_2="ChiChat2";
+    public static String TEN_TRUONG_YEU_CAU_DANH_BAI="YeuCauDanhBai";
+    public static String TEN_TRUONG_YEU_CAU_BO_LUOT="YeuCauBoLuot";
+    public static String TEN_TRUONG_TAY_BAI_MOI="TayBaiMoi";
     /**
      * thông tin trong trận đấu
      */
@@ -734,5 +738,39 @@ public class NguoiChoi {
         }
 //        trangThaiGame[52+viTri]-=moiDanh.size();
         baiDanhCu.addAll(moiDanh);
+    }
+    public static class YeuCauDanhBai{
+        public int luotDanhThu;
+        public long thoiGian;
+        public static String TEN_TRUONG_LUOT_DANH_THU="LuotDanhThu";
+        public static String TEN_TRUONG_THOI_GIAN="ThoiGian";
+        public YeuCauDanhBai(int luotDanhThu,long thoiGian){
+            this.luotDanhThu=luotDanhThu;
+            this.thoiGian=thoiGian;
+        }
+    }
+    public static class YeuCauBoLuot{
+        public int luotDanhThu;
+        public long thoiGian;
+        public static String TEN_TRUONG_LUOT_DANH_THU="LuotDanhThu";
+        public static String TEN_TRUONG_THOI_GIAN="ThoiGian";
+        public YeuCauBoLuot(long thoiGian,int luotDanhThu){
+            this.thoiGian=thoiGian;
+            this.luotDanhThu=luotDanhThu;
+        }
+    }
+    public static class TayBaiMoi{
+        public int luotDanhThu;
+        public long thoiGian;
+        public List<Integer> tayBai;
+        public static String TEN_TRUONG_LUOT_DANH_THU="LuotDanhThu";
+        public static String TEN_TRUONG_THOI_GIAN="ThoiGian";
+        public static String TEN_TRUONG_TAY_BAI="TayBai";
+        public static String TEN_TRUONG_XAC_NHAN="XacNhan";
+        public TayBaiMoi(long thoiGian,int luotDanhThu,List<Integer> tayBai) {
+            this.thoiGian = thoiGian;
+            this.luotDanhThu = luotDanhThu;
+            this.tayBai = tayBai;
+        }
     }
 }
