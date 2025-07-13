@@ -1068,7 +1068,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
         }
     }
     /**
-     * thực hiện thao tác đánh đối với các người chơi khác nhau đặc biệt với bot
+     * thực hiện thao tác đánh đối với các người chơi khác nhau
      */
     private void danh(){
         kiemTraBaiDanh.laBai.clear();
@@ -1110,17 +1110,13 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
              * đưa lên database
              */
             ArrayList<Integer> listBai=new ArrayList<>();
-            for(NutLaBai x: baiDanhMoi){
-                listBai.add(x.getLaBai().getSo());
-                listBai.add(x.getLaBai().getChat());
-            }
-            /**
-             * lưu người đánh cuối
-             */
-            nguoiDanhCuoi=nguoiDangDanh;
-            realtimeDatabase.getReference(TEN_BANG+"/"+maPhong+"/"+TEN_TRUONG_TAY_BAI_CU)
-                    .setValue(listBai);
-            listBai.clear();
+//            for(NutLaBai x: baiDanhMoi){
+//                listBai.add(x.getLaBai().getSo());
+//                listBai.add(x.getLaBai().getChat());
+//            }
+//            realtimeDatabase.getReference(TEN_BANG+"/"+maPhong+"/"+TEN_TRUONG_TAY_BAI_CU)
+//                    .setValue(listBai);
+//            listBai.clear();
             for(LaBai laBai: kiemTraBaiDanh.laBai){
                 listBai.add(laBai.getSo());
                 listBai.add(laBai.getChat());
