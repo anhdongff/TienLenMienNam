@@ -766,7 +766,7 @@ public class NguoiChoi {
         public static String TEN_TRUONG_LUOT_DANH_THU="LuotDanhThu";
         public static String TEN_TRUONG_THOI_GIAN="ThoiGian";
         public static String TEN_TRUONG_TAY_BAI="TayBai";
-        public static String TEN_TRUONG_XAC_NHAN="XacNhan";
+//        public static String TEN_TRUONG_XAC_NHAN="XacNhan";
         public TayBaiMoi(long thoiGian,int luotDanhThu,List<Integer> tayBai) {
             this.thoiGian = thoiGian;
             this.luotDanhThu = luotDanhThu;
