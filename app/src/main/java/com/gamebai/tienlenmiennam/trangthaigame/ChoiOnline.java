@@ -103,7 +103,15 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
      * kiểm tra số lượt đã đánh đã được cập nhật chưa
      */
     private boolean daCapNhatSoLuotDanh;
-    private int nguoiThang,nguoiDanhCuoi,nguoiDangDanh,doDaiTayBaiCuoi,soNguoiChoi;
+    private int nguoiThang,doDaiTayBaiCuoi,soNguoiChoi;
+    /**
+     * chỉ số của người đang đánh (so với người chơi)
+     */
+    private int nguoiDangDanh;
+    /**
+     * chỉ số của người đánh cuối cùng (so với người chơi)
+     */
+    private int nguoiDanhCuoi;
     /**
      * đếm số lượt đã đánh trong game, gắn với trường LuotDanhThu
      */
@@ -395,7 +403,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
     @Override
     public void touchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN&&hoanTatTaiLai()) {
-            if (giaiDoan == CHO_CHON&&nguoiDangDanh==0) {
+            if (giaiDoan == CHO_CHON&&nguoiDangDanh==0&&!daThaoTac) {
                 for(NutLaBai nutLaBai: baiTrenTay){
                     if(nguoiChois[0].getLaBai(baiTrenTay.indexOf(nutLaBai)).isCoTheChon()
                             &&nutLaBai.isEventHere(new PointF(event.getX(),event.getY()))) {
@@ -567,7 +575,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                         nutLaBai.ve(c);
                     }
                 }
-                if(nguoiDangDanh==0){
+                if(nguoiDangDanh==0&&!daThaoTac){
                     nutDanh.ve(c);
                     if (nguoiDanhCuoi!=0) {
                         nutBoLuot.ve(c);
