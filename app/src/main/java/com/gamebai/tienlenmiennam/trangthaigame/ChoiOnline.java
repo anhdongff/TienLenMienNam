@@ -1246,7 +1246,6 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
      * kiểm tra bài đánh của người chơi và nếu hợp lệ sẽ gửi tay bài lên server
      */
     private void kiemTraBaiDanhVaGuiBaiDanh() {
-        daThaoTac =true;
         //kiểm tra bài đánh
         kiemTraBaiDanh.laBai.clear();
         for(int i=0;i<this.nguoiChois[0].soLa();i++){
@@ -1264,6 +1263,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
             thoiGianHienCanhBao= ThongSo.TranDau.THOI_GIAN_HIEN_CANH_BAO;
             return;
         }
+        daThaoTac=true;
         //đưa lên realtime database
         ArrayList<Integer> listBai=new ArrayList<>();
 //            for(NutLaBai x: baiDanhMoi){
@@ -1282,7 +1282,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
         hashMap.put(NguoiChoi.TayBaiMoi.TEN_TRUONG_THOI_GIAN,thoiGianHienTai());
         hashMap.put(NguoiChoi.TayBaiMoi.TEN_TRUONG_TAY_BAI,listBai);
         realtimeDatabase.getReference(TEN_BANG+"/"+maPhong+"/"+TEN_TRUONG_NGUOI_CHOI+"/"
-                +nguoiChois[0].getUid()+"/"+NguoiChoi.TEN_TRUONG_TAY_BAI_MOI).setValue(hashMap)
+                +nguoiChois[0].getUid()+"/"+NguoiChoi.TEN_TRUONG_TAY_BAI_MOI).updateChildren(hashMap)
                 .addOnFailureListener(e -> {
                     thongBaoLoiVaThoatGame(mainActivity.getString(R.string.loi) + " " + e.getMessage());
         });
@@ -1299,7 +1299,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
         hashMap.put(NguoiChoi.YeuCauBoLuot.TEN_TRUONG_THOI_GIAN,thoiGianHienTai());
         realtimeDatabase.getReference(TEN_BANG+"/"+maPhong+"/"+TEN_TRUONG_NGUOI_CHOI
                 +"/"+nguoiChois[0].getUid()+"/"+NguoiChoi.TEN_TRUONG_YEU_CAU_BO_LUOT)
-                .setValue(hashMap)
+                .updateChildren(hashMap)
                 .addOnFailureListener(e -> {
                     thongBaoLoiVaThoatGame(mainActivity.getString(R.string.loi) + " " + e.getMessage());
                 });
