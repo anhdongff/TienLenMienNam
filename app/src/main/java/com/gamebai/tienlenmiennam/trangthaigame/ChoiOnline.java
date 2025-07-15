@@ -1739,12 +1739,14 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                     nguoiDanhCuoi=nguoiDangDanh;
                     nguoiDangDanh=snapshot.getValue(Long.class).intValue();
                     //System.out.println("SoNguoiChoi khi dang tai nguoiDangDanh: "+soNguoiChoi);
-                    for(int i=0;i<soNguoiChoi;i++){
-                        if(nguoiChois[i].soThuTu==nguoiDangDanh) {
-                            nguoiDangDanh=i;
-                            daCapNhatNguoiDangDanh=true;
-                            daTaiNguoiDangDanh=true;
-                            break;
+                    if (nguoiDangDanh!=-1) {
+                        for(int i=0;i<soNguoiChoi;i++){
+                            if(nguoiChois[i].soThuTu==nguoiDangDanh) {
+                                nguoiDangDanh=i;
+                                daCapNhatNguoiDangDanh=true;
+                                daTaiNguoiDangDanh=true;
+                                break;
+                            }
                         }
                     }
                 }).start();
