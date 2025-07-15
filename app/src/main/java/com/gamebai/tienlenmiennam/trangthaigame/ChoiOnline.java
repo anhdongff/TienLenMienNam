@@ -1370,7 +1370,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
     }
 
     /**
-     * chuyển người chơi đánh bài
+     * kiểm tra điều kiện chiến thắng liệu có thoả mãn và nếu không thì khởi tạo các giá trị để vào giai đoạn CHO_CHON
      */
     private void raBai() {
 //        /**
@@ -1382,9 +1382,9 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
 //                this.nguoiChois[i].boLuot=false;
 //            }
 //        }
-        /**
-         * bỏ qua người chơi bỏ lượt
-         */
+//        /**
+//         * bỏ qua người chơi bỏ lượt
+//         */
         if (!this.ketThuc()) {
             if(nguoiDangDanh==0){
                 this.boChonAll();
@@ -1742,12 +1742,12 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                         for(int i=0;i<soNguoiChoi;i++){
                             if(nguoiChois[i].soThuTu==nguoiDangDanh) {
                                 nguoiDangDanh=i;
-                                daCapNhatNguoiDangDanh=true;
-                                daTaiNguoiDangDanh=true;
                                 break;
                             }
                         }
                     }
+                    daCapNhatNguoiDangDanh=true;
+                    daTaiNguoiDangDanh=true;
                 }).start();
             }
 
