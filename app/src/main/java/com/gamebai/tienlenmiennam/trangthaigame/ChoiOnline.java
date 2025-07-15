@@ -1019,15 +1019,14 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                 }else{
                     chuDemNguoc.setNoiDung("0");
                     if (nguoiDangDanh==0) {
-                        /**
-                         * mở đầu lượt mới không được bỏ lượt
-                         */
-                        if(nguoiDangDanh==nguoiDanhCuoi){
-                            boChonAll();
-                            nguoiChois[0].setDuocChon(0,true);
-                            danh();
-                        }else {
-                            yeuCauBoLuot();
+                        if (!daThaoTac) {
+                            if(nguoiDangDanh==nguoiDanhCuoi){//mở đầu lượt mới không được bỏ lượt
+                                boChonAll();
+                                nguoiChois[0].setDuocChon(0,true);
+                                danh();
+                            }else {
+                                yeuCauBoLuot();
+                            }
                         }
                     }else{
                         if (thoiGianDemNguoc<=-ThongSo.TranDau.THOI_GIAN_YEU_CAU_DANH_BAI) {
