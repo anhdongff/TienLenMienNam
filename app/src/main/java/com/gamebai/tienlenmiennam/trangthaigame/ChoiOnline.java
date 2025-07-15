@@ -88,9 +88,16 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
     private BoBai thongTinBoBai;
     private KiemTraTayBai kiemTraBaiDanh;
     private LaBai laCuoi;
+    /**
+     * lưu lại loại tay bài của tay bài cuối cùng được đánh ra
+     */
     private TayBai tayBaiCuoi;
+    /**
+     * danh sách tay bài mới được đánh ra, mỗi lá bài được đại diện bởi 2 phần tử, số rồi đến chất
+     */
     private ArrayList<Integer> tayBaiMoi;
-    private boolean hopLe,hoanThanhNhanBai;
+    private boolean hopLe;
+    private boolean hoanThanhNhanBai;
     /**
      * kiểm tra chỉ số người đang đánh đã được cap nhật chưa
      */
@@ -416,7 +423,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                     }
                 }
                 if(nutDanh.isEventHere(new PointF(event.getX(),event.getY()))) {
-                    danh();
+                    kiemTraBaiDanhVaGuiBaiDanh();
                 }
                 if(nguoiDanhCuoi!=0&&nutBoLuot.isEventHere(new PointF(event.getX(),event.getY()))) {
                     yeuCauBoLuot();
@@ -487,7 +494,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
         temp.setViTri(new PointF(temp.getHitbox().left,
                 temp.getHitbox().top - ThongSo.LaBai.getKichThuocLaBaiCao() / 4));
         nguoiChois[0].getLaBai(i).setDuocChon(true);
-        baiTrenTay.get(i).setDuocBam(true);
+        temp.setDuocBam(true);
     }
 
     /**
@@ -1023,7 +1030,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                             if(nguoiDangDanh==nguoiDanhCuoi){//mở đầu lượt mới không được bỏ lượt
                                 boChonAll();
                                 nguoiChois[0].setDuocChon(0,true);
-                                danh();
+                                kiemTraBaiDanhVaGuiBaiDanh();
                             }else {
                                 yeuCauBoLuot();
                             }
@@ -1102,8 +1109,8 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
      * thực hiện thao tác đánh đối với các người chơi khác nhau
      */
     private void danh(){
-        kiemTraBaiDanh.laBai.clear();
         if(this.nguoiDangDanh==0){
+            kiemTraBaiDanh.laBai.clear();
             for(int i=0;i<this.nguoiChois[0].soLa();i++){
                 if(this.nguoiChois[0].getLaBai(i).isDuocChon()) {
                     kiemTraBaiDanh.laBai.add(this.nguoiChois[0].getLaBai(i));
@@ -1118,42 +1125,22 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                 hopLe=false;
                 thoiGianHienCanhBao= ThongSo.TranDau.THOI_GIAN_HIEN_CANH_BAO;
                 return;
-            }
-            if(tayBaiMoi==TayBai.Bo){
+            }else if(tayBaiMoi==TayBai.Bo){
                 tayBaiCuoi=tayBaiMoi;
                 doDaiTayBaiCuoi= kiemTraBaiDanh.laBai.size();
                 laCuoi= kiemTraBaiDanh.laBai.get(kiemTraBaiDanh.laBai.size()-1);
                 hopLe=true;
-            }
-            if(tayBaiMoi==TayBai.Thong){
+            }else if(tayBaiMoi==TayBai.Thong){
                 tayBaiCuoi=tayBaiMoi;
                 doDaiTayBaiCuoi= kiemTraBaiDanh.laBai.size()/2;
                 laCuoi= kiemTraBaiDanh.laBai.get(kiemTraBaiDanh.laBai.size()-1);
                 hopLe=true;
-            }
-            if(tayBaiMoi==TayBai.Le||tayBaiMoi==TayBai.Doi||tayBaiMoi==TayBai.Sap||tayBaiMoi==TayBai.TuQuy){
+            }else if(tayBaiMoi==TayBai.Le||tayBaiMoi==TayBai.Doi||tayBaiMoi==TayBai.Sap||tayBaiMoi==TayBai.TuQuy){
                 tayBaiCuoi=tayBaiMoi;
                 doDaiTayBaiCuoi=0;
                 laCuoi= kiemTraBaiDanh.laBai.get(kiemTraBaiDanh.laBai.size()-1);
                 hopLe=true;
             }
-            /**
-             * đưa lên database
-             */
-            ArrayList<Integer> listBai=new ArrayList<>();
-//            for(NutLaBai x: baiDanhMoi){
-//                listBai.add(x.getLaBai().getSo());
-//                listBai.add(x.getLaBai().getChat());
-//            }
-//            realtimeDatabase.getReference(TEN_BANG+"/"+maPhong+"/"+TEN_TRUONG_TAY_BAI_CU)
-//                    .setValue(listBai);
-//            listBai.clear();
-            for(LaBai laBai: kiemTraBaiDanh.laBai){
-                listBai.add(laBai.getSo());
-                listBai.add(laBai.getChat());
-            }
-            realtimeDatabase.getReference(TEN_BANG+"/"+maPhong+"/"+TEN_TRUONG_TAY_BAI_MOI)
-                    .setValue(listBai);
             /**
              * thay đổi bài đánh ở bàn, cập nhật thông tin sở hữu lá bài
              */
@@ -1193,6 +1180,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
             }
             xepLaiBaiTrenTay();
         }else{
+            kiemTraBaiDanh.laBai.clear();
             for(int i=0;i<tayBaiMoi.size();i+=2){
                 kiemTraBaiDanh.laBai.add(LaBai.timLaBaiTheoSoVaChat(tayBaiMoi.get(i),tayBaiMoi.get(i+1)));
             }
@@ -1205,21 +1193,19 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                 tayBaiCuoi=tayBaiMoi;
                 doDaiTayBaiCuoi= kiemTraBaiDanh.laBai.size();
                 laCuoi= kiemTraBaiDanh.laBai.get(kiemTraBaiDanh.laBai.size()-1);
-            }
-            if(tayBaiMoi==TayBai.Thong){
+            }else if(tayBaiMoi==TayBai.Thong){
                 tayBaiCuoi=tayBaiMoi;
                 doDaiTayBaiCuoi= kiemTraBaiDanh.laBai.size()/2;
                 laCuoi= kiemTraBaiDanh.laBai.get(kiemTraBaiDanh.laBai.size()-1);
-            }
-            if(tayBaiMoi==TayBai.Le||tayBaiMoi==TayBai.Doi||tayBaiMoi==TayBai.Sap||tayBaiMoi==TayBai.TuQuy){
+            }else if(tayBaiMoi==TayBai.Le||tayBaiMoi==TayBai.Doi||tayBaiMoi==TayBai.Sap||tayBaiMoi==TayBai.TuQuy){
                 tayBaiCuoi=tayBaiMoi;
                 doDaiTayBaiCuoi=0;
                 laCuoi= kiemTraBaiDanh.laBai.get(kiemTraBaiDanh.laBai.size()-1);
                 hopLe=true;
             }
-            if((laCuoi.getSo()==14&&tayBaiCuoi.ordinal()<=2)||
-                    tayBaiCuoi==TayBai.TuQuy||
-                    tayBaiCuoi==TayBai.Thong) nguoiChois[0].boLuot=false;
+//            if((laCuoi.getSo()==14&&tayBaiCuoi.ordinal()<=2)||
+//                    tayBaiCuoi==TayBai.TuQuy||
+//                    tayBaiCuoi==TayBai.Thong) nguoiChois[0].boLuot=false;
             /**
              * đánh bài
              */
@@ -1255,6 +1241,51 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
 //        else nguoiDangDanh++;
         dauLuot=false;
         giaiDoan= ChoiVoiMay.GiaiDoan.DANH_BAI;
+    }
+    /**
+     * kiểm tra bài đánh của người chơi và nếu hợp lệ sẽ gửi tay bài lên server
+     */
+    private void kiemTraBaiDanhVaGuiBaiDanh() {
+        daThaoTac =true;
+        //kiểm tra bài đánh
+        kiemTraBaiDanh.laBai.clear();
+        for(int i=0;i<this.nguoiChois[0].soLa();i++){
+            if(this.nguoiChois[0].getLaBai(i).isDuocChon()) {
+                kiemTraBaiDanh.laBai.add(this.nguoiChois[0].getLaBai(i));
+            }
+        }
+        kiemTraBaiDanh.sort();
+        TayBai tayBaiMoi= kiemTraBaiDanh.baiDanhHopLe(tayBaiCuoi.ordinal(),
+                doDaiTayBaiCuoi,
+                this.laCuoi,
+                this.nguoiChois[0].chiChat2);
+        if(tayBaiMoi==TayBai.KhongHopLe){
+            hopLe=false;
+            thoiGianHienCanhBao= ThongSo.TranDau.THOI_GIAN_HIEN_CANH_BAO;
+            return;
+        }
+        //đưa lên realtime database
+        ArrayList<Integer> listBai=new ArrayList<>();
+//            for(NutLaBai x: baiDanhMoi){
+//                listBai.add(x.getLaBai().getSo());
+//                listBai.add(x.getLaBai().getChat());
+//            }
+//            realtimeDatabase.getReference(TEN_BANG+"/"+maPhong+"/"+TEN_TRUONG_TAY_BAI_CU)
+//                    .setValue(listBai);
+//            listBai.clear();
+        for(LaBai laBai: kiemTraBaiDanh.laBai){
+            listBai.add(laBai.getSo());
+            listBai.add(laBai.getChat());
+        }
+        HashMap<String,Object> hashMap=new HashMap<>();
+        hashMap.put(NguoiChoi.TayBaiMoi.TEN_TRUONG_LUOT_DANH_THU,soLuotDanh);
+        hashMap.put(NguoiChoi.TayBaiMoi.TEN_TRUONG_THOI_GIAN,thoiGianHienTai());
+        hashMap.put(NguoiChoi.TayBaiMoi.TEN_TRUONG_TAY_BAI,listBai);
+        realtimeDatabase.getReference(TEN_BANG+"/"+maPhong+"/"+TEN_TRUONG_NGUOI_CHOI+"/"
+                +nguoiChois[0].getUid()+"/"+NguoiChoi.TEN_TRUONG_TAY_BAI_MOI).setValue(hashMap)
+                .addOnFailureListener(e -> {
+                    thongBaoLoiVaThoatGame(mainActivity.getString(R.string.loi) + " " + e.getMessage());
+        });
     }
 
     /**
@@ -1420,7 +1451,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
         temp.setViTri(new PointF(temp.getHitbox().left,
                 temp.getHitbox().top + ThongSo.LaBai.getKichThuocLaBaiCao() / 4));
         nguoiChois[0].getLaBai(i).setDuocChon(false);
-        baiTrenTay.get(i).setDuocBam(false);
+        temp.setDuocBam(false);
     }
 
     private boolean ketThuc() {
@@ -1705,6 +1736,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 new Thread(()->{
+                    nguoiDanhCuoi=nguoiDangDanh;
                     nguoiDangDanh=snapshot.getValue(Long.class).intValue();
                     //System.out.println("SoNguoiChoi khi dang tai nguoiDangDanh: "+soNguoiChoi);
                     for(int i=0;i<soNguoiChoi;i++){
@@ -2139,31 +2171,30 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 new Thread(()->{
-                    if((giaiDoan==CHO_CHON||giaiDoan==DANH_BAI||
-                            giaiDoan==CHIA_BAI||giaiDoan==LAT_BAI)&&nguoiDangDanh!=0){
+                    if(giaiDoan==CHO_CHON||giaiDoan==DANH_BAI||giaiDoan==CHIA_BAI||giaiDoan==LAT_BAI){
                         tayBaiMoi=new ArrayList<>();
                         for(DataSnapshot x:snapshot.getChildren()){
                             tayBaiMoi.add(x.getValue(Long.class).intValue());
                         }
-//                        if(!daTaiBaiDanhMoi){
-//                            daTaiBaiDanhCu=false;
-//                            daTaiBaiTrenTay=false;
-//                            daTaiBaiDanhMoi =true;
-//                            taiLaiBai();
-//                        }else{
-//                            /**
-//                             * lưu người đánh cuối
-//                             */
+                        if (nguoiDangDanh!=0) {
+//                            //lưu người đánh cuối
 //                            nguoiDanhCuoi=nguoiDangDanh;
-//                            danh();
-//                        }
-                        /**
-                         * lưu người đánh cuối
-                         */
-                        nguoiDanhCuoi=nguoiDangDanh;
-                        danh();
-                    }
-                    else{
+                            danh();
+                        }else {
+                            int dem=0;
+                            for(int i=0;i<tayBaiMoi.size();i+=2){//chọn các lá được đánh
+                                for(int j=dem;j<nguoiChois[0].getBaiTrenTay().size();j++){
+                                    if(nguoiChois[0].getBaiTrenTay().get(j).getSo()==tayBaiMoi.get(i)
+                                            &&nguoiChois[0].getBaiTrenTay().get(j).getChat()==tayBaiMoi.get(i+1)){
+                                        dem=j+1;
+                                        chonLaBai(j);
+                                        break;
+                                    }else boChonLaBai(j);
+                                }
+                            }
+                            danh();
+                        }
+                    } else{
                         daTaiBaiDanhMoi =true;
                     }
                 }).start();
