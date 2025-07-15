@@ -1736,7 +1736,6 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 new Thread(()->{
-                    nguoiDanhCuoi=nguoiDangDanh;
                     nguoiDangDanh=snapshot.getValue(Long.class).intValue();
                     //System.out.println("SoNguoiChoi khi dang tai nguoiDangDanh: "+soNguoiChoi);
                     if (nguoiDangDanh!=-1) {
@@ -2178,9 +2177,8 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                         for(DataSnapshot x:snapshot.getChildren()){
                             tayBaiMoi.add(x.getValue(Long.class).intValue());
                         }
+                        nguoiDanhCuoi=nguoiDangDanh;
                         if (nguoiDangDanh!=0) {
-//                            //lưu người đánh cuối
-//                            nguoiDanhCuoi=nguoiDangDanh;
                             danh();
                         }else {
                             int dem=0;
