@@ -599,7 +599,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                 break;
             case DANH_BAI:
                 synchronized (baiTrenTay){
-                    for(NutLaBai nutLaBai: baiDanhCu) {
+                    for(NutLaBai nutLaBai: baiTrenTay) {
                         nutLaBai.ve(c, paintDaDanh);
                     }
                 }
@@ -1088,7 +1088,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                 .addOnSuccessListener(taskSnapshot -> {
                     long lanCuoiYeuCauDanhBai=taskSnapshot.getValue(Long.class);
                     //kiểm tra xem đã có ai yêu cầu đánh chưa
-                    if(thoiGianHienTai()-lanCuoiYeuCauDanhBai>=ThongSo.TranDau.THOI_GIAN_CHO_CHON*10000){
+                    if(thoiGianHienTai()-lanCuoiYeuCauDanhBai>=ThongSo.TranDau.THOI_GIAN_CHO_CHON*1000){
                         HashMap<String,Object> hashMap=new HashMap<>();
                         hashMap.put(NguoiChoi.YeuCauDanhBai.TEN_TRUONG_LUOT_DANH_THU,soLuotDanh);
                         hashMap.put(NguoiChoi.YeuCauDanhBai.TEN_TRUONG_THOI_GIAN,thoiGianHienTai());
