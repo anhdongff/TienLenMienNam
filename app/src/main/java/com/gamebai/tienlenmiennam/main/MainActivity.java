@@ -814,19 +814,13 @@ public class MainActivity extends AppCompatActivity {
                     if (response.isSuccessful()&&response.body() != null) {
                         choiOnline(response.body().getOk());
                     } else{
-                        try {
-                            if (response.code()!=404) {
-                                Gson gson=new Gson();
-                                Snackbar.make(findViewById(R.id.sanhCho),
-                                        gson.fromJson(response.errorBody().string(),PhanHoiDonGian.class).getLoi(),
-                                        Snackbar.LENGTH_SHORT).show();
-                            }else{
-                                Snackbar.make(findViewById(R.id.sanhCho),
-                                        R.string.khong_co_internet,
-                                        Snackbar.LENGTH_SHORT).show();
-                            }
-                        } catch (IOException e) {
-                            Snackbar.make(findViewById(R.id.main),R.string.loi_tim_tran,
+                        if (response.code()!=404) {
+                            Snackbar.make(findViewById(R.id.sanhCho),
+                                    R.string.loi_tim_tran,
+                                    Snackbar.LENGTH_SHORT).show();
+                        }else{
+                            Snackbar.make(findViewById(R.id.sanhCho),
+                                    R.string.khong_co_internet,
                                     Snackbar.LENGTH_SHORT).show();
                         }
                     }

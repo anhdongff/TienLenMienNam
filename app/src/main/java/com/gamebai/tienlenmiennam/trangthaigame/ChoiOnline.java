@@ -927,9 +927,9 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                                 /**
                                  * chỉ số
                                  */
-                                this.laCuoi= LaBai.getTempInstance(2,-1);
-                                this.tayBaiCuoi=TayBai.KhongCo;
-                                this.doDaiTayBaiCuoi =0;
+//                                this.laCuoi= LaBai.getTempInstance(2,-1);
+//                                this.tayBaiCuoi=TayBai.KhongCo;
+//                                this.doDaiTayBaiCuoi =0;
                                 dauLuot=true;
                                 demLaBaiDiChuyen=0;
                                 demLaDenDich=0;
@@ -1014,7 +1014,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                     demLaDenDich++;
 
                 }else {
-                    luotMoi();
+                    raBai();
                 }
                 break;
             case CHO_CHON:
@@ -1336,14 +1336,6 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
         }
     }
     /**
-     * khởi tạo lượt mới
-     */
-    private void luotMoi(){
-        khoiTaoLuotMoi();
-        raBai();
-    }
-
-    /**
      * khởi tạo các giá trị cho lượt mới
      */
     private void khoiTaoLuotMoi() {
@@ -1361,12 +1353,12 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                 this.baiDanhCu.clear();
             }
         }
-        for(int i=0;i<soNguoiChoi;i++){
-            if(this.nguoiChois[i].boLuot){
-                this.nguoiChois[i].boLuot=false;
-                nguoiChois[i].chiChat2=false;
-            }
-        }
+//        for(int i=0;i<soNguoiChoi;i++){
+//            if(this.nguoiChois[i].boLuot){
+//                this.nguoiChois[i].boLuot=false;
+//                nguoiChois[i].chiChat2=false;
+//            }
+//        }
     }
 
     /**
@@ -1386,6 +1378,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
 //         * bỏ qua người chơi bỏ lượt
 //         */
         if (!this.ketThuc()) {
+            if(nguoiDangDanh==nguoiDanhCuoi) khoiTaoLuotMoi();
             if(nguoiDangDanh==0){
                 this.boChonAll();
                 this.nguoiChois[0].timCoTheChon(this.laCuoi,
@@ -1539,21 +1532,6 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
             }
         }
         this.nguoiChois[this.nguoiThang].thuNhap=-dem;
-    }
-
-    /**
-     * kiểm tra liệu lượt có kết thúc và khởi tạo luôn lượt mới
-     * @return
-     */
-    private boolean ketThucLuot() {
-        int dem=0;
-        for(int i=0;i<soNguoiChoi;i++){
-            if(this.nguoiChois[i].boLuot) dem++;
-        }
-        if(dem>=soNguoiChoi-1){
-            khoiTaoLuotMoi();
-            return true;
-        }else return false;
     }
     /**
      * tải lại dữ liệu phòng chơi
@@ -1871,8 +1849,8 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                             if(!boLuotCu&&nguoiChois[0].boLuot) {
                                 boLuot();
                             }
-                            if(boLuotCu&&!nguoiChois[0].boLuot
-                                    &&!dauLuot&&!nguoiChois[0].chiChat2) khoiTaoLuotMoi();
+//                            if(boLuotCu&&!nguoiChois[0].boLuot
+//                                    &&!dauLuot&&!nguoiChois[0].chiChat2) khoiTaoLuotMoi();
                         }
                     }).start();
                 }
@@ -1985,7 +1963,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                         }
                     }else{
                         if(giaiDoan==CHO_NGUOI_CHOI){
-                            System.out.println("cho nguoi choi sau khi tai xong nguoi choi khac: "+soNguoiChoi);
+//                            System.out.println("cho nguoi choi sau khi tai xong nguoi choi khac: "+soNguoiChoi);
                             for(int i=0;i<soNguoiChoi;i++){
                                 if(nguoiChois[i].getUid().equals(snapshot.getKey())) return;
                             }
@@ -2040,8 +2018,8 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                                     if(!boLuotCu&&nguoiChois[i].boLuot) {
                                         boLuot();
                                     }
-                                    if(boLuotCu&&!nguoiChois[i].boLuot
-                                            &&!dauLuot&&!nguoiChois[i].chiChat2) khoiTaoLuotMoi();
+//                                    if(boLuotCu&&!nguoiChois[i].boLuot
+//                                            &&!dauLuot&&!nguoiChois[i].chiChat2) khoiTaoLuotMoi();
                                 }
                                 break;
                             }

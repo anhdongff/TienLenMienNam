@@ -59,7 +59,7 @@
     <string name="game_tien_mac_dinh">\?$</string>
     <string name="dang_nhap_tren_thiet_bi_khac">Tài khoản được đăng nhập trên thiết bị khác</string>
     <string name="game_ma_phong">Mã phòng:</string>
-    <string name="loi_tim_tran">Lỗi tìm trận</string>
+    <string name="loi_tim_tran">Lỗi tìm trận, vui lòng thử lại</string>
     <string name="loi_tao_phong">Không thể tạo phòng vào lúc này</string>
     <string name="hay_nhap_ma_phong">Hãy nhập mã phòng</string>
     <string name="loi_tim_phong">Không thể tìm phòng vào lúc này</string>
