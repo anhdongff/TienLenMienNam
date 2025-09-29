@@ -132,9 +132,9 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
     private FirebaseAuth auth;
     private FirebaseDatabase realtimeDatabase;
     /**
-     * realtime database reference
+     * theo dõi sự kiện online và offline của người chơi trong phòng
      */
-    public DatabaseReference nguoiChoiOnlineReference;
+    private DatabaseReference nguoiChoiOnlineReference;
     private DatabaseReference nguoiChoiKhacReference;
     private DatabaseReference giaiDoanReference;
     private DatabaseReference ketThucDemNguocReference;
@@ -1761,6 +1761,8 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                         HashMap<String,Object> nguoiChoiOffline=new HashMap<>();
                         nguoiChoiOffline.put(NguoiChoi.TEN_TRUONG_TRANG_THAI_ONLINE,"offline");
                         nguoiChoiOnlineReference.updateChildren(nguoiChoiOnline);
+                        //huỷ theo dõi offline khi tìm trận do đã vào game
+                        mainActivity.theoDoiOfflineKhiTimTran(false);
                         nguoiChoiOnlineReference.onDisconnect().updateChildren(nguoiChoiOffline);
                         if(!daKetNoi) {
                             daKetNoi=true;
@@ -1769,6 +1771,10 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                             taiRiengTu();
                             taiSoLuotDanh();
                         }
+                        //thông báo đã vào phòng
+                        HashMap<String,Object> thongBaoVaoPhong=new HashMap<>();
+                        thongBaoVaoPhong.put("DaVaoPhong","entered");
+                        realtimeDatabase.getReference("NguoiChoiTimTran/"+uid).updateChildren(thongBaoVaoPhong);
                     }).start();
                 }
             }

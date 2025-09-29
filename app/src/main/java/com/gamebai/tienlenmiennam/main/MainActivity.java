@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Debug;
 import android.provider.Settings;
 import android.text.InputType;
 import android.util.DisplayMetrics;
@@ -26,6 +27,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -45,7 +47,14 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -82,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseFirestore firestore;
     private FirebaseAuth auth;
     private FirebaseDatabase realtimeDatabase;
+    /** tham chiếu đến node NguoiChoiTimTran/{UserID} trong realtime database */
+    private DatabaseReference nguoiChoiTimTranReference;
     /**
      * Sảnh chờ
      */
@@ -91,7 +102,10 @@ public class MainActivity extends AppCompatActivity {
     EditText editTextMaPhong;
     TextView textViewTenNguoiChoi,textViewTien,textViewHuongDan,textViewFree,textViewFirst, textViewSecond,textViewThird,textViewFouth,textViewFifth;
     NguoiChoi nguoiChoi;
-    ListenerRegistration taiKhoanListener,dangNhapListener;
+    ListenerRegistration taiKhoanListener;
+    ListenerRegistration dangNhapListener;
+    /** theo dõi sự kiện tìm được trận trong NguoiChoiTimTran/{UserID} */
+    ValueEventListener theoDoiKetQuaTimTranListener;
     /**
      * Game
      */
@@ -617,14 +631,85 @@ public class MainActivity extends AppCompatActivity {
      * hoàn thành đăng nhập, thực hiện tuần tự các bước để vào sảnh chờ
      */
     public void hoanThanhDangNhap() {
-        if(checkBoxLuuThongTinDangNhap.isChecked()){
-            luuThongTinDangNhap();
-        }
+        luuThongTinDangNhap(checkBoxLuuThongTinDangNhap.isChecked());
         khoiTaoTaiKhoanMoi();
     }
 
     /**
-     * gọi đến api tìm phòng theo id phòng
+     * theo dõi offline khi tìm trận đấu
+     * @param enable true để bật theo dõi, false để tắt theo dõi
+     */
+    public void theoDoiOfflineKhiTimTran(boolean enable){
+        if(enable) {
+            HashMap<String, Object> hashMap = new HashMap<>();
+            hashMap.put("DaVaoPhong", "offline");
+            nguoiChoiTimTranReference.onDisconnect().updateChildren(hashMap);
+        }else{
+            nguoiChoiTimTranReference.onDisconnect().cancel();
+
+        }
+    }
+    /**
+     * tìm trận đấu bằng node chuyên biệt thay vì api
+     * @param taoMoi true nếu tạo phòng mới
+     * @param maPhong nếu tìm phòng đã có còn không thì -1
+     */
+    public void timTranDau(boolean taoMoi,String maPhong){
+        String uid=auth.getUid();
+        nguoiChoiTimTranReference=realtimeDatabase.getReference("NguoiChoiTimTran/"+uid);
+        HashMap<String,Object> hashMap=new HashMap<>();
+        hashMap.put("ThoiGian",System.currentTimeMillis());
+        hashMap.put("DaVaoPhong", "wait result");
+        if(taoMoi) hashMap.put("taoMoi",taoMoi);
+        int temp=Integer.parseInt(maPhong);
+        if(temp>0&&temp<10000) hashMap.put("maPhong",maPhong);
+        nguoiChoiTimTranReference.setValue(hashMap).addOnSuccessListener(success -> {
+            //theo dõi để lấy kết quả tìm trậm
+            theoDoiKetQuaTimTranListener=new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    try{
+                        if(snapshot.child("KetQua").exists()){
+                            boolean ketQua=snapshot.child("KetQua").getValue(Boolean.class);
+                            if(ketQua){
+                                choiOnline(snapshot.child("MaPhong").getValue(Long.class).toString());
+                                //tắt theo dõi kết quả
+                                nguoiChoiTimTranReference.removeEventListener(theoDoiKetQuaTimTranListener);
+                            }else{
+                                HashMap<String, Object> hashMap = new HashMap<>();
+                                hashMap.put("DaVaoPhong", "canceled");
+                                nguoiChoiTimTranReference.onDisconnect().updateChildren(hashMap);
+                                nguoiChoiTimTranReference.removeEventListener(theoDoiKetQuaTimTranListener);
+                                theoDoiOfflineKhiTimTran(false);
+                                manHinhDangTai.an();
+                                Snackbar.make(findViewById(R.id.sanhCho),((temp>0&&temp<10000)
+                                                ?R.string.phong_da_day_hoac_khong_ton_tai:R.string.loi_tim_phong),
+                                        Snackbar.LENGTH_SHORT).show();
+                            }
+                        }
+                    }catch (Exception e){
+                        manHinhDangTai.an();
+                        Snackbar.make(findViewById(R.id.sanhCho),R.string.loi_tim_phong,
+                                Snackbar.LENGTH_SHORT).show();
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    manHinhDangTai.an();
+                    Snackbar.make(findViewById(R.id.sanhCho), R.string.loi_tim_phong,
+                            Snackbar.LENGTH_SHORT).show();
+                }
+            };
+            nguoiChoiTimTranReference.addValueEventListener(theoDoiKetQuaTimTranListener);
+        }).addOnFailureListener(failure -> {
+            manHinhDangTai.an();
+            Snackbar.make(findViewById(R.id.sanhCho),R.string.loi_tim_phong,
+                    Snackbar.LENGTH_SHORT).show();
+        });
+        theoDoiOfflineKhiTimTran(true);
+    }
+    /**
+     * tìm phòng theo id phòng
      */
     private void timPhongTheoIdPhongGame() {
         FirebaseUser user=auth.getCurrentUser();
@@ -656,49 +741,11 @@ public class MainActivity extends AppCompatActivity {
                     Snackbar.LENGTH_SHORT).show();
             return;
         }
-        user.getIdToken(false).addOnSuccessListener(task->{
-            /**
-             * tạo tokenID để xác thực trong middleware XacThucTaiKhoan trên server
-             */
-            String token="Bearer "+task.getToken();
-            apiService.timPhongTheoIdPhong(token,editTextMaPhong.getText().toString()).enqueue(
-                    new Callback<>() {
-                        @Override
-                        public void onResponse(Call<PhanHoiDonGian> call, Response<PhanHoiDonGian> response) {
-                            manHinhDangTai.an();
-                            if (response.isSuccessful() && response.body() != null) {
-                                choiOnline(editTextMaPhong.getText().toString());
-                            } else {
-                                try {
-                                    Gson gson=new Gson();
-                                    Snackbar.make(findViewById(R.id.sanhCho),
-                                            gson.fromJson(response.errorBody().string(),PhanHoiDonGian.class).getLoi(),
-                                            Snackbar.LENGTH_SHORT).show();
-                                } catch (IOException e) {
-                                    Snackbar.make(findViewById(R.id.main), R.string.loi_tim_phong,
-                                            Snackbar.LENGTH_SHORT).show();
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<PhanHoiDonGian> call, Throwable t) {
-                            manHinhDangTai.an();
-                            Snackbar.make(findViewById(R.id.sanhCho),
-                                    getString(R.string.loi) + " " + t.getMessage(),
-                                    Snackbar.LENGTH_SHORT).show();
-                        }
-                    });
-        }).addOnFailureListener(task->{
-            manHinhDangTai.an();
-            Snackbar.make(findViewById(R.id.sanhCho),
-                    getString(R.string.loi) + " " + task.getMessage(),
-                    Snackbar.LENGTH_SHORT).show();
-        });
+        timTranDau(false,editTextMaPhong.getText().toString());
     }
 
     /**
-     * gọi đến api tạo phòng
+     * tạo phòng
      */
     private void taoPhongGame() {
         FirebaseUser user=auth.getCurrentUser();
@@ -730,43 +777,7 @@ public class MainActivity extends AppCompatActivity {
                     Snackbar.LENGTH_SHORT).show();
             return;
         }
-        user.getIdToken(false).addOnSuccessListener(task->{
-            /**
-             * tạo tokenID để xác thực trong middleware XacThucTaiKhoan trên server
-             */
-            String token="Bearer "+task.getToken();
-            apiService.taoPhong(token).enqueue(new Callback<>() {
-                @Override
-                public void onResponse(Call<PhanHoiDonGian> call, Response<PhanHoiDonGian> response) {
-                    manHinhDangTai.an();
-                    if (response.isSuccessful() && response.body() != null) {
-                        choiOnline(response.body().getOk());
-                    }else{
-                        try {
-                            Gson gson=new Gson();
-                            Snackbar.make(findViewById(R.id.sanhCho),
-                                    gson.fromJson(response.errorBody().string(),PhanHoiDonGian.class).getLoi(),
-                                    Snackbar.LENGTH_SHORT).show();
-                        } catch (IOException e) {
-                            Snackbar.make(findViewById(R.id.main),R.string.loi_tao_phong,
-                                    Snackbar.LENGTH_SHORT).show();
-                        }
-                    }
-                }
-                @Override
-                public void onFailure(Call<PhanHoiDonGian> call, Throwable t) {
-                    manHinhDangTai.an();
-                    Snackbar.make(findViewById(R.id.sanhCho),
-                            getString(R.string.loi) + " " + t.getMessage(),
-                            Snackbar.LENGTH_SHORT).show();
-                }
-            });
-        }).addOnFailureListener(task->{
-            manHinhDangTai.an();
-            Snackbar.make(findViewById(R.id.sanhCho),
-                    getString(R.string.loi) + " " + task.getMessage(),
-                    Snackbar.LENGTH_SHORT).show();
-        });
+        timTranDau(true,"-1");
     }
 
     /**
@@ -802,44 +813,7 @@ public class MainActivity extends AppCompatActivity {
                     Snackbar.LENGTH_SHORT).show();
             return;
         }
-        user.getIdToken(false).addOnSuccessListener(task->{
-            /**
-             * tạo tokenID để xác thực trong middleware XacThucTaiKhoan trên server
-             */
-            String token="Bearer "+task.getToken();
-            apiService.timTran(token).enqueue(new Callback<>() {
-                @Override
-                public void onResponse(Call<PhanHoiDonGian> call, Response<PhanHoiDonGian> response) {
-                    manHinhDangTai.an();
-                    if (response.isSuccessful()&&response.body() != null) {
-                        choiOnline(response.body().getOk());
-                    } else{
-                        if (response.code()!=404) {
-                            Snackbar.make(findViewById(R.id.sanhCho),
-                                    R.string.loi_tim_tran,
-                                    Snackbar.LENGTH_SHORT).show();
-                        }else{
-                            Snackbar.make(findViewById(R.id.sanhCho),
-                                    R.string.khong_co_internet,
-                                    Snackbar.LENGTH_SHORT).show();
-                        }
-                    }
-                }
-                @Override
-                public void onFailure(Call<PhanHoiDonGian> call, Throwable t) {
-                    manHinhDangTai.an();
-                    Snackbar.make(findViewById(R.id.sanhCho),
-                            getString(R.string.loi) + " " + t.getMessage(),
-                            Snackbar.LENGTH_SHORT).show();
-                }
-            });
-        }).addOnFailureListener(task->{
-            manHinhDangTai.an();
-            Snackbar.make(findViewById(R.id.sanhCho),
-                    getString(R.string.loi) + " " + task.getMessage(),
-                    Snackbar.LENGTH_SHORT).show();
-        });
-
+        timTranDau(false,"-1");
     }
 
     private void farmData() {
@@ -1152,10 +1126,10 @@ public class MainActivity extends AppCompatActivity {
     /**
      * lưu thông tin đăng nhập nếu checkbox đã được chọn, các lần sau sẽ t động đăng nhập
      */
-    private void luuThongTinDangNhap() {
+    private void luuThongTinDangNhap(boolean luuThongTinDangNhap) {
         SharedPreferences sharedPreferences=getSharedPreferences("thongTinDangNhap",MODE_PRIVATE);
         SharedPreferences.Editor editor=sharedPreferences.edit();
-        editor.putBoolean("luuThongTinDangNhap",true);
+        editor.putBoolean("luuThongTinDangNhap",luuThongTinDangNhap);
         editor.apply();
     }
 

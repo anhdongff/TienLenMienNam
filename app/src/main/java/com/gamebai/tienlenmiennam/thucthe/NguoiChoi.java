@@ -23,6 +23,7 @@ public class NguoiChoi {
     public static String TEN_TRUONG_TIEN="Tien";
     public static String TEN_TRUONG_LAN_CUOI_DANG_NHAP="LanCuoiDangNhap";
     public static String TEN_TRUONG_LAN_CUOI_NHAN_QUA="LanCuoiNhanQua";
+    public static String TEN_TRUONG_TRANG_THAI="TrangThai";
     /**
      * realtime field's name
      */
