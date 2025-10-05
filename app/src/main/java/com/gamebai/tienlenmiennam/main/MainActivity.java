@@ -646,7 +646,6 @@ public class MainActivity extends AppCompatActivity {
             nguoiChoiTimTranReference.onDisconnect().updateChildren(hashMap);
         }else{
             nguoiChoiTimTranReference.onDisconnect().cancel();
-
         }
     }
     /**

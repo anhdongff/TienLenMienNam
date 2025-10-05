@@ -186,6 +186,8 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
      * liệu client đã thao tác (yêu cầu người chơi khác đánh bài, đánh bài, bỏ lượt) trong lượt này chưa?
      */
     private boolean daThaoTac;
+    /** nếu người chơi đã vào phòng sẽ bật cờ này */
+    private boolean daVaoPhong;
 
     public ChoiOnline(Game game, MainActivity mainActivity){
         super(game);
@@ -398,6 +400,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
         /**
          * start game
          */
+        daVaoPhong=false;
         hopLe=true;
         kiemTraBaiDanh=new KiemTraTayBai();
     }
@@ -1772,9 +1775,12 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                             taiSoLuotDanh();
                         }
                         //thông báo đã vào phòng
-                        HashMap<String,Object> thongBaoVaoPhong=new HashMap<>();
-                        thongBaoVaoPhong.put("DaVaoPhong","entered");
-                        realtimeDatabase.getReference("NguoiChoiTimTran/"+uid).updateChildren(thongBaoVaoPhong);
+                        if (!daVaoPhong) {
+                            daVaoPhong=true;
+                            HashMap<String,Object> thongBaoVaoPhong=new HashMap<>();
+                            thongBaoVaoPhong.put("DaVaoPhong","entered");
+                            realtimeDatabase.getReference("NguoiChoiTimTran/"+uid).updateChildren(thongBaoVaoPhong);
+                        }
                     }).start();
                 }
             }
