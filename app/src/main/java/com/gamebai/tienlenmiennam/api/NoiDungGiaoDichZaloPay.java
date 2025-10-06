@@ -1,5 +1,8 @@
 package com.gamebai.tienlenmiennam.api;
 
+/**
+ * body gửi lên server để tạo đơn giao dịch ZaloPay
+ */
 public class NoiDungGiaoDichZaloPay {
     private int amount;
     private String description;

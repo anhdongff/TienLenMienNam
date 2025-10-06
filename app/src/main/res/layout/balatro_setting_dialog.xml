@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/settingDialog"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_dialog_balatro"
+    android:padding="20dp">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/RedButtonsScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="12dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@id/QuayLaiButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
+                android:id="@+id/AmThanhButton"
+                android:layout_width="275dp"
+                android:layout_height="70dp"
+                android:layout_marginTop="4dp"
+                android:text="Âm thanh"
+                app:colorFont="@color/white"
+                app:colorNormal="@color/balatro_red"
+                app:fontSize="24" />
+
+            <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
+                android:id="@+id/AmNhacButton"
+                android:layout_width="275dp"
+                android:layout_height="70dp"
+                android:layout_marginTop="8dp"
+                android:text="Âm nhạc"
+                app:colorFont="@color/white"
+                app:colorNormal="@color/balatro_red"
+                app:fontSize="24" />
+
+            <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
+                android:id="@+id/MaQuaButton"
+                android:layout_width="275dp"
+                android:layout_height="70dp"
+                android:text="Mã quà"
+                app:colorFont="@color/white"
+                app:colorNormal="@color/balatro_red"
+                app:fontSize="24" />
+
+            <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
+                android:id="@+id/HoTroButton"
+                android:layout_width="275dp"
+                android:layout_height="70dp"
+                android:text="Hỗ trợ"
+                app:colorFont="@color/white"
+                app:colorNormal="@color/balatro_red"
+                app:fontSize="24" />
+
+            <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
+                android:id="@+id/DangXuatButton"
+                android:layout_width="275dp"
+                android:layout_height="70dp"
+                android:text="Đăng xuất"
+                app:colorFont="@color/white"
+                app:colorNormal="@color/balatro_red"
+                app:fontSize="24" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
+        android:id="@+id/QuayLaiButton"
+        android:layout_width="300dp"
+        android:layout_height="70dp"
+        android:layout_marginBottom="2dp"
+        android:text="Quay lại"
+        app:colorFont="@color/white"
+        app:colorNormal="@color/balatro_yellow"
+        app:fontSize="24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

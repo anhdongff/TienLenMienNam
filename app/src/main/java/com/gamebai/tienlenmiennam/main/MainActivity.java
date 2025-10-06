@@ -10,10 +10,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Debug;
 import android.provider.Settings;
 import android.text.InputType;
 import android.util.DisplayMetrics;
+import android.util.JsonReader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -27,18 +28,20 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.gamebai.tienlenmiennam.R;
 import com.gamebai.tienlenmiennam.api.ApiService;
+import com.gamebai.tienlenmiennam.api.NoiDungMaQua;
 import com.gamebai.tienlenmiennam.api.PhanHoiDonGian;
 import com.gamebai.tienlenmiennam.api.RetrofitClient;
 import com.gamebai.tienlenmiennam.hotro.Internet;
 import com.gamebai.tienlenmiennam.hotro.ThongSo;
 import com.gamebai.tienlenmiennam.thucthe.NguoiChoi;
 import com.gamebai.tienlenmiennam.ui.ManHinhDangTai;
+import com.gamebai.tienlenmiennam.uisanhcho.BalatroGiftcodeFragment;
+import com.gamebai.tienlenmiennam.uisanhcho.BalatroSettingsFragment;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.FirebaseTooManyRequestsException;
@@ -47,13 +50,10 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.MutableData;
-import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -62,16 +62,13 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.gson.Gson;
 
-import java.io.IOException;
+import org.json.JSONObject;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
     private static Context gameContext;
@@ -224,7 +221,21 @@ public class MainActivity extends AppCompatActivity {
         buttonChoiVoiMay=findViewById(R.id.buttonChoiVoiMay);
         buttonChoiVoiMay.setOnClickListener(v -> choiVoiMay());
         buttonDangXuat=findViewById(R.id.imageViewDangXuat);
-        buttonDangXuat.setOnClickListener(v -> dangXuat());
+        buttonDangXuat.setOnClickListener(v -> {
+            BalatroSettingsFragment fragment = new BalatroSettingsFragment();
+            fragment.setOnActionSelectedListener(action -> {
+                switch (action){
+                    case DANG_XUAT:
+                        dangXuat();
+                        fragment.dismiss();
+                        break;
+                    case MA_QUA:
+                        nhapMaQua();
+                        break;
+                }
+            });
+            fragment.show(getSupportFragmentManager(), "BalatroSettings");
+        });
         textViewTenNguoiChoi=findViewById(R.id.textViewTenNguoiChoi);
         textViewTien=findViewById(R.id.TextViewTien);
         textViewTien.setOnClickListener(v -> {
@@ -286,6 +297,73 @@ public class MainActivity extends AppCompatActivity {
         textViewFouth=findViewById(R.id.textViewFouth);
         textViewFifth=findViewById(R.id.textViewFifth);
         textViewFirst.setOnClickListener(v->farmData());
+    }
+
+    /**
+     * mở dialog nhập mã quà
+     */
+    private void nhapMaQua() {
+        BalatroGiftcodeFragment fragment=new BalatroGiftcodeFragment();
+        fragment.setOnActionSelectedListener(new BalatroGiftcodeFragment.OnGiftcodeActionListener(){
+            @Override
+            public void onUseGiftcode(String giftcode, View view) {
+                if (giftcode.isEmpty() || !giftcode.matches("^[a-zA-Z0-9]+$")) {
+                    Snackbar.make(view, R.string.ma_qua_khong_hop_le,
+                            Snackbar.LENGTH_SHORT).show();
+                }else{
+                    manHinhDangTai.hienThi(getString(R.string.dang_xu_ly));
+                    FirebaseUser user=auth.getCurrentUser();
+                    String token=user.getIdToken(false).getResult().getToken();
+                    if(token==null||token.isEmpty()){
+                        manHinhDangTai.an();
+                        Snackbar.make(view,"lỗi token",
+                                Snackbar.LENGTH_SHORT).show();
+                    }
+                    NoiDungMaQua maQua=new NoiDungMaQua(giftcode);
+                    apiService.suDungMaQua("Bearer "+token,maQua)
+                            .enqueue(new retrofit2.Callback<com.gamebai.tienlenmiennam.api.PhanHoiDonGian>() {
+                                @Override
+                                public void onResponse(@NonNull retrofit2.Call<com.gamebai.tienlenmiennam.api.PhanHoiDonGian> call,
+                                                       @NonNull retrofit2.Response<com.gamebai.tienlenmiennam.api.PhanHoiDonGian> response) {
+                                    manHinhDangTai.an();
+                                    if (response.isSuccessful() && response.body() != null) {
+                                        PhanHoiDonGian phanHoi = response.body();
+                                        Snackbar.make(view, phanHoi.getOk(),
+                                                Snackbar.LENGTH_LONG).show();
+                                    } else {
+                                        try {
+                                            String errorJson = response.errorBody().string();
+                                            Gson gson = new Gson();
+                                            PhanHoiDonGian errorResponse = gson.fromJson(errorJson, PhanHoiDonGian.class);
+                                            Snackbar.make(view,
+                                                    getString(R.string.loi) + " " + errorResponse.getLoi(),
+                                                    Snackbar.LENGTH_LONG).show();
+                                        }catch (Exception e){
+                                            Snackbar.make(view,
+                                                    getString(R.string.loi),
+                                                    Snackbar.LENGTH_LONG).show();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(@NonNull retrofit2.Call<com.gamebai.tienlenmiennam.api.PhanHoiDonGian> call,
+                                                      @NonNull Throwable t) {
+                                    manHinhDangTai.an();
+                                    Toast.makeText(MainActivity.this,
+                                            getString(R.string.loi) + " " + t.getMessage(),
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            });
+                }
+            }
+            @Override
+            public void onCancel() {
+                fragment.dismiss();
+            }
+
+        });
+        fragment.show(getSupportFragmentManager(),"BalatroGiftcode");
     }
 
     /**

@@ -19,4 +19,8 @@ public interface ApiService {
     @POST("createZaloPayOrder")
     Call<PhanHoiGiaoDichZaloPay> taoDonGiaoDichZaloPay(@Header("Authorization") String token,
                                                        @Body NoiDungGiaoDichZaloPay noiDungGiaoDichZaloPay);
+    @POST("MaQua")
+    Call<PhanHoiDonGian> suDungMaQua(@Header("Authorization") String token,
+                                     @Body NoiDungMaQua noiDungMaQua);
+
 }

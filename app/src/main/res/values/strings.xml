@@ -91,4 +91,6 @@
     <string name="nhan_tien_thanh_cong">Nhận quà thành công</string>
     <string name="da_nhan_tien_hom_nay">Bạn đã nhận quà hôm nay. Hãy nạp tiền nếu bạn không chờ được đến ngày mai :)</string>
     <string name="phong_da_day_hoac_khong_ton_tai">Phòng không tồn tại, đã bắt đầu trận đấu hoặc đã đầy</string>
+    <string name="ma_qua_khong_hop_le">Mã quà không hợp lệ</string>
+    <string name="dang_xu_ly">Đang xử lý</string>
 </resources>

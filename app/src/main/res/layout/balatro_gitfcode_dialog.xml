@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/giftcodeDialog"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_dialog_balatro"
+    android:padding="24dp">
+
+    <com.gamebai.tienlenmiennam.uisanhcho.BalatroEditText
+        android:id="@+id/balatroEditText"
+        android:layout_width="280dp"
+        android:layout_height="56dp"
+        android:hint="Mã quà"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#67FFFFFF"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.3" />
+
+    <LinearLayout
+        android:id="@+id/buttonsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/balatroEditText">
+
+        <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
+            android:id="@+id/btnQuayLai"
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_marginEnd="12dp"
+            android:layout_weight="1"
+            android:text="Quay lại"
+            app:colorFont="@color/white"
+            app:colorNormal="@color/balatro_yellow"
+            app:fontSize="24" />
+
+        <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
+            android:id="@+id/btnSuDung"
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:text="Sử dụng"
+            app:colorFont="@color/white"
+            app:colorNormal="@color/balatro_red"
+            app:fontSize="24" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

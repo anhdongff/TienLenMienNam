@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="colorNormal" format="color"/>
+    <attr name="colorFont" format="color"/>
+    <attr name="borderColor" format="color"/>
+    <attr name="shadowEnabled" format="boolean" />
+    <attr name="pressable" format="boolean" />
+    <attr name="fontSize" format="float"/>
+    <attr name="textAlign" format="integer"/>
+    <declare-styleable name="BalatroButton">
+        <attr name="colorNormal"/>
+        <attr name="colorFont"/>
+        <attr name="borderColor"/>
+        <attr name="shadowEnabled" />
+        <attr name="pressable" />
+        <attr name="fontSize" />
+        <attr name="textAlign"/>
+<!--        <attr name="colorPressed" format="color"/>-->
+<!--        <attr name="borderColor" format="color"/>-->
+    </declare-styleable>
+    <declare-styleable name="BalatroEditText">
+        <attr name="colorNormal" />
+        <attr name="colorFont" />
+        <attr name="borderColor" />
+        <attr name="shadowEnabled"  />
+        <attr name="pressable" />
+        <attr name="fontSize" />
+        <attr name="textAlign" />
+        <!--        <attr name="colorPressed" format="color"/>-->
+        <!--        <attr name="borderColor" format="color"/>-->
+    </declare-styleable>
+</resources>
