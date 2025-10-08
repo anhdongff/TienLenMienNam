@@ -9,19 +9,24 @@
     android:foregroundTint="#00B42C2C"
     android:textAlignment="center">
 
-    <ImageView
-        android:id="@+id/imageView5"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:scaleType="fitXY"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.602"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/TextViewTien"
-        app:srcCompat="@drawable/girl"
-        app:layout_constraintWidth_percent="1"
-        app:layout_constraintHeight="0.7"/>
+<!--    <ImageView-->
+<!--        android:id="@+id/imageView5"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:scaleType="fitXY"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.602"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/TextViewTien"-->
+<!--        app:srcCompat="@drawable/girl"-->
+<!--        app:layout_constraintWidth_percent="1"-->
+<!--        app:layout_constraintHeight="0.7"/>-->
+
+    <com.gamebai.tienlenmiennam.shader.ShaderView
+        android:id="@+id/shader_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <Button
         android:id="@+id/buttonChoiVoiMay"

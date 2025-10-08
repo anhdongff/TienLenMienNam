@@ -737,9 +737,9 @@ public class MainActivity extends AppCompatActivity {
         HashMap<String,Object> hashMap=new HashMap<>();
         hashMap.put("ThoiGian",System.currentTimeMillis());
         hashMap.put("DaVaoPhong", "wait result");
-        if(taoMoi) hashMap.put("taoMoi",taoMoi);
+        if(taoMoi) hashMap.put("TaoPhong",taoMoi);
         int temp=Integer.parseInt(maPhong);
-        if(temp>0&&temp<10000) hashMap.put("maPhong",maPhong);
+        if(temp>0&&temp<10000) hashMap.put("MaPhong",maPhong);
         nguoiChoiTimTranReference.setValue(hashMap).addOnSuccessListener(success -> {
             //theo dõi để lấy kết quả tìm trậm
             theoDoiKetQuaTimTranListener=new ValueEventListener() {
@@ -754,8 +754,8 @@ public class MainActivity extends AppCompatActivity {
                                 nguoiChoiTimTranReference.removeEventListener(theoDoiKetQuaTimTranListener);
                             }else{
                                 HashMap<String, Object> hashMap = new HashMap<>();
-                                hashMap.put("DaVaoPhong", "canceled");
-                                nguoiChoiTimTranReference.onDisconnect().updateChildren(hashMap);
+                                hashMap.put("DaVaoPhong", "cancelled");
+                                nguoiChoiTimTranReference.updateChildren(hashMap);
                                 nguoiChoiTimTranReference.removeEventListener(theoDoiKetQuaTimTranListener);
                                 theoDoiOfflineKhiTimTran(false);
                                 manHinhDangTai.an();
