@@ -9,33 +9,33 @@
     android:padding="24dp">
 
     <com.gamebai.tienlenmiennam.uisanhcho.BalatroEditText
-        android:id="@+id/balatroEditText"
-        android:layout_width="280dp"
-        android:layout_height="56dp"
-        android:gravity="center"
-        android:hint="Mã quà"
-        android:textAlignment="center"
+        android:id="@+id/balatroEditTextTieuDe"
+        android:layout_width="0dp"
+        android:layout_height="72dp"
+        android:hint="Tiêu đề"
+        android:textAlignment="viewStart"
         android:textColor="#FFFFFF"
         android:textColorHint="#67FFFFFF"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.555"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.3" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <LinearLayout
         android:id="@+id/buttonsLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="46dp"
         android:gravity="center"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/balatroEditText">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
 
         <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
             android:id="@+id/btnQuayLai"
@@ -49,16 +49,36 @@
             app:fontSize="24sp" />
 
         <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
-            android:id="@+id/btnSuDung"
+            android:id="@+id/btnThemMoi"
             android:layout_width="0dp"
             android:layout_height="70dp"
             android:layout_marginStart="12dp"
             android:layout_weight="1"
-            android:text="Sử dụng"
+            android:text="Thêm mới"
             app:colorFont="@color/white"
             app:colorNormal="@color/balatro_red"
             app:fontSize="24sp" />
     </LinearLayout>
+
+    <com.gamebai.tienlenmiennam.uisanhcho.BalatroEditText
+        android:id="@+id/balatroEditTextContent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp"
+        android:gravity="top|start"
+        android:hint="Nội dung"
+        android:inputType="textMultiLine"
+        android:scrollbars="vertical"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#67FFFFFF"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/buttonsLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.555"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/balatroEditTextTieuDe"
+        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

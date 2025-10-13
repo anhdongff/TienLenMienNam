@@ -13,8 +13,6 @@ import android.os.CountDownTimer;
 import android.provider.Settings;
 import android.text.InputType;
 import android.util.DisplayMetrics;
-import android.util.JsonReader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -36,15 +34,21 @@ import com.gamebai.tienlenmiennam.api.ApiService;
 import com.gamebai.tienlenmiennam.api.NoiDungMaQua;
 import com.gamebai.tienlenmiennam.api.PhanHoiDonGian;
 import com.gamebai.tienlenmiennam.api.RetrofitClient;
+import com.gamebai.tienlenmiennam.datamodel.YeuCauHoTro;
 import com.gamebai.tienlenmiennam.hotro.Internet;
 import com.gamebai.tienlenmiennam.hotro.ThongSo;
 import com.gamebai.tienlenmiennam.thucthe.NguoiChoi;
 import com.gamebai.tienlenmiennam.ui.ManHinhDangTai;
+import com.gamebai.tienlenmiennam.uisanhcho.BalatroCreateSupportRequestFragment;
 import com.gamebai.tienlenmiennam.uisanhcho.BalatroGiftcodeFragment;
 import com.gamebai.tienlenmiennam.uisanhcho.BalatroSettingsFragment;
+import com.gamebai.tienlenmiennam.uisanhcho.BalatroSupportRequestFragment;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.FirebaseTooManyRequestsException;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
@@ -60,13 +64,14 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.gson.Gson;
 
-import org.json.JSONObject;
-
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -90,6 +95,8 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseDatabase realtimeDatabase;
     /** tham chiếu đến node NguoiChoiTimTran/{UserID} trong realtime database */
     private DatabaseReference nguoiChoiTimTranReference;
+    /** dữ liệu yêu cầu hỗ trợ */
+    private List<YeuCauHoTro> danhSachYeuCauHoTro;
     /**
      * Sảnh chờ
      */
@@ -101,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
     NguoiChoi nguoiChoi;
     ListenerRegistration taiKhoanListener;
     ListenerRegistration dangNhapListener;
+    BalatroSupportRequestFragment supportRequestFragment;
     /** theo dõi sự kiện tìm được trận trong NguoiChoiTimTran/{UserID} */
     ValueEventListener theoDoiKetQuaTimTranListener;
     /**
@@ -232,6 +240,8 @@ public class MainActivity extends AppCompatActivity {
                     case MA_QUA:
                         nhapMaQua();
                         break;
+                    case HO_TRO:
+                        hienThiYeuCauHoTro();
                 }
             });
             fragment.show(getSupportFragmentManager(), "BalatroSettings");
@@ -300,11 +310,112 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * hiển thị dialog yêu cầu hỗ trợ
+     */
+    private void hienThiYeuCauHoTro() {
+        supportRequestFragment=new BalatroSupportRequestFragment(danhSachYeuCauHoTro);
+        supportRequestFragment.setOnActionSelectedListener(new BalatroSupportRequestFragment.OnRequestSupportActionSelectedListener() {
+            @Override
+            public void onActionSelected(BalatroSupportRequestFragment.Action action) {
+                if(action== BalatroSupportRequestFragment.Action.REQUEST_SUPPORT){
+                    taoYeuCauHoTro();
+                }
+            }
+        });
+        supportRequestFragment.show(getSupportFragmentManager(),"BalatroSupportRequest");
+    }
+    /**
+     * tạo yêu cầu hỗ trợ mới
+     */
+    private void taoYeuCauHoTro() {
+        BalatroCreateSupportRequestFragment fragment=new BalatroCreateSupportRequestFragment();
+        fragment.setOnActionSelectedListener(new BalatroCreateSupportRequestFragment
+                                                     .OnCreateSupportRequestActionSelectedListener() {
+            @Override
+            public void onCreateRequest(String tieuDe, String noiDung, View v) {
+                for(YeuCauHoTro yeuCauHoTro:danhSachYeuCauHoTro){
+                    if(yeuCauHoTro.getTrangThai()==1){//đang chờ phản hồi
+                        Snackbar.make(v,
+                                R.string.ban_co_yeu_cau_ho_tro_dang_cho_phan_hoi,
+                                Snackbar.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+                if(tieuDe.isEmpty()){
+                    Snackbar.make(v,R.string.hay_nhap_tieu_de,Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+                if(noiDung.isEmpty()){
+                    Snackbar.make(v,R.string.hay_nhap_noi_dung,Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+                manHinhDangTai.hienThi(getString(R.string.dang_gui_yeu_cau));
+                FirebaseUser user=auth.getCurrentUser();
+                if(user==null) {
+                    manHinhDangTai.an();
+                    Snackbar.make(findViewById(R.id.sanhCho),R.string.dang_nhap_het_han,
+                            Snackbar.LENGTH_SHORT).show();
+                    dangXuat();
+                    return;
+                }
+                YeuCauHoTro yeuCauHoTro=new YeuCauHoTro();
+                yeuCauHoTro.setTieuDe(tieuDe);
+                yeuCauHoTro.setNoiDung(noiDung);
+                yeuCauHoTro.setThoiGianTao(Timestamp.now());
+                yeuCauHoTro.setTrangThai(1);
+                yeuCauHoTro.setUserId(user.getUid());
+                yeuCauHoTro.setTenDangNhap(nguoiChoi.getTenDangNhap());
+                DocumentReference docRef=firestore.collection("ChamSocKhachHang").document();
+                yeuCauHoTro.setId(docRef.getId());
+                docRef.set(yeuCauHoTro.toHashMap()).addOnCompleteListener(task -> {
+                            manHinhDangTai.an();
+                            if(task.isSuccessful()){
+                                docRef.addSnapshotListener((value, error) -> {
+                                    if (error != null || value == null || !value.exists()) {
+                                        return;
+                                    }
+                                    YeuCauHoTro updatedRequest = value.toObject(YeuCauHoTro.class);
+                                    if (updatedRequest != null) {
+                                        int index = -1;
+                                        for (int i = 0; i < danhSachYeuCauHoTro.size(); i++) {
+                                            if (danhSachYeuCauHoTro.get(i).getId().equals(updatedRequest.getId())) {
+                                                index = i;
+                                                break;
+                                            }
+                                        }
+                                        if (index != -1) {
+                                            danhSachYeuCauHoTro.set(index, updatedRequest);
+                                        } else {
+                                            danhSachYeuCauHoTro.add(0, updatedRequest);
+                                        }
+                                        if(supportRequestFragment!=null) {//cập nhật lại danh sách nếu đang mở
+                                            supportRequestFragment.updateListAndRefreshUI(danhSachYeuCauHoTro);
+                                        }
+                                    }
+                                });
+                                Snackbar.make(v,
+                                        R.string.gui_yeu_cau_ho_tro_thanh_cong,
+                                        Snackbar.LENGTH_SHORT).show();
+                            }else{
+                                Snackbar.make(v,
+                                        getString(R.string.loi)+" "+task.getException().getMessage(),
+                                        Snackbar.LENGTH_LONG).show();
+                            }
+                        });
+            }
+            @Override
+            public void onCancel() {
+                fragment.dismiss();
+            }
+        });
+        fragment.show(getSupportFragmentManager(),"BalatroCreateSupportRequest");
+    }
+    /**
      * mở dialog nhập mã quà
      */
     private void nhapMaQua() {
         BalatroGiftcodeFragment fragment=new BalatroGiftcodeFragment();
-        fragment.setOnActionSelectedListener(new BalatroGiftcodeFragment.OnGiftcodeActionListener(){
+        fragment.setOnActionSelectedListener(new BalatroGiftcodeFragment.OnGiftcodeActionSelectedListener(){
             @Override
             public void onUseGiftcode(String giftcode, View view) {
                 if (giftcode.isEmpty() || !giftcode.matches("^[a-zA-Z0-9]+$")) {
@@ -1058,7 +1169,62 @@ public class MainActivity extends AppCompatActivity {
                             R.string.dang_nhap_that_bai,Snackbar.LENGTH_SHORT).show();
                     dangXuat();
                 });
-        kiemTraIdGame();
+        khoiTaoDuLieuKhac();
+    }
+    /**
+     * khởi tạo các các dữ liệu cần có trước các để view hoạt động được
+     */
+    private void khoiTaoDuLieuKhac(){
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null) {
+            // Xử lý trường hợp người dùng chưa đăng nhập
+            dangXuat();
+            return;
+        }
+        Task<QuerySnapshot> layDanhSachYeuCauHoTroTask= firestore.collection("ChamSocKhachHang")
+                .whereEqualTo("UserId", user.getUid())
+                .orderBy("ThoiGianTao", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .get();
+        List<Task<?>> allTasks = new ArrayList<>();
+        allTasks.add(layDanhSachYeuCauHoTroTask);
+        Tasks.whenAllSuccess(allTasks).addOnSuccessListener(result -> {
+            //dữ liệu yêu cầu hỗ trợ
+            QuerySnapshot danhSachYeuCauHoTroSnashot=(QuerySnapshot) result.get(0);
+            if (danhSachYeuCauHoTro == null) {
+                danhSachYeuCauHoTro = new java.util.ArrayList<>();
+            }
+            danhSachYeuCauHoTro.clear();
+            for (com.google.firebase.firestore.QueryDocumentSnapshot document : danhSachYeuCauHoTroSnashot) {
+                YeuCauHoTro yeuCau = document.toObject(YeuCauHoTro.class);
+                if (yeuCau.getTrangThai() == 1) {
+                    document.getReference().addSnapshotListener((value, error) -> {
+                        if (error != null) {
+                            Snackbar.make(findViewById(R.id.main),
+                                    R.string.loi_tai_du_lieu,Snackbar.LENGTH_SHORT).show();
+                            dangXuat();
+                            return;
+                        }
+                        if (value != null && value.exists()) {
+                            YeuCauHoTro updatedYeuCau = value.toObject(YeuCauHoTro.class);
+                            // Tìm và cập nhật yêu cầu trong danh sách
+                            for (int i = 0; i < danhSachYeuCauHoTro.size(); i++) {
+                                if (danhSachYeuCauHoTro.get(i).getId().equals(updatedYeuCau.getId())) {
+                                    danhSachYeuCauHoTro.set(i, updatedYeuCau);
+                                    break;
+                                }
+                            }
+                        }
+                    });
+                }
+                danhSachYeuCauHoTro.add(yeuCau);
+            }
+            kiemTraIdGame();
+        }).addOnFailureListener(e -> {
+            manHinhDangTai.an();
+            Snackbar.make(findViewById(R.id.main),
+                    R.string.loi_tai_du_lieu,Snackbar.LENGTH_SHORT).show();
+            dangXuat();
+        });
     }
     private void kiemTraIdGame() {
 //        FirebaseUser user=auth.getCurrentUser();

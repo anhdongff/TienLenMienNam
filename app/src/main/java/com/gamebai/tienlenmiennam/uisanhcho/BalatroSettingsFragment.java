@@ -1,18 +1,13 @@
 package com.gamebai.tienlenmiennam.uisanhcho;
 
-import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
+
 import com.gamebai.tienlenmiennam.R;
 
 /**
@@ -21,21 +16,27 @@ import com.gamebai.tienlenmiennam.R;
  * Khi người dùng bấm nút đỏ, callback onActionSelected sẽ được gọi.
  */
 public class BalatroSettingsFragment extends BalatroDialogFragment {
+    /**
+     * các hành động có thể chọn trong cài đặt
+     */
     public enum Action {
         AM_THANH, AM_NHAC, MA_QUA, HO_TRO, DANG_XUAT
     }
-
-    public interface OnActionSelectedListener {
+    /**
+     * lớp trừu tượng để lắng nghe sự kiện người dùng chọn hành động,
+     * phải được implement (sửa các hàm trong đây) ở Activity hoặc Fragment sử dụng
+     */
+    public interface OnSettingActionSelectedListener {
         void onActionSelected(Action action);
     }
 
-    private OnActionSelectedListener listener;
+    private OnSettingActionSelectedListener listener;
 
     public BalatroSettingsFragment() {
         // Bắt buộc phải có constructor rỗng
     }
 
-    public void setOnActionSelectedListener(OnActionSelectedListener listener) {
+    public void setOnActionSelectedListener(OnSettingActionSelectedListener listener) {
         this.listener = listener;
     }
 

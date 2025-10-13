@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.*;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.animation.ScaleAnimation;
 
@@ -28,7 +29,9 @@ public class BalatroButton extends AppCompatTextView {
     // các chức năng khác
     private boolean shadowEnabled = true;
     private boolean pressable = true;
-
+    public BalatroButton(Context context) {
+        super(context);
+    }
     public BalatroButton(Context context, AttributeSet attrs) {
         super(context, attrs);
         setPadding(32, 16, 32, 16);
@@ -41,7 +44,11 @@ public class BalatroButton extends AppCompatTextView {
             colorNormal = a.getColor(R.styleable.BalatroButton_colorNormal, colorNormal);
             colorFont = a.getColor(R.styleable.BalatroButton_colorFont, colorFont);
             borderColor=a.getColor(R.styleable.BalatroButton_borderColor,borderColor);
-            setTextSize(a.getFloat(R.styleable.BalatroButton_fontSize, fontSize));
+            float defaultFontSizeInPixels = TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_SP, fontSize, getResources().getDisplayMetrics()
+            );
+            setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                    a.getDimension(R.styleable.BalatroButton_fontSize, defaultFontSizeInPixels));
             int align = a.getInt(R.styleable.BalatroButton_textAlign, 1); // 0: LEFT, 1: CENTER, 2: RIGHT
             switch (align) {
                 case 0: textAlign = Paint.Align.LEFT; break;
@@ -116,7 +123,7 @@ public class BalatroButton extends AppCompatTextView {
         paint.setTypeface(getTypeface());
         Paint.FontMetrics fm = paint.getFontMetrics();
         String[] lines = getText().toString().split("\n");
-        float lineHeight = (fm.descent - fm.ascent)*0.75f;
+        float lineHeight = (fm.descent - fm.ascent)*(lines.length>1?0.75f:1f);
         float totalTextHeight = lines.length * lineHeight;
         float textY = getHeight() / 2f - totalTextHeight / 2f - fm.ascent;
 
@@ -177,5 +184,10 @@ public class BalatroButton extends AppCompatTextView {
         anim.setFillAfter(true);
         anim.setDuration(80);
         startAnimation(anim);
+    }
+
+    public void setColorFont(int color) {
+        this.colorFont = color;
+        invalidate();
     }
 }

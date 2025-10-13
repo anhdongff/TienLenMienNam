@@ -93,4 +93,13 @@
     <string name="phong_da_day_hoac_khong_ton_tai">Phòng không tồn tại, đã bắt đầu trận đấu hoặc đã đầy</string>
     <string name="ma_qua_khong_hop_le">Mã quà không hợp lệ</string>
     <string name="dang_xu_ly">Đang xử lý</string>
+    <string name="loi_tai_du_lieu">Lỗi tải dữ liệu</string>
+    <string name="chua_co_gi_o_day">Chưa có gì ở đây</string>
+    <string name="phan_hoi">Phản hồi</string>
+    <string name="yeu_cau_chua_duoc_phan_hoi">Chưa có phản hồi. Hãy kiên nhẫn chờ chúng tôi!</string>
+    <string name="ban_co_yeu_cau_ho_tro_dang_cho_phan_hoi">Bạn vẫn còn yêu cầu đang chờ phản hồi</string>
+    <string name="hay_nhap_tieu_de">Hãy nhập tiêu đề</string>
+    <string name="hay_nhap_noi_dung">Hãy nhập nội dung</string>
+    <string name="dang_gui_yeu_cau">Đang gửi yêu cầu...</string>
+    <string name="gui_yeu_cau_ho_tro_thanh_cong">Gửi yêu cầu hỗ trợ thành công</string>
 </resources>

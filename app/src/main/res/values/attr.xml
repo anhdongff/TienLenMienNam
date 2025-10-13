@@ -5,7 +5,7 @@
     <attr name="borderColor" format="color"/>
     <attr name="shadowEnabled" format="boolean" />
     <attr name="pressable" format="boolean" />
-    <attr name="fontSize" format="float"/>
+    <attr name="fontSize" format="dimension"/>
     <attr name="textAlign" format="integer"/>
     <declare-styleable name="BalatroButton">
         <attr name="colorNormal"/>

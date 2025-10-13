@@ -33,7 +33,7 @@
                 android:text="Âm thanh"
                 app:colorFont="@color/white"
                 app:colorNormal="@color/balatro_red"
-                app:fontSize="24" />
+                app:fontSize="24sp" />
 
             <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
                 android:id="@+id/AmNhacButton"
@@ -43,7 +43,7 @@
                 android:text="Âm nhạc"
                 app:colorFont="@color/white"
                 app:colorNormal="@color/balatro_red"
-                app:fontSize="24" />
+                app:fontSize="24sp" />
 
             <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
                 android:id="@+id/MaQuaButton"
@@ -52,7 +52,7 @@
                 android:text="Mã quà"
                 app:colorFont="@color/white"
                 app:colorNormal="@color/balatro_red"
-                app:fontSize="24" />
+                app:fontSize="24sp" />
 
             <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
                 android:id="@+id/HoTroButton"
@@ -61,7 +61,7 @@
                 android:text="Hỗ trợ"
                 app:colorFont="@color/white"
                 app:colorNormal="@color/balatro_red"
-                app:fontSize="24" />
+                app:fontSize="24sp" />
 
             <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
                 android:id="@+id/DangXuatButton"
@@ -70,7 +70,7 @@
                 android:text="Đăng xuất"
                 app:colorFont="@color/white"
                 app:colorNormal="@color/balatro_red"
-                app:fontSize="24" />
+                app:fontSize="24sp" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
@@ -82,7 +82,7 @@
         android:text="Quay lại"
         app:colorFont="@color/white"
         app:colorNormal="@color/balatro_yellow"
-        app:fontSize="24"
+        app:fontSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

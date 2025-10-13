@@ -9,16 +9,23 @@ import androidx.annotation.Nullable;
 
 import com.gamebai.tienlenmiennam.R;
 
+/**
+ * Fragment hiển thị giao diện nhập mã giftcode với các nút chức năng.
+ * Sử dụng layout balatro_gitfcode_dialog.xml.
+ */
 public class BalatroGiftcodeFragment extends BalatroDialogFragment {
-    public interface OnGiftcodeActionListener {
+    /**
+     * lớp trừu tượng để lắng nghe sự kiện người dùng chọn hành động,
+     * phải được implement (sửa các hàm trong đây) ở Activity hoặc Fragment sử dụng
+     */
+    public interface OnGiftcodeActionSelectedListener {
         void onUseGiftcode(String giftcode, View v);
         void onCancel();
     }
-    public void setOnActionSelectedListener(OnGiftcodeActionListener listener) {
+    private OnGiftcodeActionSelectedListener listener;
+    public void setOnActionSelectedListener(OnGiftcodeActionSelectedListener listener) {
         this.listener = listener;
     }
-    private OnGiftcodeActionListener listener;
-
     public BalatroGiftcodeFragment() {
         // Required empty public constructor
     }
@@ -31,7 +38,6 @@ public class BalatroGiftcodeFragment extends BalatroDialogFragment {
         BalatroEditText editText = view.findViewById(R.id.balatroEditText);
         view.findViewById(R.id.btnQuayLai).setOnClickListener(v -> {
             if (listener != null) listener.onCancel();
-            dismiss();
         });
 
         view.findViewById(R.id.btnSuDung).setOnClickListener(v -> {

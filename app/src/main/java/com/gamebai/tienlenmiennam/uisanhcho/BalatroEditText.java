@@ -31,7 +31,7 @@ public class BalatroEditText extends AppCompatEditText {
         setBackgroundResource(R.drawable.bg_balatro_edittext);
 //        setTextSize(18);
         setPadding(24, 16, 24, 16);
-        setGravity(Gravity.CENTER_VERTICAL);
+//        setGravity(Gravity.CENTER_VERTICAL);
         setTypeface(ResourcesCompat.getFont(getContext(), com.gamebai.tienlenmiennam.R.font.m6x11plus)); // hoặc font pixel tuỳ bạn
     }
 }
