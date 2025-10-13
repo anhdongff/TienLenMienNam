@@ -1183,6 +1183,7 @@ public class MainActivity extends AppCompatActivity {
         }
         Task<QuerySnapshot> layDanhSachYeuCauHoTroTask= firestore.collection("ChamSocKhachHang")
                 .whereEqualTo("UserId", user.getUid())
+                .whereGreaterThan("TrangThai", 0)
                 .orderBy("ThoiGianTao", com.google.firebase.firestore.Query.Direction.DESCENDING)
                 .get();
         List<Task<?>> allTasks = new ArrayList<>();
