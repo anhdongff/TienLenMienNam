@@ -22,5 +22,11 @@ public interface ApiService {
     @POST("MaQua")
     Call<PhanHoiDonGian> suDungMaQua(@Header("Authorization") String token,
                                      @Body NoiDungMaQua noiDungMaQua);
+    @POST("KiemTraVaKhoiTaoTienTrinhSuKien")
+    Call<PhanHoiDonGian> kiemTraVaKhoiTaoTienTrinhSuKien(@Header("Authorization") String token,
+                                                        @Body NoiDungSuKien noiDungKiemTraSuKien);
+    @POST("NhanThuongSuKien")
+    Call<PhanHoiDonGian> nhanThuongSuKien(@Header("Authorization") String token,
+                                         @Body NoiDungSuKien noiDungNhanThuongSuKien);
 
 }

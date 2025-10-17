@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/balatro_event"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_dialog_balatro"
+    android:padding="20dp">
+
+    <!-- Panel bên trái chiếm 35% chiều rộng -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/leftPanel"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.35">
+
+        <ScrollView
+            android:id="@+id/leftScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/ButtonDong"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0">
+
+            <LinearLayout
+                android:id="@+id/leftButtonPanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <!--                <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton-->
+                <!--                    android:id="@+id/btnThongTin"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="48dp"-->
+                <!--                    android:text="Thông tin"-->
+                <!--                    app:colorFont="@color/white"-->
+                <!--                    app:colorNormal="@color/balatro_red" />-->
+
+                <!--                <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton-->
+                <!--                    android:id="@+id/btnCaiDat"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="48dp"-->
+                <!--                    android:text="Cài đặt"-->
+                <!--                    app:colorFont="@color/white"-->
+                <!--                    app:colorNormal="@color/balatro_red" />-->
+
+                <!--                <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton-->
+                <!--                    android:id="@+id/btnHoTro"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="48dp"-->
+                <!--                    android:text="Hỗ trợ"-->
+                <!--                    app:colorFont="@color/white"-->
+                <!--                    app:colorNormal="@color/balatro_red" />-->
+
+                <!--                <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton-->
+                <!--                    android:id="@+id/btnDangXuat"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="48dp"-->
+                <!--                    android:text="Đăng xuất"-->
+                <!--                    app:colorFont="@color/white"-->
+                <!--                    app:colorNormal="@color/balatro_red" />-->
+
+            </LinearLayout>
+        </ScrollView>
+
+        <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
+            android:id="@+id/ButtonDong"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Đóng"
+            app:colorFont="@color/white"
+            app:colorNormal="@color/balatro_yellow"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Panel bên phải chiếm 65% chiều rộng -->
+    <FrameLayout
+        android:id="@+id/rightContentPanel"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/leftPanel"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ScrollView
+            android:id="@+id/rightScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <!-- Xóa bỏ các thuộc tính app:layout_... vì không cần thiết trong FrameLayout -->
+
+            <LinearLayout
+                android:id="@+id/rightButtonPanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"></LinearLayout>
+        </ScrollView>
+    </FrameLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

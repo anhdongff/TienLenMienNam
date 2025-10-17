@@ -13,6 +13,7 @@ import android.os.CountDownTimer;
 import android.provider.Settings;
 import android.text.InputType;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -20,7 +21,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,15 +31,20 @@ import androidx.core.app.ActivityCompat;
 
 import com.gamebai.tienlenmiennam.R;
 import com.gamebai.tienlenmiennam.api.ApiService;
+import com.gamebai.tienlenmiennam.api.ApiUtility;
 import com.gamebai.tienlenmiennam.api.NoiDungMaQua;
+import com.gamebai.tienlenmiennam.api.NoiDungSuKien;
 import com.gamebai.tienlenmiennam.api.PhanHoiDonGian;
 import com.gamebai.tienlenmiennam.api.RetrofitClient;
+import com.gamebai.tienlenmiennam.datamodel.SuKien;
+import com.gamebai.tienlenmiennam.datamodel.TienTrinhNhiemVu;
 import com.gamebai.tienlenmiennam.datamodel.YeuCauHoTro;
 import com.gamebai.tienlenmiennam.hotro.Internet;
 import com.gamebai.tienlenmiennam.hotro.ThongSo;
 import com.gamebai.tienlenmiennam.thucthe.NguoiChoi;
 import com.gamebai.tienlenmiennam.ui.ManHinhDangTai;
 import com.gamebai.tienlenmiennam.uisanhcho.BalatroCreateSupportRequestFragment;
+import com.gamebai.tienlenmiennam.uisanhcho.BalatroEventFragment;
 import com.gamebai.tienlenmiennam.uisanhcho.BalatroGiftcodeFragment;
 import com.gamebai.tienlenmiennam.uisanhcho.BalatroSettingsFragment;
 import com.gamebai.tienlenmiennam.uisanhcho.BalatroSupportRequestFragment;
@@ -75,6 +80,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import retrofit2.Call;
+
 public class MainActivity extends AppCompatActivity {
     private static Context gameContext;
     ManHinhDangTai manHinhDangTai;
@@ -97,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference nguoiChoiTimTranReference;
     /** dữ liệu yêu cầu hỗ trợ */
     private List<YeuCauHoTro> danhSachYeuCauHoTro;
+    private List<SuKien> danhSachSuKien;
     /**
      * Sảnh chờ
      */
@@ -111,6 +119,8 @@ public class MainActivity extends AppCompatActivity {
     BalatroSupportRequestFragment supportRequestFragment;
     /** theo dõi sự kiện tìm được trận trong NguoiChoiTimTran/{UserID} */
     ValueEventListener theoDoiKetQuaTimTranListener;
+    /** danh sách listener đã đăng ký để hủy khi đăng xuất */
+    List<ListenerRegistration> danhSachFirebaseListener;
     /**
      * Game
      */
@@ -192,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
         realtimeDatabase=FirebaseDatabase.getInstance(
                 "https://tienlenmiennam-d2c29-default-rtdb.asia-southeast1.firebasedatabase.app/");
         realtimeDatabase.setPersistenceEnabled(false);
+        danhSachFirebaseListener=new ArrayList<>();
         /**
          * tải thông tin đăng nhập nếu đã lưu trước đó
          */
@@ -284,17 +295,72 @@ public class MainActivity extends AppCompatActivity {
             });
         textViewHuongDan=findViewById(R.id.textViewHuongDan);
         textViewHuongDan.setOnClickListener(v->{
-            ScrollView scrollView = new ScrollView(this);
-            TextView textView = new TextView(this);
-            textView.setText(R.string.game_noi_dung_huong_dan);
-            textView.setPadding(32, 32, 32, 32); // Padding tùy ý
-            textView.setTextSize(16);
-            scrollView.addView(textView);
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(R.string.game_huong_dan);
-            builder.setView(scrollView);
-            builder.setPositiveButton(R.string.ok, (dialog, which) -> dialog.dismiss());
-            builder.show();
+//            ScrollView scrollView = new ScrollView(this);
+//            TextView textView = new TextView(this);
+//            textView.setText(R.string.game_noi_dung_huong_dan);
+//            textView.setPadding(32, 32, 32, 32); // Padding tùy ý
+//            textView.setTextSize(16);
+//            scrollView.addView(textView);
+//            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//            builder.setTitle(R.string.game_huong_dan);
+//            builder.setView(scrollView);
+//            builder.setPositiveButton(R.string.ok, (dialog, which) -> dialog.dismiss());
+//            builder.show();
+            BalatroEventFragment fragment=new BalatroEventFragment();
+            fragment.setListener((idSuKien, idNhiemVu, view) -> {
+                manHinhDangTai.hienThi(getString(R.string.dang_xu_ly));
+                FirebaseUser user = auth.getCurrentUser();
+                if (user == null) {
+                    manHinhDangTai.an();
+                    Snackbar.make(findViewById(R.id.sanhCho), R.string.dang_nhap_het_han,
+                            Snackbar.LENGTH_SHORT).show();
+                    dangXuat();
+                    return;
+                }
+                NoiDungSuKien noiDungSuKien = new NoiDungSuKien(idSuKien, idNhiemVu);
+                String token = user.getIdToken(false).getResult().getToken();
+                if (token == null || token.isEmpty()) {
+                    manHinhDangTai.an();
+                    Snackbar.make(view, "lỗi token",
+                            Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+                apiService.nhanThuongSuKien("Bearer " + token, noiDungSuKien)
+                        .enqueue(new retrofit2.Callback<PhanHoiDonGian>() {
+                            @Override
+                            public void onResponse(@NonNull retrofit2.Call<PhanHoiDonGian> call,
+                                                   @NonNull retrofit2.Response<PhanHoiDonGian> response) {
+                                manHinhDangTai.an();
+                                if (response.isSuccessful() && response.body() != null) {
+                                    PhanHoiDonGian phanHoi = response.body();
+                                    Snackbar.make(view, phanHoi.getOk(),
+                                            Snackbar.LENGTH_LONG).show();
+                                } else {
+                                    try {
+                                        String errorJson = response.errorBody().string();
+                                        Gson gson = new Gson();
+                                        PhanHoiDonGian errorResponse = gson.fromJson(errorJson, PhanHoiDonGian.class);
+                                        Snackbar.make(view,
+                                                getString(R.string.loi) + " " + errorResponse.getLoi(),
+                                                Snackbar.LENGTH_LONG).show();
+                                    } catch (Exception e) {
+                                        Snackbar.make(view,
+                                                getString(R.string.loi),
+                                                Snackbar.LENGTH_LONG).show();
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(@NonNull retrofit2.Call<PhanHoiDonGian> call,
+                                                  @NonNull Throwable t) {
+                                manHinhDangTai.an();
+                                Snackbar.make(view,getString(R.string.loi),Snackbar.LENGTH_LONG).show();
+                            }
+                        });
+            });
+            fragment.setDanhSachSuKien(danhSachSuKien);
+            fragment.show(getSupportFragmentManager(), "BalatroEvent");
         });
         textViewFree=findViewById(R.id.textViewFree);
         textViewFree.setOnClickListener(v->{
@@ -1174,56 +1240,169 @@ public class MainActivity extends AppCompatActivity {
     /**
      * khởi tạo các các dữ liệu cần có trước các để view hoạt động được
      */
-    private void khoiTaoDuLieuKhac(){
+    private void khoiTaoDuLieuKhac() {
         FirebaseUser user = auth.getCurrentUser();
         if (user == null) {
-            // Xử lý trường hợp người dùng chưa đăng nhập
             dangXuat();
             return;
-        }
-        Task<QuerySnapshot> layDanhSachYeuCauHoTroTask= firestore.collection("ChamSocKhachHang")
-                .whereEqualTo("UserId", user.getUid())
-                .whereGreaterThan("TrangThai", 0)
-                .orderBy("ThoiGianTao", com.google.firebase.firestore.Query.Direction.DESCENDING)
-                .get();
-        List<Task<?>> allTasks = new ArrayList<>();
-        allTasks.add(layDanhSachYeuCauHoTroTask);
-        Tasks.whenAllSuccess(allTasks).addOnSuccessListener(result -> {
-            //dữ liệu yêu cầu hỗ trợ
-            QuerySnapshot danhSachYeuCauHoTroSnashot=(QuerySnapshot) result.get(0);
-            if (danhSachYeuCauHoTro == null) {
-                danhSachYeuCauHoTro = new java.util.ArrayList<>();
-            }
-            danhSachYeuCauHoTro.clear();
-            for (com.google.firebase.firestore.QueryDocumentSnapshot document : danhSachYeuCauHoTroSnashot) {
-                YeuCauHoTro yeuCau = document.toObject(YeuCauHoTro.class);
-                if (yeuCau.getTrangThai() == 1) {
-                    document.getReference().addSnapshotListener((value, error) -> {
-                        if (error != null) {
-                            Snackbar.make(findViewById(R.id.main),
-                                    R.string.loi_tai_du_lieu,Snackbar.LENGTH_SHORT).show();
-                            dangXuat();
-                            return;
+        }// B1: Lấy token của người dùng một cách bất đồng bộ
+        user.getIdToken(false).addOnSuccessListener(getTokenResult -> {
+            String token = getTokenResult.getToken();
+
+            // B2: Gọi API kiểm tra và khởi tạo tiến trình sự kiện trước
+            NoiDungSuKien noiDungSuKien = new NoiDungSuKien();
+            Call<PhanHoiDonGian> apiCall = apiService.kiemTraVaKhoiTaoTienTrinhSuKien("Bearer " + token, noiDungSuKien);
+            Task<PhanHoiDonGian> kiemTraVaKhoiTaoTienTrinhSuKienTask = ApiUtility.wrapRetrofitCall(apiCall);
+
+            kiemTraVaKhoiTaoTienTrinhSuKienTask.addOnSuccessListener(phanHoi -> {
+                // B3: Sau khi API thành công, chạy các truy vấn Firestore song song
+                Task<QuerySnapshot> layDanhSachYeuCauHoTroTask = firestore.collection("ChamSocKhachHang")
+                        .whereEqualTo("UserId", user.getUid())
+                        .whereGreaterThan("TrangThai", 0)
+                        .orderBy("ThoiGianTao", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                        .get();
+
+                Task<QuerySnapshot> layDanhSachSuKienTask = firestore.collection("SuKien")
+                        .whereEqualTo("TrangThai", 1)
+                        .whereGreaterThan("ThoiGianKetThuc", System.currentTimeMillis())
+                        .get();
+
+                List<Task<?>> firestoreTasks = new ArrayList<>();
+                firestoreTasks.add(layDanhSachYeuCauHoTroTask);
+                firestoreTasks.add(layDanhSachSuKienTask);
+
+                Tasks.whenAllSuccess(firestoreTasks).addOnSuccessListener(results -> {
+                    // B4: Xử lý kết quả từ các truy vấn Firestore
+                    // Dữ liệu yêu cầu hỗ trợ
+                    QuerySnapshot danhSachYeuCauHoTroSnashot = (QuerySnapshot) results.get(0);
+                    if (danhSachYeuCauHoTro == null) {
+                        danhSachYeuCauHoTro = new java.util.ArrayList<>();
+                    }
+                    danhSachYeuCauHoTro.clear();
+                    for (com.google.firebase.firestore.QueryDocumentSnapshot document : danhSachYeuCauHoTroSnashot) {
+                        YeuCauHoTro yeuCau = document.toObject(YeuCauHoTro.class);
+                        if (yeuCau.getTrangThai() == 1) {
+                            danhSachFirebaseListener.add(document.getReference()
+                                    .addSnapshotListener((value, error) -> {
+                                        if (error != null) {
+                                            Snackbar.make(findViewById(R.id.main), R.string.loi_tai_du_lieu, Snackbar.LENGTH_SHORT).show();
+                                            dangXuat();
+                                            return;
+                                        }
+                                        if (value != null && value.exists()) {
+                                            YeuCauHoTro updatedYeuCau = value.toObject(YeuCauHoTro.class);
+                                            for (int i = 0; i < danhSachYeuCauHoTro.size(); i++) {
+                                                if (danhSachYeuCauHoTro.get(i).getId().equals(updatedYeuCau.getId())) {
+                                                    danhSachYeuCauHoTro.set(i, updatedYeuCau);
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }));
                         }
-                        if (value != null && value.exists()) {
-                            YeuCauHoTro updatedYeuCau = value.toObject(YeuCauHoTro.class);
-                            // Tìm và cập nhật yêu cầu trong danh sách
-                            for (int i = 0; i < danhSachYeuCauHoTro.size(); i++) {
-                                if (danhSachYeuCauHoTro.get(i).getId().equals(updatedYeuCau.getId())) {
-                                    danhSachYeuCauHoTro.set(i, updatedYeuCau);
-                                    break;
-                                }
-                            }
+                        danhSachYeuCauHoTro.add(yeuCau);
+                    }
+
+                    // Dữ liệu sự kiện
+                    QuerySnapshot danhSachSuKienSnapshot = (QuerySnapshot) results.get(1);
+                    if (danhSachSuKien == null) {
+                        danhSachSuKien = new java.util.ArrayList<>();
+                    }
+                    danhSachSuKien.clear();
+                    List<String> danhSachSuKienIds = new ArrayList<>();
+                    for (com.google.firebase.firestore.QueryDocumentSnapshot document : danhSachSuKienSnapshot) {
+                        SuKien suKien = document.toObject(SuKien.class);
+                        danhSachSuKien.add(suKien);
+                        danhSachSuKienIds.add(suKien.getId());
+                        if (suKien.getTrangThai() == 1) {
+                            danhSachFirebaseListener.add(document.getReference()
+                                    .addSnapshotListener((value, error) -> {
+                                        if (error != null) {
+                                            Log.e("QUERY", "Error: " + error.getMessage());
+                                            Snackbar.make(findViewById(R.id.main), R.string.loi_tai_du_lieu, Snackbar.LENGTH_SHORT).show();
+                                            dangXuat();
+                                            return;
+                                        }
+                                        if (value != null && value.exists()) {
+                                            SuKien updatedSuKien = value.toObject(SuKien.class);
+                                            for (int i = 0; i < danhSachSuKien.size(); i++) {
+                                                if (danhSachSuKien.get(i).getId().equals(updatedSuKien.getId())) {
+                                                    danhSachSuKien.get(i).copyInfoFrom(updatedSuKien);
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }));
                         }
-                    });
-                }
-                danhSachYeuCauHoTro.add(yeuCau);
-            }
-            kiemTraIdGame();
+                    }
+
+                    // Lấy dữ liệu nhiệm vụ sự kiện
+                    if (!danhSachSuKien.isEmpty()) {
+                        firestore.collectionGroup("DanhSachTienTrinhNhiemVu")
+                                .whereIn("SuKienId", danhSachSuKienIds).whereEqualTo("UserId", user.getUid())
+                                .get().addOnSuccessListener(task -> {
+                                    for (DocumentSnapshot document : task.getDocuments()) {
+                                        TienTrinhNhiemVu tienTrinhNhiemVu = document.toObject(TienTrinhNhiemVu.class);
+                                        for (SuKien suKien : danhSachSuKien) {
+                                            if (suKien.getId().equals(tienTrinhNhiemVu.getSuKienId())
+                                                    && suKien.getTienTrinhNhiemVu() != null
+                                                    && !suKien.getTienTrinhNhiemVu().containsKey(tienTrinhNhiemVu.getId())) {
+                                                suKien.getTienTrinhNhiemVu().put(tienTrinhNhiemVu.getId(), tienTrinhNhiemVu);
+                                            }
+                                        }
+                                        // Theo dõi thay đổi giá trị tiến trình nhiệm vụ
+                                        if (tienTrinhNhiemVu.getGiaTriHienTai() < tienTrinhNhiemVu.getGiaTriYeuCau()
+                                                && !tienTrinhNhiemVu.isDaNhan()) {
+                                            danhSachFirebaseListener.add(document.getReference()
+                                                    .addSnapshotListener((value, error) -> {
+                                                        if (error != null) {
+                                                            Log.e("QUERY", "Error: " + error.getMessage());
+                                                            Snackbar.make(findViewById(R.id.main), R.string.loi_tai_du_lieu, Snackbar.LENGTH_SHORT).show();
+                                                            dangXuat();
+                                                            return;
+                                                        }
+                                                        if (value != null && value.exists()) {
+                                                            TienTrinhNhiemVu updatedTienTrinh = value.toObject(TienTrinhNhiemVu.class);
+                                                            for (SuKien suKien : danhSachSuKien) {
+                                                                if (suKien.getId().equals(updatedTienTrinh.getSuKienId())
+                                                                        && suKien.getTienTrinhNhiemVu() != null
+                                                                        && suKien.getTienTrinhNhiemVu().containsKey(updatedTienTrinh.getId())) {
+                                                                    suKien.getTienTrinhNhiemVu().put(updatedTienTrinh.getId(), updatedTienTrinh);
+                                                                    break;
+                                                                }
+                                                            }
+                                                        }
+                                                    }));
+                                        }
+                                    }
+                                    kiemTraIdGame();
+                                }).addOnFailureListener(e -> {
+                                    Log.e("QUERY", "Error: " + e.getMessage());
+                                    manHinhDangTai.an();
+                                    Snackbar.make(findViewById(R.id.main), R.string.loi_tai_du_lieu, Snackbar.LENGTH_SHORT).show();
+                                    dangXuat();
+                                });
+                    } else {
+                        kiemTraIdGame();
+                    }
+                }).addOnFailureListener(e -> {
+                    Log.e("QUERY", "Error: " + e.getMessage());
+                    manHinhDangTai.an();
+                    Snackbar.make(findViewById(R.id.main), R.string.loi_tai_du_lieu, Snackbar.LENGTH_SHORT).show();
+                    dangXuat();
+                });
+            }).addOnFailureListener(e -> {
+                Log.e("API_RESPONSE", "Error: " + e.getMessage());
+                // Lỗi khi gọi API
+                manHinhDangTai.an();
+                Snackbar.make(findViewById(R.id.main), R.string.loi_tai_du_lieu, Snackbar.LENGTH_SHORT).show();
+                dangXuat();
+            });
         }).addOnFailureListener(e -> {
+            Log.e("TOKEN", "Error: " + e.getMessage());
+            // Lỗi khi lấy token
             manHinhDangTai.an();
-            Snackbar.make(findViewById(R.id.main),
-                    R.string.loi_tai_du_lieu,Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(findViewById(R.id.main), "Lỗi xác thực, không thể tải dữ liệu", Snackbar.LENGTH_SHORT).show();
             dangXuat();
         });
     }
@@ -1408,9 +1587,11 @@ public class MainActivity extends AppCompatActivity {
         auth.signOut();
         nguoiChoi=null;
         lanCuoiDangNhap=0;
-        /**
-         * huỷ các listener trong game trường hợp bị log acc
-         */
+        //huỷ các listener trong game trường hợp bị log acc
+        for(ListenerRegistration listener:danhSachFirebaseListener){
+            listener.remove();
+        }
+        danhSachFirebaseListener.clear();
         game.huyTheoDoiNguoiChoiOnline();
         if (dangNhapListener != null) {
             dangNhapListener.remove();
@@ -1419,9 +1600,7 @@ public class MainActivity extends AppCompatActivity {
             taiKhoanListener.remove();
         }
         setContentView(R.layout.activity_main);
-        /**
-         * khởi tạo lại các thành phần của view đăng nhập
-         */
+        //khởi tạo lại các thành phần của view đăng nhập
         khoiTaoViewDangNhap();
     }
 

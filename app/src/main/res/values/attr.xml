@@ -7,6 +7,7 @@
     <attr name="pressable" format="boolean" />
     <attr name="fontSize" format="dimension"/>
     <attr name="textAlign" format="integer"/>
+    <attr name="autoLines" format="boolean"/>
     <declare-styleable name="BalatroButton">
         <attr name="colorNormal"/>
         <attr name="colorFont"/>
@@ -15,6 +16,7 @@
         <attr name="pressable" />
         <attr name="fontSize" />
         <attr name="textAlign"/>
+        <attr name="autoLines"/>
 <!--        <attr name="colorPressed" format="color"/>-->
 <!--        <attr name="borderColor" format="color"/>-->
     </declare-styleable>
