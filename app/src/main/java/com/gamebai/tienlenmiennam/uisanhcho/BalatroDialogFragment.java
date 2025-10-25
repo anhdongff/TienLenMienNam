@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
+import android.view.ViewGroup;
 import android.view.Window;
 
 import androidx.annotation.NonNull;
@@ -36,6 +37,18 @@ public class BalatroDialogFragment extends DialogFragment {
     }
 
     private float tyLeCao = 0.95f;
+    private boolean isWrapContent= false;
+
+    public boolean isWrapContent() {
+        return isWrapContent;
+    }
+    /**
+     * đặt dialog thành wrap content thay vì tỷ lệ
+     * @param wrapContent
+     */
+    public void setWrapContent(boolean wrapContent) {
+        isWrapContent = wrapContent;
+    }
 
     public float getTyLeRong() {
         return tyLeRong;
@@ -56,21 +69,30 @@ public class BalatroDialogFragment extends DialogFragment {
         dialog.getWindow().getAttributes().windowAnimations = R.style.BalatroDialogAnimation;
         return dialog;
     }
+
     @Override
     public void onStart() {
         super.onStart();
         Dialog dialog = getDialog();
         if (dialog != null && dialog.getWindow() != null) {
-            Window window = dialog.getWindow();
+            Window window = dialog.getWindow();// Kiểm tra xem có nên dùng wrap_content không
+            if (isWrapContent) {
+                // Nếu isWrapContent là true, đặt layout thành wrap_content
+                // Hệ thống sẽ tự động tính toán kích thước dựa trên nội dung của layout XML
+                window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            } else {
+                // Nếu isWrapContent là false, giữ lại logic cũ (tính theo tỷ lệ)
+                // Lấy kích thước màn hình
+                DisplayMetrics metrics = new DisplayMetrics();
+                requireActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+                int width = (int) (metrics.widthPixels * tyLeRong);
+                int height = (int) (metrics.heightPixels * tyLeCao);
 
-            // Lấy kích thước màn hình
-            DisplayMetrics metrics = new DisplayMetrics();
-            requireActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-            int width = (int) (metrics.widthPixels * tyLeRong);
-            int height = (int) (metrics.heightPixels * tyLeCao);
+                // Áp dụng kích thước theo tỷ lệ
+                window.setLayout(width, height);
+            }
 
-            // Áp dụng layout
-            window.setLayout(width, height);
+            // Các thiết lập chung khác giữ nguyên
             window.setGravity(Gravity.CENTER);
             window.setBackgroundDrawableResource(android.R.color.transparent);
         }

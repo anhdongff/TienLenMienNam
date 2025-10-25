@@ -101,6 +101,7 @@ public class BalatroEventFragment extends BalatroDialogFragment{
                                     claimButton.setOnClickListener(claimView -> {
                                         if (listener != null) {
                                             listener.onClaimReward(suKien.getId(), nhiemVuId, view);
+                                            nhiemVu.setDaNhan(true);
                                             claimButton.setText("Đã nhận");
                                             claimButton.setEnabled(false);
                                         }
@@ -117,7 +118,7 @@ public class BalatroEventFragment extends BalatroDialogFragment{
                 leftButtonPanel.addView(suKienButton);
             }
         } else {
-            EditText emptyTextView = new EditText(getContext());
+            TextView emptyTextView = new TextView(getContext());
             emptyTextView.setText("Chưa có sự kiện nào");
             emptyTextView.setGravity(Gravity.CENTER);
             Typeface typeface = ResourcesCompat.getFont(requireContext(), R.font.m6x11plus);

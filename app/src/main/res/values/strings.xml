@@ -102,4 +102,5 @@
     <string name="hay_nhap_noi_dung">Hãy nhập nội dung</string>
     <string name="dang_gui_yeu_cau">Đang gửi yêu cầu...</string>
     <string name="gui_yeu_cau_ho_tro_thanh_cong">Gửi yêu cầu hỗ trợ thành công</string>
+    <string name="chua_co_quang_cao">Hiện chưa có quảng cáo để hiển thị.</string>
 </resources>

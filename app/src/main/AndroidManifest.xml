@@ -17,6 +17,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TiếnLênMiềnNam"
         tools:targetApi="31">
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-7074834616251007~1724295183"/>
         <activity
             android:name=".main.NapTienActivity"
             android:exported="true"
