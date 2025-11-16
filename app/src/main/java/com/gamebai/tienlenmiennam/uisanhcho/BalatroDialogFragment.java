@@ -17,7 +17,7 @@ import com.gamebai.tienlenmiennam.R;
  * Fragment hiển thị một dialog với layout tùy chọn và style, animation của balatro
  * Hãy override onCreateView để inflate layout mong muốn và xử lý các sự kiện
  */
-public class BalatroDialogFragment extends DialogFragment {
+public abstract class BalatroDialogFragment extends DialogFragment {
     private float tyLeRong = 0.47f;
 
     /**

@@ -36,6 +36,7 @@ import com.gamebai.tienlenmiennam.api.NoiDungMaQua;
 import com.gamebai.tienlenmiennam.api.NoiDungSuKien;
 import com.gamebai.tienlenmiennam.api.PhanHoiDonGian;
 import com.gamebai.tienlenmiennam.api.RetrofitClient;
+import com.gamebai.tienlenmiennam.datamodel.QuanHeNguoiChoi;
 import com.gamebai.tienlenmiennam.datamodel.SuKien;
 import com.gamebai.tienlenmiennam.datamodel.TienTrinhNhiemVu;
 import com.gamebai.tienlenmiennam.datamodel.YeuCauHoTro;
@@ -58,6 +59,7 @@ import com.google.android.gms.ads.rewarded.RewardItem;
 import com.google.android.gms.ads.rewarded.RewardedAd;
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.FirebaseNetworkException;
@@ -73,6 +75,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -112,9 +115,11 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseDatabase realtimeDatabase;
     /** tham chiếu đến node NguoiChoiTimTran/{UserID} trong realtime database */
     private DatabaseReference nguoiChoiTimTranReference;
+    private DatabaseReference nguoiChoiReference;
     /** dữ liệu yêu cầu hỗ trợ */
     private List<YeuCauHoTro> danhSachYeuCauHoTro;
     private List<SuKien> danhSachSuKien;
+    private HashMap<String,QuanHeNguoiChoi> danhSachBanBe;
     /**
      * Sảnh chờ
      */
@@ -221,6 +226,33 @@ public class MainActivity extends AppCompatActivity {
         //game
         gamePanel=new GamePanel(this);
         game=gamePanel.getGame();
+        // viết lệnh chèn dữ liệu có sẵn vào firestore
+        // Đoạn mã để đồng bộ dữ liệu từ Firestore sang Realtime Database
+//        firestore.collection("TaiKhoan").get().addOnSuccessListener(queryDocumentSnapshots -> {
+//                    DatabaseReference nguoiChoiRef = realtimeDatabase.getReference("NguoiChoi");
+//                    java.util.Map<String, Object> updates = new java.util.HashMap<>();
+//
+//                    for (com.google.firebase.firestore.QueryDocumentSnapshot document : queryDocumentSnapshots) {
+//                        String userId = document.getId();
+//                        // Thêm đường dẫn và giá trị vào map để cập nhật
+//                        // Ví dụ: "userId123/TrangThai": "offline"
+//                        updates.put(userId + "/TrangThai", "offline");
+//                        updates.put(userId + "/Ten", document.getString("TenDangNhap"));
+//                        updates.put(userId+"/Tien",document.getLong("Tien"));
+//                    }
+//
+//                    // Thực hiện một lần ghi duy nhất cho tất cả người dùng
+//                    if (!updates.isEmpty()) {
+//                        nguoiChoiRef.updateChildren(updates)
+//                                .addOnSuccessListener(aVoid ->
+//                                        Log.d("RealtimeDB_Init", "Đã cập nhật trạng thái offline cho tất cả người dùng."))
+//                                .addOnFailureListener(e ->
+//                                        Log.e("RealtimeDB_Init", "Lỗi khi cập nhật Realtime Database.", e));
+//                    }
+//                })
+//                .addOnFailureListener(e -> {
+//                    Log.e("RealtimeDB_Init", "Lỗi khi lấy danh sách người dùng từ Firestore.", e);
+//                });
     }
 
     /**
@@ -231,12 +263,12 @@ public class MainActivity extends AppCompatActivity {
         RewardedAd.load(this, adUnitId, adRequest, new RewardedAdLoadCallback() {
             @Override
             public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                Log.e("AdMob", "Quảng cáo có thưởng tải thất bại: " + loadAdError.getMessage());
+                Log.e("LOI", "Quảng cáo có thưởng tải thất bại: " + loadAdError.getMessage());
                 rewardedAd = null;
             }
             @Override
             public void onAdLoaded(@NonNull RewardedAd ad) {
-                Log.e("AdMob", "Quảng cáo có thưởng đã tải thành công.");
+                Log.d("AdMob", "Quảng cáo có thưởng đã tải thành công.");
                 rewardedAd = ad;
             }
         });
@@ -255,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
                     Snackbar.make(findViewById(R.id.main),R.string.chua_co_quang_cao,Snackbar.LENGTH_SHORT).show();
                     // Được gọi khi quảng cáo hiển thị thất bại.
-                    Log.e("AdMob", "Quảng cáo có thưởng hiển thị thất bại: " + adError.getMessage());
+                    Log.e("LOI", "Quảng cáo có thưởng hiển thị thất bại: " + adError.getMessage());
                     // Quan trọng: Tải lại quảng cáo mới để sử dụng cho lần sau.
                     taiQuangCao();
                 }
@@ -315,7 +347,7 @@ public class MainActivity extends AppCompatActivity {
             fragment.setOnActionSelectedListener(action -> {
                 switch (action){
                     case DANG_XUAT:
-                        dangXuat();
+                        dangXuat(false);
                         fragment.dismiss();
                         break;
                     case MA_QUA:
@@ -384,7 +416,7 @@ public class MainActivity extends AppCompatActivity {
                     manHinhDangTai.an();
                     Snackbar.make(findViewById(R.id.sanhCho), R.string.dang_nhap_het_han,
                             Snackbar.LENGTH_SHORT).show();
-                    dangXuat();
+                    dangXuat(false);
                     return;
                 }
                 NoiDungSuKien noiDungSuKien = new NoiDungSuKien(idSuKien, idNhiemVu);
@@ -508,7 +540,7 @@ public class MainActivity extends AppCompatActivity {
                     manHinhDangTai.an();
                     Snackbar.make(findViewById(R.id.sanhCho),R.string.dang_nhap_het_han,
                             Snackbar.LENGTH_SHORT).show();
-                    dangXuat();
+                    dangXuat(false);
                     return;
                 }
                 YeuCauHoTro yeuCauHoTro=new YeuCauHoTro();
@@ -894,13 +926,13 @@ public class MainActivity extends AppCompatActivity {
                                         luuThoiDiemGuiLaiEmailXacThuc();
                                         dialogDangMo=false;
                                         dialog.dismiss();
-                                        dangXuat();
+                                        dangXuat(false);
                                     }
                                 })
                                 .setNegativeButton(R.string.khong, (dialog, which) -> {
                                     dialogDangMo=false;
                                     dialog.dismiss();
-                                    dangXuat();
+                                    dangXuat(false);
                                 });
                         AlertDialog dialog=builder.create();
                         dialog.setCancelable(false);
@@ -1015,7 +1047,7 @@ public class MainActivity extends AppCompatActivity {
             manHinhDangTai.an();
             Snackbar.make(findViewById(R.id.sanhCho),R.string.dang_nhap_het_han,
                     Snackbar.LENGTH_SHORT).show();
-            dangXuat();
+            dangXuat(false);
             return;
         }
         /**
@@ -1051,7 +1083,7 @@ public class MainActivity extends AppCompatActivity {
             manHinhDangTai.an();
             Snackbar.make(findViewById(R.id.sanhCho),R.string.dang_nhap_het_han,
                     Snackbar.LENGTH_SHORT).show();
-            dangXuat();
+            dangXuat(false);
             return;
         }
         /**
@@ -1087,7 +1119,7 @@ public class MainActivity extends AppCompatActivity {
             manHinhDangTai.an();
             Snackbar.make(findViewById(R.id.sanhCho),R.string.dang_nhap_het_han,
                     Snackbar.LENGTH_SHORT).show();
-            dangXuat();
+            dangXuat(false);
             return;
         }
         /**
@@ -1195,7 +1227,7 @@ public class MainActivity extends AppCompatActivity {
                                                                                     +" "+task2.getMessage(),
                                                                                     Toast.LENGTH_SHORT)
                                                                                     .show();
-                                                                            dangXuat();
+                                                                            dangXuat(false);
                                                                         });
                                                                 dialogDangMo=false;
                                                                 dialog.dismiss();
@@ -1208,7 +1240,7 @@ public class MainActivity extends AppCompatActivity {
                                                                         +task1.getException().getMessage(),
                                                                         Toast.LENGTH_SHORT)
                                                                         .show();
-                                                                dangXuat();
+                                                                dangXuat(false);
                                                             }
                                                         }
                                                     });
@@ -1230,7 +1262,7 @@ public class MainActivity extends AppCompatActivity {
                                                         +task.getException().getMessage(),
                                                 Toast.LENGTH_SHORT)
                                         .show();
-                                dangXuat();
+                                dangXuat(false);
                             }
                         }
                     });
@@ -1248,7 +1280,7 @@ public class MainActivity extends AppCompatActivity {
             manHinhDangTai.an();
             Snackbar.make(findViewById(R.id.sanhCho),R.string.dang_nhap_het_han,
                     Snackbar.LENGTH_SHORT).show();
-            dangXuat();
+            dangXuat(false);
             return;
         }
         DocumentReference documentReference= firestore.collection(NguoiChoi.TEN_COLLECTION)
@@ -1268,23 +1300,51 @@ public class MainActivity extends AppCompatActivity {
                                     if(game.getTrangThaiGame()==ThongSo.TrangThaiGame.TRANG_THAI_CHOI_ONLINE){
                                         game.choiOnline.thoat();
                                     }
-                                    dangXuat();
+                                    dangXuat(true);
                                 }
                             });
                 }).addOnFailureListener(task->{
                     Snackbar.make(findViewById(R.id.main),
                             R.string.dang_nhap_that_bai,Snackbar.LENGTH_SHORT).show();
-                    dangXuat();
+                    dangXuat(false);
                 });
         khoiTaoDuLieuKhac();
     }
+    /**
+     * theo dõi trạng thái online của người chơi
+     */
+    private void theoDoiTrangThaiOnline() {
+        FirebaseUser user=auth.getCurrentUser();
+        if(user==null) {
+            manHinhDangTai.an();
+            Snackbar.make(findViewById(R.id.sanhCho),R.string.dang_nhap_het_han,
+                    Snackbar.LENGTH_SHORT).show();
+            dangXuat(false);
+            return;
+        }
+        nguoiChoiReference=realtimeDatabase.getReference("NguoiChoi/"+user.getUid());
+        HashMap<String,Object> hashMapOnline=new HashMap<>();
+        hashMapOnline.put("TrangThai","online");
+        hashMapOnline.put("Ten",nguoiChoi.getTenDangNhap());
+        hashMapOnline.put("LoiMoi",null);
+        HashMap<String,Object> hashMapOffline=new HashMap<>();
+        hashMapOffline.put("TrangThai","offline");
+        nguoiChoiReference.updateChildren(hashMapOnline).addOnSuccessListener(v->{
+            nguoiChoiReference.onDisconnect().updateChildren(hashMapOffline);
+        }).addOnFailureListener(e->{
+            Log.e("LOI", "Error: " + e.getMessage());
+            Toast.makeText(this,getString(R.string.loi_tai_du_lieu),Toast.LENGTH_SHORT).show();
+            dangXuat(false);
+        });
+    }
+
     /**
      * khởi tạo các các dữ liệu cần có trước các để view hoạt động được
      */
     private void khoiTaoDuLieuKhac() {
         FirebaseUser user = auth.getCurrentUser();
         if (user == null) {
-            dangXuat();
+            dangXuat(false);
             return;
         }// B1: Lấy token của người dùng một cách bất đồng bộ
         user.getIdToken(false).addOnSuccessListener(getTokenResult -> {
@@ -1294,158 +1354,330 @@ public class MainActivity extends AppCompatActivity {
             NoiDungSuKien noiDungSuKien = new NoiDungSuKien();
             Call<PhanHoiDonGian> apiCall = apiService.kiemTraVaKhoiTaoTienTrinhSuKien("Bearer " + token, noiDungSuKien);
             Task<PhanHoiDonGian> kiemTraVaKhoiTaoTienTrinhSuKienTask = ApiUtility.wrapRetrofitCall(apiCall);
-
             kiemTraVaKhoiTaoTienTrinhSuKienTask.addOnSuccessListener(phanHoi -> {
                 // B3: Sau khi API thành công, chạy các truy vấn Firestore song song
-                Task<QuerySnapshot> layDanhSachYeuCauHoTroTask = firestore.collection("ChamSocKhachHang")
-                        .whereEqualTo("UserId", user.getUid())
-                        .whereGreaterThan("TrangThai", 0)
-                        .orderBy("ThoiGianTao", com.google.firebase.firestore.Query.Direction.DESCENDING)
-                        .get();
-
-                Task<QuerySnapshot> layDanhSachSuKienTask = firestore.collection("SuKien")
-                        .whereEqualTo("TrangThai", 1)
-                        .whereGreaterThan("ThoiGianKetThuc", System.currentTimeMillis())
-                        .get();
-
+                Task<Void> layDanhSachYeuCauHoTroTask = khoiTaoListenerYeuCauHoTro(user);
+                Task<Void> layDanhSachSuKienTask = khoiTaoListenerSuKienVaNhiemVu(user);
+                Task<Void> layDanhSachBanBeTask=khoiTaoDuLieuBanBe(user);
                 List<Task<?>> firestoreTasks = new ArrayList<>();
                 firestoreTasks.add(layDanhSachYeuCauHoTroTask);
                 firestoreTasks.add(layDanhSachSuKienTask);
-
+                firestoreTasks.add(layDanhSachBanBeTask);
                 Tasks.whenAllSuccess(firestoreTasks).addOnSuccessListener(results -> {
-                    // B4: Xử lý kết quả từ các truy vấn Firestore
-                    // Dữ liệu yêu cầu hỗ trợ
-                    QuerySnapshot danhSachYeuCauHoTroSnashot = (QuerySnapshot) results.get(0);
-                    if (danhSachYeuCauHoTro == null) {
-                        danhSachYeuCauHoTro = new java.util.ArrayList<>();
-                    }
-                    danhSachYeuCauHoTro.clear();
-                    for (com.google.firebase.firestore.QueryDocumentSnapshot document : danhSachYeuCauHoTroSnashot) {
-                        YeuCauHoTro yeuCau = document.toObject(YeuCauHoTro.class);
-                        if (yeuCau.getTrangThai() == 1) {
-                            danhSachFirebaseListener.add(document.getReference()
-                                    .addSnapshotListener((value, error) -> {
-                                        if (error != null) {
-                                            Snackbar.make(findViewById(R.id.main), R.string.loi_tai_du_lieu, Snackbar.LENGTH_SHORT).show();
-                                            dangXuat();
-                                            return;
-                                        }
-                                        if (value != null && value.exists()) {
-                                            YeuCauHoTro updatedYeuCau = value.toObject(YeuCauHoTro.class);
-                                            for (int i = 0; i < danhSachYeuCauHoTro.size(); i++) {
-                                                if (danhSachYeuCauHoTro.get(i).getId().equals(updatedYeuCau.getId())) {
-                                                    danhSachYeuCauHoTro.set(i, updatedYeuCau);
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }));
-                        }
-                        danhSachYeuCauHoTro.add(yeuCau);
-                    }
-
-                    // Dữ liệu sự kiện
-                    QuerySnapshot danhSachSuKienSnapshot = (QuerySnapshot) results.get(1);
-                    if (danhSachSuKien == null) {
-                        danhSachSuKien = new java.util.ArrayList<>();
-                    }
-                    danhSachSuKien.clear();
-                    List<String> danhSachSuKienIds = new ArrayList<>();
-                    for (com.google.firebase.firestore.QueryDocumentSnapshot document : danhSachSuKienSnapshot) {
-                        SuKien suKien = document.toObject(SuKien.class);
-                        danhSachSuKien.add(suKien);
-                        danhSachSuKienIds.add(suKien.getId());
-                        if (suKien.getTrangThai() == 1) {
-                            danhSachFirebaseListener.add(document.getReference()
-                                    .addSnapshotListener((value, error) -> {
-                                        if (error != null) {
-                                            Log.e("QUERY", "Error: " + error.getMessage());
-                                            Snackbar.make(findViewById(R.id.main), R.string.loi_tai_du_lieu, Snackbar.LENGTH_SHORT).show();
-                                            dangXuat();
-                                            return;
-                                        }
-                                        if (value != null && value.exists()) {
-                                            SuKien updatedSuKien = value.toObject(SuKien.class);
-                                            for (int i = 0; i < danhSachSuKien.size(); i++) {
-                                                if (danhSachSuKien.get(i).getId().equals(updatedSuKien.getId())) {
-                                                    danhSachSuKien.get(i).copyInfoFrom(updatedSuKien);
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }));
+                    if(!danhSachBanBe.isEmpty()){
+                        for(QuanHeNguoiChoi temp:danhSachBanBe.values()){
+                            Log.d("BANBE",temp.toString());
                         }
                     }
-
-                    // Lấy dữ liệu nhiệm vụ sự kiện
-                    if (!danhSachSuKien.isEmpty()) {
-                        firestore.collectionGroup("DanhSachTienTrinhNhiemVu")
-                                .whereIn("SuKienId", danhSachSuKienIds).whereEqualTo("UserId", user.getUid())
-                                .get().addOnSuccessListener(task -> {
-                                    for (DocumentSnapshot document : task.getDocuments()) {
-                                        TienTrinhNhiemVu tienTrinhNhiemVu = document.toObject(TienTrinhNhiemVu.class);
-                                        for (SuKien suKien : danhSachSuKien) {
-                                            if (suKien.getId().equals(tienTrinhNhiemVu.getSuKienId())
-                                                    && suKien.getTienTrinhNhiemVu() != null
-                                                    && !suKien.getTienTrinhNhiemVu().containsKey(tienTrinhNhiemVu.getId())) {
-                                                suKien.getTienTrinhNhiemVu().put(tienTrinhNhiemVu.getId(), tienTrinhNhiemVu);
-                                            }
-                                        }
-                                        // Theo dõi thay đổi giá trị tiến trình nhiệm vụ
-                                        if (tienTrinhNhiemVu.getGiaTriHienTai() < tienTrinhNhiemVu.getGiaTriYeuCau()
-                                                && !tienTrinhNhiemVu.isDaNhan()) {
-                                            danhSachFirebaseListener.add(document.getReference()
-                                                    .addSnapshotListener((value, error) -> {
-                                                        if (error != null) {
-                                                            Log.e("QUERY", "Error: " + error.getMessage());
-                                                            Snackbar.make(findViewById(R.id.main), R.string.loi_tai_du_lieu, Snackbar.LENGTH_SHORT).show();
-                                                            dangXuat();
-                                                            return;
-                                                        }
-                                                        if (value != null && value.exists()) {
-                                                            TienTrinhNhiemVu updatedTienTrinh = value.toObject(TienTrinhNhiemVu.class);
-                                                            for (SuKien suKien : danhSachSuKien) {
-                                                                if (suKien.getId().equals(updatedTienTrinh.getSuKienId())
-                                                                        && suKien.getTienTrinhNhiemVu() != null
-                                                                        && suKien.getTienTrinhNhiemVu().containsKey(updatedTienTrinh.getId())) {
-                                                                    suKien.getTienTrinhNhiemVu().put(updatedTienTrinh.getId(), updatedTienTrinh);
-                                                                    break;
-                                                                }
-                                                            }
-                                                        }
-                                                    }));
-                                        }
-                                    }
-                                    kiemTraIdGame();
-                                }).addOnFailureListener(e -> {
-                                    Log.e("QUERY", "Error: " + e.getMessage());
-                                    manHinhDangTai.an();
-                                    Snackbar.make(findViewById(R.id.main), R.string.loi_tai_du_lieu, Snackbar.LENGTH_SHORT).show();
-                                    dangXuat();
-                                });
-                    } else {
-                        kiemTraIdGame();
-                    }
+                    kiemTraIdGame();
                 }).addOnFailureListener(e -> {
-                    Log.e("QUERY", "Error: " + e.getMessage());
+                    Log.e("LOI", "Error: " + e.getMessage());
                     manHinhDangTai.an();
                     Snackbar.make(findViewById(R.id.main), R.string.loi_tai_du_lieu, Snackbar.LENGTH_SHORT).show();
-                    dangXuat();
+                    dangXuat(false);
                 });
             }).addOnFailureListener(e -> {
-                Log.e("API_RESPONSE", "Error: " + e.getMessage());
+                Log.e("LOI", "Error: " + e.getMessage());
                 // Lỗi khi gọi API
                 manHinhDangTai.an();
                 Snackbar.make(findViewById(R.id.main), R.string.loi_tai_du_lieu, Snackbar.LENGTH_SHORT).show();
-                dangXuat();
+                dangXuat(false);
             });
         }).addOnFailureListener(e -> {
-            Log.e("TOKEN", "Error: " + e.getMessage());
+            Log.e("LOI", "Error: " + e.getMessage());
             // Lỗi khi lấy token
             manHinhDangTai.an();
             Snackbar.make(findViewById(R.id.main), "Lỗi xác thực, không thể tải dữ liệu", Snackbar.LENGTH_SHORT).show();
-            dangXuat();
+            dangXuat(false);
         });
+    }
+    /**
+     * Khởi tạo listener cho danh sách Yêu cầu Hỗ trợ.
+     * Phương thức này trả về một Task sẽ hoàn thành sau khi dữ liệu được tải lần đầu.
+     * @param user Người dùng hiện tại.
+     * @return Một Task<Void> báo hiệu việc khởi tạo đã xong.
+     */
+    private Task<Void> khoiTaoListenerYeuCauHoTro(FirebaseUser user) {
+        // TaskCompletionSource giúp chúng ta kiểm soát việc hoàn thành của Task
+        TaskCompletionSource<Void> tcs = new TaskCompletionSource<>();
+
+        // Khởi tạo danh sách nếu nó chưa tồn tại
+        if (danhSachYeuCauHoTro == null) {
+            danhSachYeuCauHoTro = new java.util.ArrayList<>();
+        }
+        // Xóa dữ liệu cũ để chuẩn bị nhận dữ liệu mới từ listener
+        danhSachYeuCauHoTro.clear();
+
+        // Tạo truy vấn và đính kèm snapshot listener
+        Query query = firestore.collection("ChamSocKhachHang")
+                .whereEqualTo("UserId", user.getUid())
+                .whereGreaterThan("TrangThai", 0)
+                .orderBy("ThoiGianTao", com.google.firebase.firestore.Query.Direction.DESCENDING);
+
+        danhSachFirebaseListener.add(query.addSnapshotListener((querySnapshot, error) -> {
+            if (error != null) {
+                Log.e("LOI", "YeuCauHoTro listener failed.", error);
+                // Báo lỗi cho Task nếu có sự cố
+                if (!tcs.getTask().isComplete()) {
+                    tcs.setException(error);
+                }
+                return;
+            }
+
+            if (querySnapshot == null) {
+                // Nếu không có dữ liệu, coi như là hoàn thành (không có yêu cầu nào)
+                if (!tcs.getTask().isComplete()) {
+                    tcs.setResult(null);
+                }
+                return;
+            }
+
+            // Xử lý các thay đổi trong danh sách yêu cầu
+            for (DocumentChange dc : querySnapshot.getDocumentChanges()) {
+                YeuCauHoTro yeuCau = dc.getDocument().toObject(YeuCauHoTro.class);
+
+                switch (dc.getType()) {
+                    case ADDED:
+                        // Một yêu cầu mới được thêm vào hoặc tải dữ liệu lần đầu
+                        danhSachYeuCauHoTro.add(yeuCau);
+                        break;
+                    case MODIFIED:
+                        // Một yêu cầu đã được cập nhật
+                        for (int i = 0; i < danhSachYeuCauHoTro.size(); i++) {
+                            if (danhSachYeuCauHoTro.get(i).getId().equals(yeuCau.getId())) {
+                                danhSachYeuCauHoTro.set(i, yeuCau);
+                                break;
+                            }
+                        }
+                        break;
+//                    case REMOVED:
+//                        // Một yêu cầu đã bị xóa
+//                        danhSachYeuCauHoTro.removeIf(yc -> yc.getId().equals(yeuCau.getId()));
+//                        break;
+                }
+            }
+
+            // Sắp xếp lại danh sách sau khi có thay đổi (tùy chọn, nếu thứ tự là quan trọng)
+            // danhSachYeuCauHoTro.sort(...);
+
+            // *** ĐIỂM QUAN TRỌNG ***
+            // Báo cho Task là đã hoàn thành sau khi xử lý xong dữ liệu ban đầu.
+            // Chúng ta chỉ làm điều này một lần.
+            if (!tcs.getTask().isComplete()) {
+                tcs.setResult(null); // Đánh dấu Task là thành công
+            }
+        }));
+
+        // Trả về Task mà Tasks.whenAllSuccess sẽ theo dõi
+        return tcs.getTask();
+    }
+    /**
+     * Khởi tạo listener cho danh sách Sự kiện và Tiến trình nhiệm vụ liên quan.
+     * Phương thức này trả về một Task sẽ hoàn thành sau khi tất cả dữ liệu ban đầu
+     * (sự kiện và nhiệm vụ) được tải xong.
+     * @param user Người dùng hiện tại.
+     * @return Một Task<Void> báo hiệu việc khởi tạo đã xong.
+     */
+    private Task<Void> khoiTaoListenerSuKienVaNhiemVu(FirebaseUser user) {
+        // TaskCompletionSource giúp chúng ta kiểm soát việc hoàn thành của Task chính
+        TaskCompletionSource<Void> tcs = new TaskCompletionSource<>();
+
+        // Khởi tạo danh sách nếu nó chưa tồn tại
+        if (danhSachSuKien == null) {
+            danhSachSuKien = new java.util.ArrayList<>();
+        }
+        danhSachSuKien.clear();
+
+        // 1. Tạo truy vấn và đính kèm snapshot listener cho collection "SuKien"
+        Query suKienQuery = firestore.collection("SuKien")
+                .whereEqualTo("TrangThai", 1)
+                .whereGreaterThan("ThoiGianKetThuc", System.currentTimeMillis());
+
+        danhSachFirebaseListener.add(suKienQuery.addSnapshotListener((suKienSnapshot, error) -> {
+            if (error != null) {
+                Log.e("LOI", "SuKien listener failed.", error);
+                if (!tcs.getTask().isComplete()) {
+                    tcs.setException(error); // Báo lỗi cho Task nếu có sự cố
+                }
+                return;
+            }
+
+            if (suKienSnapshot == null) {
+                if (!tcs.getTask().isComplete()) {
+                    tcs.setResult(null); // Hoàn thành nếu không có sự kiện nào
+                }
+                return;
+            }
+
+            List<String> danhSachSuKienIds = new ArrayList<>();
+            // 2. Xử lý các thay đổi trong danh sách sự kiện
+            for (DocumentChange dc : suKienSnapshot.getDocumentChanges()) {
+                SuKien suKien = dc.getDocument().toObject(SuKien.class);
+                switch (dc.getType()) {
+                    case ADDED:
+                        danhSachSuKien.add(suKien);
+                        danhSachSuKienIds.add(suKien.getId());
+                        // Thêm listener cho từng sự kiện để theo dõi thay đổi thông tin (như tên, mô tả...)
+                        danhSachFirebaseListener.add(dc.getDocument().getReference().addSnapshotListener((value, e) -> {
+                            if (value != null && value.exists()) {
+                                SuKien updatedSuKien = value.toObject(SuKien.class);
+                                for (int i = 0; i < danhSachSuKien.size(); i++) {
+                                    if (danhSachSuKien.get(i).getId().equals(updatedSuKien.getId())) {
+                                        danhSachSuKien.get(i).copyInfoFrom(updatedSuKien);
+                                        break;
+                                    }
+                                }
+                            }
+                        }));
+                        break;
+//                    case MODIFIED:
+//                        // Thông tin sự kiện đã được cập nhật, listener riêng ở trên sẽ xử lý
+//                        break;
+//                    case REMOVED:
+//                        danhSachSuKien.removeIf(sk -> sk.getId().equals(suKien.getId()));
+//                        break;
+                }
+            }
+
+            // 3. Chỉ thực hiện khi Task chưa hoàn thành (tức là trong lần tải đầu tiên)
+            if (!tcs.getTask().isComplete()) {
+                // Nếu không có sự kiện nào được thêm vào, coi như hoàn thành
+                if (danhSachSuKienIds.isEmpty()) {
+                    tcs.setResult(null);
+                    return;
+                }
+
+                // 4. Lấy dữ liệu Tiến trình nhiệm vụ liên quan
+                firestore.collectionGroup("DanhSachTienTrinhNhiemVu")
+                        .whereIn("SuKienId", danhSachSuKienIds)
+                        .whereEqualTo("UserId", user.getUid())
+                        .get()
+                        .addOnSuccessListener(nhiemVuSnapshot -> {
+                            for (DocumentSnapshot document : nhiemVuSnapshot.getDocuments()) {
+                                TienTrinhNhiemVu tienTrinh = document.toObject(TienTrinhNhiemVu.class);
+                                if (tienTrinh == null) continue;
+
+                                // Gắn tiến trình nhiệm vụ vào sự kiện tương ứng
+                                for (SuKien suKien : danhSachSuKien) {
+                                    if (suKien.getId().equals(tienTrinh.getSuKienId())) {
+                                        suKien.getTienTrinhNhiemVu().put(tienTrinh.getId(), tienTrinh);
+                                    }
+                                }
+
+                                // Thêm listener cho các nhiệm vụ chưa hoàn thành
+                                if (tienTrinh.getGiaTriHienTai() < tienTrinh.getGiaTriYeuCau() && !tienTrinh.isDaNhan()) {
+                                    danhSachFirebaseListener.add(document.getReference().addSnapshotListener((value, e) -> {
+                                        if (value != null && value.exists()) {
+                                            TienTrinhNhiemVu updatedTienTrinh = value.toObject(TienTrinhNhiemVu.class);
+                                            for (SuKien suKien : danhSachSuKien) {
+                                                if (suKien.getId().equals(updatedTienTrinh.getSuKienId())) {
+                                                    suKien.getTienTrinhNhiemVu().put(updatedTienTrinh.getId(), updatedTienTrinh);
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }));
+                                }
+                            }
+                            // 5. *** ĐIỂM QUAN TRỌNG *** - Đánh dấu Task chính đã hoàn thành
+                            tcs.setResult(null);
+                        })
+                        .addOnFailureListener(e -> {
+                            tcs.setException(e);
+                        });
+            }
+        }));
+        return tcs.getTask();
+    }
+    /**
+     * khởi tạo danh sách bạn bè, theo dõi thay đổi của danh sách
+     * @param user người dùng hiện tại
+     * @return Task<Void> trả về 1 task đã khởi tạo xong
+     */
+    private Task<Void> khoiTaoDuLieuBanBe(FirebaseUser user){
+        if(danhSachBanBe==null){
+            danhSachBanBe=new HashMap<>();
+        }
+        danhSachBanBe.clear();
+        TaskCompletionSource<Void> tcs = new TaskCompletionSource<>();
+        danhSachFirebaseListener.add(firestore.collection("QuanHeNguoiChoi")
+                .whereArrayContains("UserIds",user.getUid())
+                .addSnapshotListener((querySnapshot, error) -> {
+                    if (error != null) {
+                        Log.e("LOI", "Listen failed.", error);
+                        if (!tcs.getTask().isComplete()) {
+                            tcs.setException(error); // Báo lỗi cho Task nếu có sự cố
+                        }
+                        return;
+                    }
+                    if (querySnapshot == null) return;
+
+                    // Xử lý các thay đổi trong danh sách bạn bè
+                    for (DocumentChange dc : querySnapshot.getDocumentChanges()) {
+                        QuanHeNguoiChoi quanHeNguoiChoi = dc.getDocument().toObject(QuanHeNguoiChoi.class);
+                        String banBeId = quanHeNguoiChoi.getUserIds().get(0).equals(user.getUid())
+                                ? quanHeNguoiChoi.getUserIds().get(1)
+                                : quanHeNguoiChoi.getUserIds().get(0);
+
+                        switch (dc.getType()) {
+                            case ADDED:
+                                // Một người bạn mới được thêm vào hoặc tải dữ liệu lần đầu
+                                // Đây là nơi bạn sẽ thực hiện logic khởi tạo
+                                quanHeNguoiChoi.setTenBanBe("???");
+                                quanHeNguoiChoi.setTien(0);
+                                quanHeNguoiChoi.setOnline(false);
+                                quanHeNguoiChoi.setBanBeReference(realtimeDatabase.getReference("NguoiChoi/" + banBeId));
+                                quanHeNguoiChoi.setBanBeOnlineListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        try {
+                                            if (snapshot.child("TrangThai").exists()) {
+                                                String trangThai = snapshot.child("TrangThai").getValue(String.class);
+                                                quanHeNguoiChoi.setOnline("online".equals(trangThai));
+                                            }
+                                            if(snapshot.child("Ten").exists()){
+                                                String ten=snapshot.child("Ten").getValue(String.class);
+                                                quanHeNguoiChoi.setTenBanBe(ten);
+                                            }
+                                            if(snapshot.child("Tien").exists()){
+                                                Long tien=snapshot.child("Tien").getValue(Long.class);
+                                                quanHeNguoiChoi.setTien(tien!=null?tien:0);
+                                            }
+                                        } catch (Exception e) {
+                                            Log.e("LOI", "Error: " + e.getMessage());
+                                        }
+                                    }
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+                                        Log.e("LOI", "Error: " + error.getMessage());
+                                        Toast.makeText(MainActivity.getContext(),getString(R.string.loi_tai_du_lieu),Toast.LENGTH_SHORT).show();
+                                        dangXuat(false);
+                                    }
+                                });
+                                quanHeNguoiChoi.addLisener();
+                                danhSachBanBe.put(banBeId, quanHeNguoiChoi);
+                                break;
+                            case MODIFIED:
+                                // Mối quan hệ bạn bè đã thay đổi (ví dụ: trạng thái bị chặn)
+                                QuanHeNguoiChoi currentQuanHe = danhSachBanBe.get(banBeId);
+                                if (currentQuanHe != null) {
+                                    currentQuanHe.copyFrom(quanHeNguoiChoi); // Cập nhật dữ liệu
+                                }
+                                break;
+//                                    case REMOVED:
+//                                        // Bạn bè đã bị xóa
+//                                        QuanHeNguoiChoi removedQuanHe = danhSachBanBe.remove(banBeId);
+//                                        if (removedQuanHe != null) {
+//                                            removedQuanHe.removeListener(); // Dọn dẹp listener của Realtime Database
+//                                        }
+//                                        break;
+                        }
+                    }
+                    if (!tcs.getTask().isComplete()) {
+                        tcs.setResult(null); // Đánh dấu Task là thành công
+                    }
+                }));
+        return tcs.getTask();
     }
     private void kiemTraIdGame() {
 //        FirebaseUser user=auth.getCurrentUser();
@@ -1481,7 +1713,7 @@ public class MainActivity extends AppCompatActivity {
             manHinhDangTai.an();
             Snackbar.make(findViewById(R.id.sanhCho),R.string.dang_nhap_het_han,
                     Snackbar.LENGTH_SHORT).show();
-            dangXuat();
+            dangXuat(false);
             return;
         }
         /**
@@ -1545,7 +1777,7 @@ public class MainActivity extends AppCompatActivity {
                 .addSnapshotListener((value, error) -> {
                     if(error!=null||value==null||!value.exists()) {
                         Toast.makeText(this,error.getMessage(),Toast.LENGTH_SHORT).show();
-                        dangXuat();
+                        dangXuat(false);
                     }
                     if (nguoiChoi == null) {
                         nguoiChoi=new NguoiChoi(value.getString(NguoiChoi.TEN_TRUONG_EMAIL),
@@ -1558,6 +1790,7 @@ public class MainActivity extends AppCompatActivity {
                         nguoiChoi.setTenDangNhap(value.getString(NguoiChoi.TEN_TRUONG_TEN_DANG_NHAP));
                         nguoiChoi.setEmail(value.getString(NguoiChoi.TEN_TRUONG_EMAIL));
                     }
+                    theoDoiTrangThaiOnline();
                     textViewTenNguoiChoi.setText(nguoiChoi.getTenDangNhap());
                     textViewTien.setText(String.valueOf(nguoiChoi.getTien()));
                     manHinhDangTai.an();
@@ -1622,10 +1855,10 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * đăng xuất ra màn hình đăng nhập
+     * @param dangNhapNhapTrenThietBiKhac true nếu bị đăng nhập trên thiết bị khác
      */
-    public void dangXuat(){
+    public void dangXuat(boolean dangNhapNhapTrenThietBiKhac) {
         manHinhDangTai.an();
-        auth.signOut();
         nguoiChoi=null;
         lanCuoiDangNhap=0;
         //huỷ các listener trong game trường hợp bị log acc
@@ -1640,6 +1873,21 @@ public class MainActivity extends AppCompatActivity {
         if (taiKhoanListener != null) {
             taiKhoanListener.remove();
         }
+        if(nguoiChoiReference!=null){
+            if (!dangNhapNhapTrenThietBiKhac) {
+                HashMap <String,Object> hashMapOffline=new HashMap<>();
+                hashMapOffline.put("TrangThai","offline");
+                nguoiChoiReference.updateChildren(hashMapOffline);
+            }
+            nguoiChoiReference.onDisconnect().cancel();
+        }
+        if(danhSachBanBe!=null){
+            for(QuanHeNguoiChoi quanHeNguoiChoi:danhSachBanBe.values()){
+                quanHeNguoiChoi.removeListener();
+            }
+            danhSachBanBe.clear();
+        }
+        auth.signOut();
         setContentView(R.layout.activity_main);
         //khởi tạo lại các thành phần của view đăng nhập
         khoiTaoViewDangNhap();
