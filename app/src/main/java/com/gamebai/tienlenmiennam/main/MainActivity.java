@@ -46,6 +46,7 @@ import com.gamebai.tienlenmiennam.thucthe.NguoiChoi;
 import com.gamebai.tienlenmiennam.ui.ManHinhDangTai;
 import com.gamebai.tienlenmiennam.uisanhcho.BalatroCreateSupportRequestFragment;
 import com.gamebai.tienlenmiennam.uisanhcho.BalatroEventFragment;
+import com.gamebai.tienlenmiennam.uisanhcho.BalatroFriendFragment;
 import com.gamebai.tienlenmiennam.uisanhcho.BalatroGiftcodeFragment;
 import com.gamebai.tienlenmiennam.uisanhcho.BalatroPlayFragment;
 import com.gamebai.tienlenmiennam.uisanhcho.BalatroSettingsFragment;
@@ -55,7 +56,6 @@ import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.rewarded.RewardItem;
 import com.google.android.gms.ads.rewarded.RewardedAd;
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
 import com.google.android.gms.tasks.Task;
@@ -82,12 +82,9 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -116,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
     /** tham chiếu đến node NguoiChoiTimTran/{UserID} trong realtime database */
     private DatabaseReference nguoiChoiTimTranReference;
     private DatabaseReference nguoiChoiReference;
+    //dữ liệu khác
     /** dữ liệu yêu cầu hỗ trợ */
     private List<YeuCauHoTro> danhSachYeuCauHoTro;
     private List<SuKien> danhSachSuKien;
@@ -134,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
     BalatroSupportRequestFragment supportRequestFragment;
     /** theo dõi sự kiện tìm được trận trong NguoiChoiTimTran/{UserID} */
     ValueEventListener theoDoiKetQuaTimTranListener;
-    /** danh sách listener đã đăng ký để hủy khi đăng xuất */
+    /** danh sách firestore listener đã đăng ký*/
     List<ListenerRegistration> danhSachFirebaseListener;
     /**
      * Game
@@ -492,8 +490,134 @@ public class MainActivity extends AppCompatActivity {
         textViewFifth=findViewById(R.id.textViewFifth);
         textViewFirst.setOnClickListener(v->farmData());
         textViewSecond.setOnClickListener(v->hienThiQuangCao());
+        textViewThird.setOnClickListener(v->hienThiBanBe());
     }
+    private void hienThiBanBe(){
+        BalatroFriendFragment fragment=new BalatroFriendFragment();
+        fragment.init(danhSachBanBe,auth.getCurrentUser().getUid());
+        fragment.setAction(new BalatroFriendFragment.BalatroFriendFragmentAction() {
 
+            /**
+             * @param action
+             * @param quanHeNguoiChoi
+             * @param view
+             */
+            @Override
+            public void onAction(BalatroFriendFragment.Action action, QuanHeNguoiChoi quanHeNguoiChoi, View view) {
+                switch (action){
+                    case ADD_FRIEND:
+                        themBanBe(quanHeNguoiChoi,view);
+                        break;
+                    case UNFRIEND:
+                        xoaBanBe(quanHeNguoiChoi,view);
+                        break;
+                    case REJECT_FRIEND:
+                        tuChoiYeuCauKetBan(quanHeNguoiChoi,view);
+                        break;
+                    case ACCEPT_FRIEND:
+                        chapNhanYeuCauKetBan(quanHeNguoiChoi,view);
+                        break;
+                }
+            }
+
+            private void chapNhanYeuCauKetBan(QuanHeNguoiChoi quanHeNguoiChoi, View view) {
+                manHinhDangTai.hienThi();
+                firestore.collection("QuanHeNguoiChoi").document(quanHeNguoiChoi.getId()).update("TrangThai",1)
+                        .addOnSuccessListener(task->{
+                            manHinhDangTai.an();
+                            Toast.makeText(MainActivity.getContext(),R.string.chap_nhan_loi_moi_ket_ban_thanh_cong,Toast.LENGTH_SHORT).show();
+                        }).addOnFailureListener(task->{
+                            Log.e("LOI","Lỗi khi chấp nhận yêu cầu kết bạn: "+task.getMessage());
+                            manHinhDangTai.an();
+                            Toast.makeText(MainActivity.getContext(),R.string.loi_chap_nhan_loi_moi,Toast.LENGTH_SHORT).show();
+                        });
+            }
+
+            private void tuChoiYeuCauKetBan(QuanHeNguoiChoi quanHeNguoiChoi, View view) {
+                manHinhDangTai.hienThi();
+                firestore.collection("QuanHeNguoiChoi").document(quanHeNguoiChoi.getId()).delete()
+                        .addOnSuccessListener(task->{
+                            manHinhDangTai.an();
+                            Toast.makeText(MainActivity.getContext(),R.string.tu_choi_loi_moi_ket_ban_thanh_cong,Toast.LENGTH_SHORT).show();
+                        }).addOnFailureListener(task->{
+                            Log.e("LOI","Lỗi khi từ chối yêu cầu kết bạn: "+task.getMessage());
+                            manHinhDangTai.an();
+                            Toast.makeText(MainActivity.getContext(),R.string.loi_tu_choi_loi_moi,Toast.LENGTH_SHORT).show();
+                        });
+            }
+
+            private void xoaBanBe(QuanHeNguoiChoi quanHeNguoiChoi, View view) {
+                manHinhDangTai.hienThi();
+                firestore.collection("QuanHeNguoiChoi").document(quanHeNguoiChoi.getId()).delete()
+                        .addOnSuccessListener(task->{
+                            manHinhDangTai.an();
+                            Toast.makeText(MainActivity.getContext(),R.string.huy_ket_ban_thanh_cong,Toast.LENGTH_SHORT).show();
+                        }).addOnFailureListener(task->{
+                            Log.e("LOI","Lỗi khi huỷ kết bạn: "+task.getMessage());
+                            manHinhDangTai.an();
+                            Toast.makeText(MainActivity.getContext(),R.string.loi_huy_ket_ban,Toast.LENGTH_SHORT).show();
+                        });
+            }
+
+            private void themBanBe(QuanHeNguoiChoi quanHeNguoiChoi, View view) {
+                manHinhDangTai.hienThi();
+                quanHeNguoiChoi.setThoiGianTao(System.currentTimeMillis());
+                firestore.collection("QuanHeNguoiChoi").document().set(quanHeNguoiChoi.toHashMapForFirestore())
+                        .addOnSuccessListener(task->{
+                            manHinhDangTai.an();
+                            Toast.makeText(MainActivity.getContext(),R.string.them_ban_be_thanh_cong,Toast.LENGTH_SHORT).show();
+                        })
+                        .addOnFailureListener(task-> {
+                            Log.e("LOI","Lỗi khi thêm bạn bè: "+task.getMessage());
+                            manHinhDangTai.an();
+                            Toast.makeText(MainActivity.getContext(),R.string.loi_them_ban_be,Toast.LENGTH_SHORT).show();
+                        });
+            }
+
+            /**
+             * @param name
+             * @param callback
+             */
+            @Override
+            public void searchFriend(String name, BalatroFriendFragment.SearchFriendCallback callback) {
+                manHinhDangTai.hienThi();
+                firestore.collection("TaiKhoan")
+                        .whereEqualTo("TenDangNhap", name)
+                        .get()
+                        .addOnCompleteListener(task -> {
+                            manHinhDangTai.an();
+                            if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
+                                com.google.firebase.firestore.DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                                if (document.getId().equals(auth.getCurrentUser().getUid())) {
+                                    callback.onError(new Exception("Bạn không thể tìm kiếm chính mình."));
+                                    return;
+                                }
+
+                                QuanHeNguoiChoi playerInfo = new QuanHeNguoiChoi();
+                                if (document.contains("Tien")) {
+                                    playerInfo.setTien(document.getLong("Tien").longValue());
+                                }
+                                playerInfo.setTenBanBe(document.getString("TenDangNhap"));
+
+                                java.util.List<String> userIds = new java.util.ArrayList<>();
+                                userIds.add(auth.getCurrentUser().getUid());
+                                userIds.add(document.getId());
+                                playerInfo.setUserIds(userIds);
+
+                                callback.onResult(playerInfo);
+                            } else {
+                                if (task.getException() != null) {
+                                    callback.onError(task.getException());
+                                    Log.e("LOI", "Lỗi khi tìm kiếm người chơi: " + task.getException().getMessage());
+                                } else {
+                                    callback.onError(new Exception("Không tìm thấy người chơi."));
+                                }
+                            }
+                        });
+            }
+        });
+        fragment.show(getSupportFragmentManager(),"BalatroFriend");
+    }
     /**
      * hiển thị dialog yêu cầu hỗ trợ
      */
@@ -1481,7 +1605,7 @@ public class MainActivity extends AppCompatActivity {
     private Task<Void> khoiTaoListenerSuKienVaNhiemVu(FirebaseUser user) {
         // TaskCompletionSource giúp chúng ta kiểm soát việc hoàn thành của Task chính
         TaskCompletionSource<Void> tcs = new TaskCompletionSource<>();
-
+        final boolean[] isInitialLoadStarted = {false};
         // Khởi tạo danh sách nếu nó chưa tồn tại
         if (danhSachSuKien == null) {
             danhSachSuKien = new java.util.ArrayList<>();
@@ -1540,7 +1664,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // 3. Chỉ thực hiện khi Task chưa hoàn thành (tức là trong lần tải đầu tiên)
-            if (!tcs.getTask().isComplete()) {
+            if (!tcs.getTask().isComplete()&& !isInitialLoadStarted[0]) {
+                isInitialLoadStarted[0] = true;
                 // Nếu không có sự kiện nào được thêm vào, coi như hoàn thành
                 if (danhSachSuKienIds.isEmpty()) {
                     tcs.setResult(null);
@@ -1580,10 +1705,16 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }
                             // 5. *** ĐIỂM QUAN TRỌNG *** - Đánh dấu Task chính đã hoàn thành
-                            tcs.setResult(null);
+                            // Chỉ gọi setResult nếu Task chưa hoàn thành
+                            if (!tcs.getTask().isComplete()) {
+                                tcs.setResult(null);
+                            }
                         })
                         .addOnFailureListener(e -> {
-                            tcs.setException(e);
+                            // Chỉ gọi setException nếu Task chưa hoàn thành
+                            if (!tcs.getTask().isComplete()) {
+                                tcs.setException(e);
+                            }
                         });
             }
         }));
@@ -1621,56 +1752,57 @@ public class MainActivity extends AppCompatActivity {
 
                         switch (dc.getType()) {
                             case ADDED:
-                                // Một người bạn mới được thêm vào hoặc tải dữ liệu lần đầu
-                                // Đây là nơi bạn sẽ thực hiện logic khởi tạo
-                                quanHeNguoiChoi.setTenBanBe("???");
-                                quanHeNguoiChoi.setTien(0);
-                                quanHeNguoiChoi.setOnline(false);
-                                quanHeNguoiChoi.setBanBeReference(realtimeDatabase.getReference("NguoiChoi/" + banBeId));
-                                quanHeNguoiChoi.setBanBeOnlineListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        try {
-                                            if (snapshot.child("TrangThai").exists()) {
-                                                String trangThai = snapshot.child("TrangThai").getValue(String.class);
-                                                quanHeNguoiChoi.setOnline("online".equals(trangThai));
-                                            }
-                                            if(snapshot.child("Ten").exists()){
-                                                String ten=snapshot.child("Ten").getValue(String.class);
-                                                quanHeNguoiChoi.setTenBanBe(ten);
-                                            }
-                                            if(snapshot.child("Tien").exists()){
-                                                Long tien=snapshot.child("Tien").getValue(Long.class);
-                                                quanHeNguoiChoi.setTien(tien!=null?tien:0);
-                                            }
-                                        } catch (Exception e) {
-                                            Log.e("LOI", "Error: " + e.getMessage());
-                                        }
+                                if (!danhSachBanBe.containsKey(banBeId)) {
+                                    // Một người bạn mới được thêm vào hoặc tải dữ liệu lần đầu
+                                    quanHeNguoiChoi.setId(dc.getDocument().getId());
+                                    quanHeNguoiChoi.setTenBanBe("???");
+                                    quanHeNguoiChoi.setTien(0);
+                                    quanHeNguoiChoi.setOnline(false);
+                                    quanHeNguoiChoi.setBanBeReference(realtimeDatabase.getReference("NguoiChoi/" + banBeId));
+                                    if (quanHeNguoiChoi.getTrangThai()==1) {//nếu đã kết bạn thì theo dõi trạng thái
+                                        quanHeNguoiChoi.startListener();
+                                    }else{//nếu đang chờ chấp nhận chỉ lấy thông tin
+                                        quanHeNguoiChoi.getBanBeReference().get()
+                                                .addOnCompleteListener(task->{
+                                                    if(task.isSuccessful()&&task.getResult().exists()){
+                                                        DataSnapshot snapshot=task.getResult();
+                                                        try {
+                                                            if(snapshot.child("Ten").exists()){
+                                                                String ten=snapshot.child("Ten").getValue(String.class);
+                                                                quanHeNguoiChoi.setTenBanBe(ten);
+                                                            }
+                                                            if(snapshot.child("Tien").exists()){
+                                                                Long tien=snapshot.child("Tien").getValue(Long.class);
+                                                                quanHeNguoiChoi.setTien(tien);
+                                                            }
+                                                        } catch (Exception e) {
+                                                            Log.e("LOI", "Error: " + e.getMessage());
+                                                        }
+                                                    }
+                                                });
                                     }
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {
-                                        Log.e("LOI", "Error: " + error.getMessage());
-                                        Toast.makeText(MainActivity.getContext(),getString(R.string.loi_tai_du_lieu),Toast.LENGTH_SHORT).show();
-                                        dangXuat(false);
-                                    }
-                                });
-                                quanHeNguoiChoi.addLisener();
-                                danhSachBanBe.put(banBeId, quanHeNguoiChoi);
-                                break;
-                            case MODIFIED:
-                                // Mối quan hệ bạn bè đã thay đổi (ví dụ: trạng thái bị chặn)
-                                QuanHeNguoiChoi currentQuanHe = danhSachBanBe.get(banBeId);
-                                if (currentQuanHe != null) {
-                                    currentQuanHe.copyFrom(quanHeNguoiChoi); // Cập nhật dữ liệu
+                                    danhSachBanBe.put(banBeId, quanHeNguoiChoi);
                                 }
                                 break;
-//                                    case REMOVED:
-//                                        // Bạn bè đã bị xóa
-//                                        QuanHeNguoiChoi removedQuanHe = danhSachBanBe.remove(banBeId);
-//                                        if (removedQuanHe != null) {
-//                                            removedQuanHe.removeListener(); // Dọn dẹp listener của Realtime Database
-//                                        }
-//                                        break;
+                            case MODIFIED:
+                                // Đã chấp nhận kết bạn
+                                QuanHeNguoiChoi currentQuanHe = danhSachBanBe.get(banBeId);
+                                QuanHeNguoiChoi newQuanHe = dc.getDocument().toObject(QuanHeNguoiChoi.class);
+                                if (currentQuanHe != null) {
+                                    if(currentQuanHe.getTrangThai()!=newQuanHe.getTrangThai()&&
+                                        newQuanHe.getTrangThai()==1){
+                                        currentQuanHe.copyFrom(newQuanHe);
+                                        currentQuanHe.startListener();
+                                    }
+                                }
+                                break;
+                            case REMOVED:
+                                // Bạn bè đã bị xóa
+                                QuanHeNguoiChoi removedQuanHe = danhSachBanBe.remove(banBeId);
+                                if (removedQuanHe != null&&removedQuanHe.getTrangThai()==1) {
+                                    removedQuanHe.stopListener(); // Dọn dẹp listener của Realtime Database
+                                }
+                                break;
                         }
                     }
                     if (!tcs.getTask().isComplete()) {
@@ -1779,18 +1911,21 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(this,error.getMessage(),Toast.LENGTH_SHORT).show();
                         dangXuat(false);
                     }
+                    boolean lanDauKhoiTao=false;
                     if (nguoiChoi == null) {
                         nguoiChoi=new NguoiChoi(value.getString(NguoiChoi.TEN_TRUONG_EMAIL),
                                 value.getString(NguoiChoi.TEN_TRUONG_TEN_DANG_NHAP),
                                 value.getString(NguoiChoi.TEN_TRUONG_ID_GAME),
                                 value.getLong(NguoiChoi.TEN_TRUONG_TIEN));
+                        lanDauKhoiTao=true;
                     }else{
-                        nguoiChoi.setTien(value.getLong(NguoiChoi.TEN_TRUONG_TIEN));
-                        nguoiChoi.setIdGame(value.getString(NguoiChoi.TEN_TRUONG_ID_GAME));
+                        nguoiChoi.setTien(value.getLong(NguoiChoi.TEN_TRUONG_TIEN));nguoiChoi.setIdGame(value.getString(NguoiChoi.TEN_TRUONG_ID_GAME));
                         nguoiChoi.setTenDangNhap(value.getString(NguoiChoi.TEN_TRUONG_TEN_DANG_NHAP));
                         nguoiChoi.setEmail(value.getString(NguoiChoi.TEN_TRUONG_EMAIL));
                     }
-                    theoDoiTrangThaiOnline();
+                    if (lanDauKhoiTao) {
+                        theoDoiTrangThaiOnline();
+                    }
                     textViewTenNguoiChoi.setText(nguoiChoi.getTenDangNhap());
                     textViewTien.setText(String.valueOf(nguoiChoi.getTien()));
                     manHinhDangTai.an();
@@ -1883,7 +2018,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if(danhSachBanBe!=null){
             for(QuanHeNguoiChoi quanHeNguoiChoi:danhSachBanBe.values()){
-                quanHeNguoiChoi.removeListener();
+                quanHeNguoiChoi.stopListener();
             }
             danhSachBanBe.clear();
         }

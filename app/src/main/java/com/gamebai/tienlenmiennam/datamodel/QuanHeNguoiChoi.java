@@ -1,5 +1,14 @@
 package com.gamebai.tienlenmiennam.datamodel;
 
+import android.util.Log;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+
+import com.gamebai.tienlenmiennam.R;
+import com.gamebai.tienlenmiennam.main.MainActivity;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
@@ -8,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class QuanHeNguoiChoi {
+    private String id;
     private List<String> UserIds;
     private long ThoiGianTao;
     private int TrangThai;
@@ -17,6 +27,14 @@ public class QuanHeNguoiChoi {
     DatabaseReference banBeReference;
     ValueEventListener banBeOnlineListener;
     public QuanHeNguoiChoi() {}
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public long getTien() {
         return Tien;
@@ -42,6 +60,12 @@ public class QuanHeNguoiChoi {
         this.ThoiGianTao = thoiGianTao;
     }
 
+    /**
+     * lấy trạng thái giữa 2 người chơi
+     * 1 - đã hấp nhận
+     * 0 - đang chờ
+     * @return
+     */
     public int getTrangThai() {
         return TrangThai;
     }
@@ -49,7 +73,12 @@ public class QuanHeNguoiChoi {
     public void setTrangThai(int trangThai) {
         this.TrangThai = trangThai;
     }
-    public HashMap<String, Object> toHashMap() {
+
+    /**
+     * chuyển sang hashmap để đẩy lên firestore
+     * @return
+     */
+    public HashMap<String, Object> toHashMapForFirestore() {
         HashMap<String, Object> result = new HashMap<>();
         result.put("UserIds", UserIds);
         result.put("ThoiGianTao", ThoiGianTao);
@@ -93,15 +122,54 @@ public class QuanHeNguoiChoi {
     public void setBanBeOnlineListener(ValueEventListener banBeOnlineListener) {
         this.banBeOnlineListener = banBeOnlineListener;
     }
-    public void addLisener(){
+    private void addListener(){
         banBeReference.addValueEventListener(banBeOnlineListener);
     }
-    public void removeListener() {
+    private void removeListener() {
         if(banBeReference!=null&&banBeOnlineListener!=null){
             banBeReference.removeEventListener(banBeOnlineListener);
         }
     }
 
+    /**
+     * bắt sự kiện thay đổi trạng thái online của ban be
+     */
+    public void startListener(){
+        setBanBeOnlineListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                try {
+                    if (snapshot.child("TrangThai").exists()) {
+                        String trangThai = snapshot.child("TrangThai").getValue(String.class);
+                        setOnline("online".equals(trangThai));
+                    }
+                    if(snapshot.child("Ten").exists()){
+                        String ten=snapshot.child("Ten").getValue(String.class);
+                        setTenBanBe(ten);
+                    }
+                    if(snapshot.child("Tien").exists()){
+                        Long tien=snapshot.child("Tien").getValue(Long.class);
+                        setTien(tien!=null?tien:0);
+                    }
+                } catch (Exception e) {
+                    Log.e("LOI", "Error: " + e.getMessage());
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("LOI", "Error: " + error.getMessage());
+//                Toast.makeText(MainActivity.getContext(),MainActivity.getContext().getText(R.string.loi_tai_du_lieu),Toast.LENGTH_SHORT).show();
+            }
+        });
+        addListener();
+    }
+
+    /**
+     * dừng lắng nghe sự kiện thay đổi trạng thái online của ban be
+     */
+    public void stopListener(){
+        removeListener();
+    }
     @Override
     public String toString() {
         return "QuanHeNguoiChoi{" +

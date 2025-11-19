@@ -15,11 +15,17 @@ public class ManHinhDangTai {
     private AlertDialog dialog;
     private Context context;
     private String noiDung;
+    private boolean isDisplayed;
     public ManHinhDangTai(Context context,String noiDung) {
         this.context=context;
         this.noiDung=noiDung;
+        isDisplayed =false;
     }
     public void hienThi(){
+        if(isDisplayed){
+            return;
+        }
+        isDisplayed =true;
         AlertDialog.Builder builder=new AlertDialog.Builder(context);
         LayoutInflater inflater=LayoutInflater.from(context);
         View view=inflater.inflate(R.layout.dang_tai,null);
@@ -34,6 +40,10 @@ public class ManHinhDangTai {
         dialog.show();
     }
     public void hienThi(String noiDung){
+        if(isDisplayed){
+            return;
+        }
+        isDisplayed =true;
         AlertDialog.Builder builder=new AlertDialog.Builder(context);
         LayoutInflater inflater=LayoutInflater.from(context);
         View view=inflater.inflate(R.layout.dang_tai,null);
@@ -48,7 +58,8 @@ public class ManHinhDangTai {
         dialog.show();
     }
     public void an(){
-        if(dialog!=null&&dialog.isShowing()){
+        if(dialog!=null&&dialog.isShowing()&&isDisplayed){
+            isDisplayed =false;
             dialog.dismiss();
         }
     }

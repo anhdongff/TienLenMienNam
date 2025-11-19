@@ -102,5 +102,18 @@
     <string name="hay_nhap_noi_dung">Hãy nhập nội dung</string>
     <string name="dang_gui_yeu_cau">Đang gửi yêu cầu...</string>
     <string name="gui_yeu_cau_ho_tro_thanh_cong">Gửi yêu cầu hỗ trợ thành công</string>
-    <string name="chua_co_quang_cao">Hiện chưa có quảng cáo để hiển thị.</string>
+    <string name="chua_co_quang_cao">Hiện chưa có quảng cáo để hiển thị</string>
+    <string name="loi_chap_nhan_loi_moi">Có lỗi xảy ra khi chấp nhận lời mời kết bạn</string>
+    <string name="chap_nhan_loi_moi_ket_ban_thanh_cong">Chấp nhận lời mời thành công</string>
+    <string name="tu_choi_loi_moi_ket_ban_thanh_cong">Từ chối lời mời thành công</string>
+    <string name="loi_tu_choi_loi_moi">Có lỗi xảy ra khi từ chối lời mời</string>
+    <string name="huy_ket_ban_thanh_cong">Huỷ kết bạn thành công</string>
+    <string name="loi_huy_ket_ban">Có lỗi xảy ra khi huỷ kết bạn\n</string>
+    <string name="them_ban_be_thanh_cong">Thêm bạn bè thành công\n</string>
+    <string name="loi_them_ban_be">Có lỗi xảy ra khi thêm bạn bè</string>
+    <string name="ban_da_la_ban_be">bạn và người chơi này đã là bạn bè</string>
+    <string name="nguoi_choi_da_gui_loi_moi_ket_ban">Người chơi này đã gửi lời mời kết bạn, hãy xác nhận\n</string>
+    <string name="ban_da_gui_loi_moi_ket_ban">Bạn đã gửi lời mời cho người chơi này, hãy chờ họ xác nhận</string>
+    <string name="them_ban_be">thêm bạn bè</string>
+    <string name="xu">xu</string>
 </resources>

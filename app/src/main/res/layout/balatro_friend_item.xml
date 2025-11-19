@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/balatro_friend_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    android:background="@drawable/bg_text_or_item_balatro"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tenTextView"
+        android:layout_width="0dp"
+        android:layout_height="24dp"
+        android:fontFamily="@font/m6x11plus"
+        android:text="Tiêu đề"
+        android:textColor="#F4EFEF"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/onlineTextView"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tienTextView"
+        android:layout_width="0dp"
+        android:layout_height="24dp"
+        android:fontFamily="@font/m6x11plus"
+        android:text="Nội dung"
+        android:textColor="#F4EFEF"
+        android:textSize="17sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/onlineTextView"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tenTextView"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/onlineTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:fontFamily="@font/m6x11plus"
+        android:gravity="center"
+        android:text="online"
+        android:textAlignment="center"
+        android:textColor="#F4EFEF"
+        android:textSize="17sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/balatroButtonHuyKetBan"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
+        android:id="@+id/balatroButtonHuyKetBan"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:text="huỷ kết bạn"
+        app:colorFont="@color/white"
+        app:colorNormal="@color/balatro_red"
+        app:fontSize="11dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

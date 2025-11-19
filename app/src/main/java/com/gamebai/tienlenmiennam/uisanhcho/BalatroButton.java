@@ -70,6 +70,30 @@ public class BalatroButton extends AppCompatTextView {
         setClipToOutline(false);
     }
 
+    public boolean isAutoLines() {
+        return autoLines;
+    }
+
+    public void setAutoLines(boolean autoLines) {
+        this.autoLines = autoLines;
+    }
+
+    public boolean isShadowEnabled() {
+        return shadowEnabled;
+    }
+
+    public void setShadowEnabled(boolean shadowEnabled) {
+        this.shadowEnabled = shadowEnabled;
+    }
+
+    public boolean isPressable() {
+        return pressable;
+    }
+
+    public void setPressable(boolean pressable) {
+        this.pressable = pressable;
+    }
+
     // Hàm thiết lập màu nền bình thường
     public void setColorNormal(int color) {
         this.colorNormal = color;

@@ -25,6 +25,17 @@ import java.util.Map;
 
 public class BalatroEventFragment extends BalatroDialogFragment{
     private List<SuKien> danhSachSuKien;
+    public BalatroEventFragment() {
+        // Required empty public constructor
+    }
+    /**
+     * Khởi tạo các giá trị phù hợp cho fragment
+     * @param danhSachSuKien
+     */
+    public void init(List<SuKien> danhSachSuKien){
+        this.danhSachSuKien=danhSachSuKien;
+        setTyLeRong(0.9f);
+    }
     public interface BalatroEventFragmentListener {
         void onClaimReward(String idSuKien, String idNhiemVu, View view);
     }

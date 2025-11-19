@@ -13,7 +13,7 @@ import com.gamebai.tienlenmiennam.R;
 import com.google.android.material.snackbar.Snackbar;
 
 public class BalatroPlayFragment extends BalatroDialogFragment {
-
+    public BalatroPlayFragment(){}
     public enum Action {
         JOIN_WITH_CODE,
         QUICK_PLAY,
