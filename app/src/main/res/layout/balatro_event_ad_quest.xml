@@ -2,16 +2,30 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/balatro_event_quest"
+    android:id="@+id/balatro_event_ad_quest"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
     android:background="@drawable/bg_text_or_item_balatro"
     android:padding="16dp">
 
+    <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
+        android:id="@+id/claimBalatroButton"
+        android:layout_width="127dp"
+        android:layout_height="50dp"
+        android:enabled="false"
+        android:text="@string/nhan"
+        app:colorFont="@color/white"
+        app:colorNormal="@color/balatro_red"
+        app:fontSize="17sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/titleTextView"
+        app:pressable="true" />
+
     <TextView
         android:id="@+id/titleTextView"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:fontFamily="@font/m6x11plus"
         android:text="Tiêu đề"
@@ -36,16 +50,17 @@
         app:layout_constraintTop_toBottomOf="@+id/titleTextView" />
 
     <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
-        android:id="@+id/claimBalatroButton"
+        android:id="@+id/watchAdBalatroButton"
         android:layout_width="127dp"
         android:layout_height="50dp"
-        android:enabled="false"
-        android:text="@string/nhan"
+        android:text="@string/xem"
         app:colorFont="@color/white"
-        app:colorNormal="@color/balatro_red"
+        app:colorNormal="@color/balatro_blue"
         app:fontSize="17sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/claimBalatroButton"
         app:layout_constraintTop_toBottomOf="@+id/titleTextView"
+        app:layout_constraintVertical_bias="0.0"
         app:pressable="true" />
 </androidx.constraintlayout.widget.ConstraintLayout>

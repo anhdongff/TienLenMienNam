@@ -21,6 +21,11 @@ public class ManHinhDangTai {
         this.noiDung=noiDung;
         isDisplayed =false;
     }
+
+    public boolean isDisplayed() {
+        return isDisplayed;
+    }
+
     public void hienThi(){
         if(isDisplayed){
             return;

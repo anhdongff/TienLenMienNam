@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/BalatroCormfirmInvite"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_dialog_balatro"
+    android:padding="24dp">
+
+    <LinearLayout
+        android:id="@+id/buttonsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
+            android:id="@+id/btnTuChoi"
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_marginEnd="12dp"
+            android:layout_weight="1"
+            android:text="@string/Tu_choi"
+            app:colorFont="@color/white"
+            app:colorNormal="@color/balatro_yellow"
+            app:fontSize="24sp" />
+
+        <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
+            android:id="@+id/btnThamGia"
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:text="@string/Tham_gia"
+            app:colorFont="@color/white"
+            app:colorNormal="@color/balatro_red"
+            app:fontSize="24sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textViewThongTinLoiMoi"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_text_or_item_balatro"
+        android:fontFamily="@font/m6x11plus"
+        android:gravity="center"
+        android:padding="50dp"
+        android:text="@string/noi_dung_loi_moi"
+        android:textColor="#F4EFEF"
+        android:textSize="28sp"
+        app:layout_constraintBottom_toTopOf="@+id/buttonsLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

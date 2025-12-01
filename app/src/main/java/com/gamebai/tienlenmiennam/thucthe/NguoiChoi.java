@@ -13,6 +13,8 @@ public class NguoiChoi {
     private String tenDangNhap;
     private String idGame;
     private long tien;
+    private long soQuangCaoDaXemTrongNgay;
+    private long soQuangCaoCoTheXemTrongNgay;
     /**
      * firestore field's name
      */
@@ -22,8 +24,8 @@ public class NguoiChoi {
     public static String TEN_TRUONG_ID_GAME="IdGame";
     public static String TEN_TRUONG_TIEN="Tien";
     public static String TEN_TRUONG_LAN_CUOI_DANG_NHAP="LanCuoiDangNhap";
-    public static String TEN_TRUONG_LAN_CUOI_NHAN_QUA="LanCuoiNhanQua";
-    public static String TEN_TRUONG_TRANG_THAI="TrangThai";
+    public static String TEN_TRUONG_SO_QUANG_CAO_DA_XEM_TRONG_NGAY="SoQuangCaoDaXemTrongNgay";
+    public static String TEN_TRUONG_SO_QUANG_CAO_CO_THE_XEM_TRONG_NGAY="SoQuangCaoCoTheXemTrongNgay";
     /**
      * realtime field's name
      */
@@ -34,7 +36,6 @@ public class NguoiChoi {
     public static String TEN_TRUONG_TEN="Ten";
     public static String TEN_TRUONG_BAI_TREN_TAY="BaiTrenTay";
     public static String TEN_TRUONG_TRANG_THAI_ONLINE="TrangThai";
-    public static String TEN_TRUONG_DANH_DAU_TIEN="DanhDauTien";
     public static String TEN_TRUONG_SAN_SANG="SanSang";
     public static String TEN_TRUONG_CHUOI_CHAT_2="ChiChat2";
     public static String TEN_TRUONG_YEU_CAU_DANH_BAI="YeuCauDanhBai";
@@ -69,11 +70,13 @@ public class NguoiChoi {
         trenTay=new ArrayList<>();
     }
 
-    public NguoiChoi(String email, String tenDangNhap, String idGame, long tien) {
+    public NguoiChoi(String email, String tenDangNhap, String idGame, long tien, long soQuangCaoDaXemTrongNgay, long soQuangCaoCoTheXemTrongNgay) {
         this.email = email;
         this.tenDangNhap = tenDangNhap;
         this.idGame = idGame;
         this.tien = tien;
+        this.soQuangCaoDaXemTrongNgay = soQuangCaoDaXemTrongNgay;
+        this.soQuangCaoCoTheXemTrongNgay = soQuangCaoCoTheXemTrongNgay;
         active=true;
         anhLaKeMayMan=false;
         trenTay=new ArrayList<>();
@@ -120,6 +123,22 @@ public class NguoiChoi {
 
     public void setUid(String uid) {
         this.uid = uid;
+    }
+
+    public long getSoQuangCaoDaXemTrongNgay() {
+        return soQuangCaoDaXemTrongNgay;
+    }
+
+    public void setSoQuangCaoDaXemTrongNgay(long soQuangCaoDaXemTrongNgay) {
+        this.soQuangCaoDaXemTrongNgay = soQuangCaoDaXemTrongNgay;
+    }
+
+    public long getSoQuangCaoCoTheXemTrongNgay() {
+        return soQuangCaoCoTheXemTrongNgay;
+    }
+
+    public void setSoQuangCaoCoTheXemTrongNgay(long soQuangCaoCoTheXemTrongNgay) {
+        this.soQuangCaoCoTheXemTrongNgay = soQuangCaoCoTheXemTrongNgay;
     }
 
     /**

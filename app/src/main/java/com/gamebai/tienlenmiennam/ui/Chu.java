@@ -6,6 +6,8 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
+import com.gamebai.tienlenmiennam.R;
+
 /**
  * cung cấp các phương thức để phục vụ việc vẽ chữ lên canvas (vẽ trong 1 dòng)
  */

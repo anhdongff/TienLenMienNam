@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.gamebai.tienlenmiennam.R;
 import com.gamebai.tienlenmiennam.hotro.PhuongThucBitmap;
@@ -65,7 +66,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
     private Chu chuDemNguoc, chuCanhBao, chuDemLaBai,chuThuNhap,
             chuThongBaoKetQua,chuTen,chuTien, chuMaPhong,chuDangChoNguoiChoi;
     private Paint paintKhongBamDuoc,paintDaDanh,paintThuNhapThang,paintThuNhapThua;
-    private Nut nutDanh,nutBoLuot,nutThoat,nutRiengTuCongKhai, nutSanSang;
+    private Nut nutDanh,nutBoLuot,nutThoat,nutRiengTuCongKhai, nutSanSang, nutMoiBan;
     private VienDemNguoc vienDemNguoc;
     /**
      * Các tên trường trong realtime database
@@ -244,7 +245,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
         paintCanhBao.setTextAlign(Paint.Align.LEFT);
         paintCanhBao.setColor(Color.YELLOW);
         paintCanhBao.setTextSize(ThongSo.CanhBaoChonBai.getKichCo());
-        paintCanhBao.setTypeface(Typeface.create(Typeface.SANS_SERIF, Typeface.ITALIC));
+        paintCanhBao.setTypeface(Typeface.create(ResourcesCompat.getFont(mainActivity,R.font.m6x11plus), Typeface.ITALIC));
         chuCanhBao =new Chu(ThongSo.CanhBaoChonBai.NOI_DUNG,paintCanhBao);
         chuCanhBao.setViTri(ThongSo.CanhBaoChonBai.getViTriX(),ThongSo.CanhBaoChonBai.getViTriY());
         chuMaPhong =new Chu(mainActivity.getString(R.string.game_ma_phong),paintCanhBao);
@@ -259,20 +260,20 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
         paintDemNguoc.setTextAlign(Paint.Align.CENTER);
         paintDemNguoc.setColor(Color.YELLOW);
         paintDemNguoc.setTextSize(ThongSo.DemNguoc.getKichCo());
-        paintDemNguoc.setTypeface(Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD));
+        paintDemNguoc.setTypeface(Typeface.create(ResourcesCompat.getFont(mainActivity,R.font.m6x11plus), Typeface.BOLD));
         chuDemNguoc =new Chu(String.valueOf(ThongSo.TranDau.THOI_GIAN_CHO_CHON),paintDemNguoc);
         thoiGianDemNguoc= ThongSo.TranDau.THOI_GIAN_CHO_CHON;
         Paint panitDemLaBai=new Paint();
         panitDemLaBai.setTextAlign(Paint.Align.CENTER);
         panitDemLaBai.setColor(Color.YELLOW);
         panitDemLaBai.setTextSize(ThongSo.CanhBaoChonBai.getKichCo());
-        panitDemLaBai.setTypeface(Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD));
+        panitDemLaBai.setTypeface(Typeface.create(ResourcesCompat.getFont(mainActivity,R.font.m6x11plus), Typeface.BOLD));
         chuDemLaBai =new Chu(String.valueOf(0),panitDemLaBai);
         Paint paintThongBaoKetQua=new Paint();
         paintThongBaoKetQua.setTextAlign(Paint.Align.CENTER);
         paintThongBaoKetQua.setColor(Color.YELLOW);
         paintThongBaoKetQua.setTextSize(ThongSo.ThongBaoKetQua.getKichCo());
-        paintThongBaoKetQua.setTypeface(Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD));
+        paintThongBaoKetQua.setTypeface(Typeface.create(ResourcesCompat.getFont(mainActivity,R.font.m6x11plus), Typeface.BOLD));
         chuThongBaoKetQua =new Chu(ThongSo.ThongBaoKetQua.NOI_DUNG_THUA,paintThongBaoKetQua);
         chuThongBaoKetQua.setViTri((float) (MainActivity.chieuRongManHinh) /2,
                 (MainActivity.chieuCaoManHinh +chuThongBaoKetQua.getHitBox().height()) /2);
@@ -280,19 +281,19 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
         paintChuTen.setTextAlign(Paint.Align.CENTER);
         paintChuTen.setColor(Color.LTGRAY);
         paintChuTen.setTextSize(ThongSo.ThongTinNguoiChoiTrongTran.getKichCo());
-        paintChuTen.setTypeface(Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD));
+        paintChuTen.setTypeface(Typeface.create(ResourcesCompat.getFont(mainActivity,R.font.m6x11plus), Typeface.BOLD));
         chuTen =new Chu(ThongSo.ThongTinNguoiChoiTrongTran.NOI_DUNG_TEN,paintChuTen);
         Paint paintChuTien=new Paint();
         paintChuTien.setTextAlign(Paint.Align.CENTER);
         paintChuTien.setColor(Color.LTGRAY);
         paintChuTien.setTextSize(ThongSo.ThongTinNguoiChoiTrongTran.getKichCo());
-        paintChuTien.setTypeface(Typeface.create(Typeface.SANS_SERIF, Typeface.ITALIC));
+        paintChuTien.setTypeface(Typeface.create(ResourcesCompat.getFont(mainActivity,R.font.m6x11plus), Typeface.ITALIC));
         chuTien =new Chu(ThongSo.ThongTinNguoiChoiTrongTran.NOI_DUNG_TIEN,paintChuTien);
         paintThuNhapThang=new Paint();
         paintThuNhapThang.setTextAlign(Paint.Align.CENTER);
         paintThuNhapThang.setColor(Color.GREEN);
         paintThuNhapThang.setTextSize(ThongSo.ThongTinNguoiChoiTrongTran.getKichCo()+15);
-        paintThuNhapThang.setTypeface(Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD));
+        paintThuNhapThang.setTypeface(Typeface.create(ResourcesCompat.getFont(mainActivity,R.font.m6x11plus), Typeface.BOLD));
         paintThuNhapThua=new Paint(paintThuNhapThang);
         paintThuNhapThua.setColor(Color.RED);
         chuThuNhap =new Chu(String.valueOf(0),paintThuNhapThang);
@@ -308,7 +309,11 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
         });
         ColorMatrixColorFilter colorMatrixColorFilter=new ColorMatrixColorFilter(colorMatrix);
         paintKhongBamDuoc.setColorFilter(colorMatrixColorFilter);
+        paintKhongBamDuoc.setAntiAlias(true);
+        paintKhongBamDuoc.setFilterBitmap(true);
         paintDaDanh =new Paint();
+        paintDaDanh.setAntiAlias(true);
+        paintDaDanh.setFilterBitmap(true);
         colorMatrix = new ColorMatrix(new float[]{
                 0.7f, 0, 0, 0, 0,  // Giảm sáng
                 0, 0.7f, 0, 0, 0,
@@ -381,6 +386,13 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                 ThongSo.ThongSoManHinh.TI_LE_CHIEU_CAO_MAN_HINH,true), temp,
                 (float) (MainActivity.chieuRongManHinh- temp.getWidth()) /2,
                 (float) (MainActivity.chieuCaoManHinh - temp.getHeight()) /2,
+                temp.getWidth(),temp.getHeight());
+        temp=getBitmapTheoTiLe(BitmapFactory.decodeResource(mainActivity
+                        .getResources(),R.drawable.button_moi_ban_be,options),
+                ThongSo.ThongSoManHinh.TI_LE_CHIEU_RONG_MAN_HINH,
+                ThongSo.ThongSoManHinh.TI_LE_CHIEU_CAO_MAN_HINH,true);
+        nutMoiBan=new Nut(temp,(float) (MainActivity.chieuRongManHinh- temp.getWidth()) /2,
+                nutSanSang.getHitbox().bottom+ThongSo.UI.KHOANG_CACH_GIUA_PHAN_TU_CAO,
                 temp.getWidth(),temp.getHeight());
         /**
          * cờ kiểm tra tải
@@ -473,6 +485,11 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                     }
                 }
             }
+            if(nutMoiBan.isEventHere(new PointF(event.getX(),event.getY()))){
+                if(giaiDoan== ChoiVoiMay.GiaiDoan.CHO_NGUOI_CHOI&&!nutSanSang.isDuocBam()){
+                    mainActivity.hienThiDanhSachMoiBanBe();
+                }
+            }
         }
     }
 
@@ -517,6 +534,9 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
             case CHO_NGUOI_CHOI:
                 nutThoat.ve(c);
                 veAvartar(c);
+                if(!nutSanSang.isDuocBam()){
+                    nutMoiBan.ve(c);
+                }
                 if(soNguoiChoi>1){
                     nutSanSang.ve(c);
                 }else{
@@ -738,7 +758,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                 BoBai.ChiSoSoHuu.NGUOI_CHOI_1.getViTriAvartarX(),
                 BoBai.ChiSoSoHuu.NGUOI_CHOI_1.getViTriAvartarY(),
                 temp);
-        chuTien.setNoiDung(nguoiChois[0].getTien()+"$");
+        chuTien.setNoiDung(nguoiChois[0].getTien()+" xu");
         chuTien.setViTri(BoBai.ChiSoSoHuu.NGUOI_CHOI_1.getViTriAvartarX()
                         +ThongSo.Avatar.getKichThuocRongAvatar()/2,
                 BoBai.ChiSoSoHuu.NGUOI_CHOI_1.getViTriAvartarY()
@@ -756,7 +776,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
         if(giaiDoan==KET_THUC){
             if(nguoiThang==0) chuThuNhap.setPaint(paintThuNhapThang);
             else chuThuNhap.setPaint(paintThuNhapThua);
-            chuThuNhap.setNoiDung(nguoiChois[0].thuNhap+"$");
+            chuThuNhap.setNoiDung(nguoiChois[0].thuNhap+" xu");
             chuThuNhap.setViTri(BoBai.ChiSoSoHuu.NGUOI_CHOI_1.getViTriAvartarX()
                             +ThongSo.Avatar.getKichThuocRongAvatar()/2,
                     chuTen.getHitBox().top);
@@ -769,7 +789,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                     BoBai.ChiSoSoHuu.NGUOI_CHOI_2.getViTriAvartarX(),
                     BoBai.ChiSoSoHuu.NGUOI_CHOI_2.getViTriAvartarY(),
                     temp);
-            chuTien.setNoiDung(nguoiChois[1].getTien()+"$");
+            chuTien.setNoiDung(nguoiChois[1].getTien()+" xu");
             chuTien.setViTri(BoBai.ChiSoSoHuu.NGUOI_CHOI_2.getViTriAvartarX()
                             +ThongSo.Avatar.getKichThuocRongAvatar()/2,
                     BoBai.ChiSoSoHuu.NGUOI_CHOI_2.getViTriAvartarY()
@@ -787,7 +807,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
             if(giaiDoan==KET_THUC){
                 if(nguoiThang==1) chuThuNhap.setPaint(paintThuNhapThang);
                 else chuThuNhap.setPaint(paintThuNhapThua);
-                chuThuNhap.setNoiDung(nguoiChois[1].thuNhap+"$");
+                chuThuNhap.setNoiDung(nguoiChois[1].thuNhap+" xu");
                 chuThuNhap.setViTri(BoBai.ChiSoSoHuu.NGUOI_CHOI_2.getViTriAvartarX()
                                 +ThongSo.Avatar.getKichThuocRongAvatar()/2,
                         chuTen.getHitBox().top);
@@ -813,7 +833,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                             +vienDemNguoc.getPaint().getStrokeWidth()
                             +chuTien.getHitBox().height());
             chuTen.ve(c);
-            chuTien.setNoiDung(nguoiChois[2].getTien()+"$");
+            chuTien.setNoiDung(nguoiChois[2].getTien()+" xu");
             chuTien.setViTri(BoBai.ChiSoSoHuu.NGUOI_CHOI_3.getViTriAvartarX()
                             +ThongSo.Avatar.getKichThuocRongAvatar()/2,
                     chuTen.getHitBox().bottom+chuTien.getHitBox().height());
@@ -821,7 +841,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
             if(giaiDoan==KET_THUC){
                 if(nguoiThang==2) chuThuNhap.setPaint(paintThuNhapThang);
                 else chuThuNhap.setPaint(paintThuNhapThua);
-                chuThuNhap.setNoiDung(nguoiChois[2].thuNhap+"$");
+                chuThuNhap.setNoiDung(nguoiChois[2].thuNhap+" xu");
                 chuThuNhap.setViTri(BoBai.ChiSoSoHuu.NGUOI_CHOI_3.getViTriAvartarX()
                                 +ThongSo.Avatar.getKichThuocRongAvatar()/2,
                         chuTien.getHitBox().bottom+chuThuNhap.getHitBox().height());
@@ -835,7 +855,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                     BoBai.ChiSoSoHuu.NGUOI_CHOI_4.getViTriAvartarX(),
                     BoBai.ChiSoSoHuu.NGUOI_CHOI_4.getViTriAvartarY(),
                     temp);
-            chuTien.setNoiDung(nguoiChois[3].getTien()+"$");
+            chuTien.setNoiDung(nguoiChois[3].getTien()+" xu");
             chuTien.setViTri(BoBai.ChiSoSoHuu.NGUOI_CHOI_4.getViTriAvartarX()
                             +ThongSo.Avatar.getKichThuocRongAvatar()/2,
                     BoBai.ChiSoSoHuu.NGUOI_CHOI_4.getViTriAvartarY()
@@ -853,7 +873,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
             if(giaiDoan==KET_THUC){
                 if(nguoiThang==3) chuThuNhap.setPaint(paintThuNhapThang);
                 else chuThuNhap.setPaint(paintThuNhapThua);
-                chuThuNhap.setNoiDung(nguoiChois[3].thuNhap+"$");
+                chuThuNhap.setNoiDung(nguoiChois[3].thuNhap+" xu");
                 chuThuNhap.setViTri(BoBai.ChiSoSoHuu.NGUOI_CHOI_4.getViTriAvartarX()
                                 +ThongSo.Avatar.getKichThuocRongAvatar()/2,
                         chuTen.getHitBox().top);

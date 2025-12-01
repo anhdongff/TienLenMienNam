@@ -26,4 +26,6 @@
     <color name="balatro_red">#ff4c40</color>
     <color name="balatro_green">#429f79</color>
     <color name="balatro_yellow">#ff9800</color>
+    <color name="balatro_dark_gray_for_btn">#3b5055</color>
+    <color name="balatro_light_gray_for_btn">#708387</color>
 </resources>

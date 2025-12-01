@@ -11,12 +11,16 @@ public class Nut {
     protected boolean duocBam,kichHoat;
     protected Bitmap anhNut;
     protected int idConTro;
+    protected Paint smoothPaint;
     public Nut(Bitmap anhNut,float viTriX, float viTriY, float rong, float cao) {
         this.anhNut = anhNut;
         hitbox = new RectF(viTriX, viTriY, viTriX + rong, viTriY + cao);
         duocBam = false;
         idConTro=-1;
         kichHoat=false;
+        smoothPaint = new Paint();
+        smoothPaint.setFilterBitmap(true); // Bật cờ lọc bitmap
+        smoothPaint.setAntiAlias(true);    // Bật cờ khử răng cưa
     }
     public Bitmap getAnhNut() {
         return anhNut;
@@ -72,9 +76,20 @@ public class Nut {
     public void setDuocBam(boolean duocBam) {
         this.duocBam = duocBam;
     }
+
+    /**
+     * vẽ nút lên màn hình với paint mặc định đã khử răng cưa và lọc bitmap
+     * @param canvas khung tranh để vẽ lên
+     */
     public void ve(Canvas canvas){
-        canvas.drawBitmap(anhNut,hitbox.left,hitbox.top,null);
+        canvas.drawBitmap(anhNut,hitbox.left,hitbox.top,smoothPaint);
     }
+
+    /**
+     * vẽ nút lên màn hình với paint tùy chỉnh
+     * @param canvas khung tranh để vẽ lên
+     * @param paint paint tuỳ chỉnh
+     */
     public void ve(Canvas canvas, Paint paint){
         canvas.drawBitmap(anhNut,hitbox.left,hitbox.top,paint);
     }

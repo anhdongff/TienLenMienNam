@@ -17,7 +17,7 @@ public class NutBatTat extends Nut{
     }
     @Override
     public void ve(Canvas canvas){
-        canvas.drawBitmap(getAnhNut(),hitbox.left,hitbox.top,null);
+        canvas.drawBitmap(getAnhNut(),hitbox.left,hitbox.top,smoothPaint);
     }
     @Override
     public void ve(Canvas canvas, Paint paint){

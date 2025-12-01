@@ -116,4 +116,19 @@
     <string name="ban_da_gui_loi_moi_ket_ban">Bạn đã gửi lời mời cho người chơi này, hãy chờ họ xác nhận</string>
     <string name="them_ban_be">thêm bạn bè</string>
     <string name="xu">xu</string>
+    <string name="ban_chua_online">Người chơi này chưa online\n</string>
+    <string name="ban_dang_choi">Người chơi này đang trong trận đấu khác</string>
+    <string name="Tu_choi">Từ chối</string>
+    <string name="Tham_gia">Tham gia</string>
+    <string name="noi_dung_loi_moi">Nguời chơi %1$s mời bạn tham gia phòng với mã %2$s</string>
+    <string name="choi_ngay">Chơi ngay</string>
+    <string name="su_kien">Sự kiện</string>
+    <string name="free_xu">Xu miễn phí</string>
+    <string name="ban_be">Bạn bè</string>
+    <string name="nhan_thuong_quang_cao_thanh_cong">Bạn đã nhận được %1$d %2$s từ việc xem quảng cáo</string>
+    <string name="loi_nhan_thuong_quang_cao">Có lỗi xảy ra khi nhận thưởng</string>
+    <string name="dat_gioi_han_xem_quang_cao">Bạn đã đạt gới hạn quảng cáo trong ngày (%1$d/%2$d), hoàn thành 1 trận đấu sẽ tăng giới hạn lên 1</string>
+    <string name="nhan">Nhận</string>
+    <string name="xem">Xem</string>
+    <string name="co_loi_xay_ra">Có lỗi xảy ra, vuy lòng thử lại</string>
 </resources>

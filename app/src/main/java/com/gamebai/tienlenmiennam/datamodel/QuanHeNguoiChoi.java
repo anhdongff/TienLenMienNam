@@ -24,9 +24,21 @@ public class QuanHeNguoiChoi {
     private String tenBanBe;
     private long Tien;
     private boolean online;
+    private long lastInviteTime;
+    private boolean inGame;
     DatabaseReference banBeReference;
     ValueEventListener banBeOnlineListener;
-    public QuanHeNguoiChoi() {}
+    public QuanHeNguoiChoi() {
+        lastInviteTime = 0;
+    }
+
+    public long getLastInviteTime() {
+        return lastInviteTime;
+    }
+
+    public void setLastInviteTime(long lastInviteTime) {
+        this.lastInviteTime = lastInviteTime;
+    }
 
     public String getId() {
         return id;
@@ -34,6 +46,14 @@ public class QuanHeNguoiChoi {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public boolean isInGame() {
+        return inGame;
+    }
+
+    public void setInGame(boolean inGame) {
+        this.inGame = inGame;
     }
 
     public long getTien() {
@@ -150,6 +170,10 @@ public class QuanHeNguoiChoi {
                     if(snapshot.child("Tien").exists()){
                         Long tien=snapshot.child("Tien").getValue(Long.class);
                         setTien(tien!=null?tien:0);
+                    }
+                    if(snapshot.child("inGame").exists()) {
+                        Boolean inGame = snapshot.child("InGame").getValue(Boolean.class);
+                        setInGame(inGame!=null?inGame:false);
                     }
                 } catch (Exception e) {
                     Log.e("LOI", "Error: " + e.getMessage());

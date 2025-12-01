@@ -37,7 +37,8 @@ public class BalatroEventFragment extends BalatroDialogFragment{
         setTyLeRong(0.9f);
     }
     public interface BalatroEventFragmentListener {
-        void onClaimReward(String idSuKien, String idNhiemVu, View view);
+        void onClaimReward(String idSuKien, String idNhiemVu);
+        void onWatchAd();
     }
     private BalatroEventFragmentListener listener;
     public void setListener(BalatroEventFragmentListener listener) {
@@ -45,7 +46,6 @@ public class BalatroEventFragment extends BalatroDialogFragment{
     }
     public void setDanhSachSuKien(List<SuKien> danhSachSuKien) {
         this.danhSachSuKien = danhSachSuKien;
-        setTyLeRong(0.9f);
     }
 
     @Override
@@ -96,10 +96,21 @@ public class BalatroEventFragment extends BalatroDialogFragment{
                             String nhiemVuId = entry.getKey();
                             TienTrinhNhiemVu nhiemVu = entry.getValue();
 
-                            View questView = inflater.inflate(R.layout.balatro_event_quest, rightButtonPanel, false);
+                            View questView;
+                            if(!nhiemVu.getLoai().equals("QuangCao")){
+                                questView = inflater.inflate(R.layout.balatro_event_quest, rightButtonPanel, false);
+                            }else{//loại nhiệm vụ quảng cáo
+                                questView = inflater.inflate(R.layout.balatro_event_ad_quest, rightButtonPanel, false);
+                                BalatroButton watchAdButton = questView.findViewById(R.id.watchAdBalatroButton);
+                                watchAdButton.setOnClickListener(v1 -> {
+                                    if (listener != null) {
+                                        listener.onWatchAd();
+                                    }
+                                });
+                            }
                             TextView questTitle = questView.findViewById(R.id.titleTextView);
                             TextView questReward = questView.findViewById(R.id.rewardTextView);
-                            BalatroButton claimButton = questView.findViewById(R.id.ClaimBalatroButton);
+                            BalatroButton claimButton = questView.findViewById(R.id.claimBalatroButton);
                             questTitle.setText(nhiemVu.getNoiDung()+" ("
                                     + nhiemVu.getGiaTriHienTai() + "/" + nhiemVu.getGiaTriYeuCau() + ")");
                             questReward.setText(String.format("%d$", nhiemVu.getPhanThuong()));
@@ -111,7 +122,7 @@ public class BalatroEventFragment extends BalatroDialogFragment{
                                     claimButton.setEnabled(true);
                                     claimButton.setOnClickListener(claimView -> {
                                         if (listener != null) {
-                                            listener.onClaimReward(suKien.getId(), nhiemVuId, view);
+                                            listener.onClaimReward(suKien.getId(), nhiemVuId);
                                             nhiemVu.setDaNhan(true);
                                             claimButton.setText("Đã nhận");
                                             claimButton.setEnabled(false);
