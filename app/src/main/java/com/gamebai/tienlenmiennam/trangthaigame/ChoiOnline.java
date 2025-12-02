@@ -28,6 +28,7 @@ import androidx.core.content.res.ResourcesCompat;
 
 import com.gamebai.tienlenmiennam.R;
 import com.gamebai.tienlenmiennam.hotro.PhuongThucBitmap;
+import com.gamebai.tienlenmiennam.hotro.SoundManager;
 import com.gamebai.tienlenmiennam.hotro.ThongSo;
 import com.gamebai.tienlenmiennam.hotro.TrangThaiGame;
 import com.gamebai.tienlenmiennam.main.Game;
@@ -189,6 +190,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
     private boolean daThaoTac;
     /** nếu người chơi đã vào phòng sẽ bật cờ này */
     private boolean daVaoPhong;
+    private SoundManager soundManager;
 
     public ChoiOnline(Game game, MainActivity mainActivity){
         super(game);
@@ -394,6 +396,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
         nutMoiBan=new Nut(temp,(float) (MainActivity.chieuRongManHinh- temp.getWidth()) /2,
                 nutSanSang.getHitbox().bottom+ThongSo.UI.KHOANG_CACH_GIUA_PHAN_TU_CAO,
                 temp.getWidth(),temp.getHeight());
+        soundManager=SoundManager.getInstance(mainActivity);
         /**
          * cờ kiểm tra tải
          */
@@ -430,22 +433,27 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                     if(nguoiChois[0].getLaBai(baiTrenTay.indexOf(nutLaBai)).isCoTheChon()
                             &&nutLaBai.isEventHere(new PointF(event.getX(),event.getY()))) {
                         if (nutLaBai.isDuocBam()) {
+                            soundManager.playSfx(SoundManager.Sfx.PICK_UP);
                             chonLaBai(baiTrenTay.indexOf(nutLaBai));
                         } else {
+                            soundManager.playSfx(SoundManager.Sfx.UN_PICK_UP);
                             boChonLaBai(baiTrenTay.indexOf(nutLaBai));
                         }
                         break;
                     }
                 }
                 if(nutDanh.isEventHere(new PointF(event.getX(),event.getY()))) {
+                    soundManager.playSfx(SoundManager.Sfx.BUTTON_CLICK);
                     kiemTraBaiDanhVaGuiBaiDanh();
                 }
                 if(nguoiDanhCuoi!=0&&nutBoLuot.isEventHere(new PointF(event.getX(),event.getY()))) {
+                    soundManager.playSfx(SoundManager.Sfx.BUTTON_CLICK);
                     yeuCauBoLuot();
                 }
             }
             if(nutThoat.isEventHere(new PointF(event.getX(),event.getY()))) {
                 if (giaiDoan== ChoiVoiMay.GiaiDoan.CHO_NGUOI_CHOI) {
+                    soundManager.playSfx(SoundManager.Sfx.BUTTON_CLICK);
                     if(nutThoat.isDuocBam()) {
                         Toast.makeText(mainActivity, mainActivity.getString(R.string.game_da_san_sang),
                                 Toast.LENGTH_SHORT).show();
@@ -458,6 +466,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
             if(nutRiengTuCongKhai.isEventHere(new PointF(event.getX(),event.getY()))) {
                 if (giaiDoan==ChoiVoiMay.GiaiDoan.CHO_NGUOI_CHOI
                         &&nguoiChois[0].soThuTu==0) {
+                    soundManager.playSfx(SoundManager.Sfx.BUTTON_CLICK);
                     if(nutRiengTuCongKhai.isDuocBam()) {
                         nutRiengTuCongKhai.setDuocBam(false);
                         thayDoiRiengTuCongKhai();
@@ -470,6 +479,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
             }
             if(nutSanSang.isEventHere(new PointF(event.getX(),event.getY()))){
                 if(giaiDoan== ChoiVoiMay.GiaiDoan.CHO_NGUOI_CHOI) {
+                    soundManager.playSfx(SoundManager.Sfx.BUTTON_CLICK);
                     if(nutSanSang.isDuocBam()){
                         realtimeDatabase.getReference(TEN_BANG+"/"
                                         +maPhong+"/"+TEN_TRUONG_NGUOI_CHOI+"/"+nguoiChois[0].getUid()+"/"
@@ -487,6 +497,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
             }
             if(nutMoiBan.isEventHere(new PointF(event.getX(),event.getY()))){
                 if(giaiDoan== ChoiVoiMay.GiaiDoan.CHO_NGUOI_CHOI&&!nutSanSang.isDuocBam()){
+                    soundManager.playSfx(SoundManager.Sfx.BUTTON_CLICK);
                     mainActivity.hienThiDanhSachMoiBanBe();
                 }
             }
@@ -1011,6 +1022,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                         temp.diChuyen(delta,true);
                         if(temp.isDaDenDich()){
                             demLaDenDich++;
+                            soundManager.playSfx(SoundManager.Sfx.THROWING_CARDS);
                         }
                         if(demSoFrame>=2){
                             demLaBaiDiChuyen++;
@@ -1260,6 +1272,7 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                 }
             }
         }
+        soundManager.playSfx(SoundManager.Sfx.PLAY_HAND);
 //        if(nguoiDangDanh==soNguoiChoi-1) nguoiDangDanh=0;
 //        else nguoiDangDanh++;
         dauLuot=false;
@@ -1487,7 +1500,10 @@ public class ChoiOnline extends TrangThaiCoBan implements TrangThaiGame, PhuongT
                 nguoiThang=i;
                 tinhThuNhap();
                 chuDemNguoc.setNoiDung(ThongSo.DemNguoc.NOI_DUNG_NHAT);
-                if(i==0) chuThongBaoKetQua.setNoiDung(ThongSo.ThongBaoKetQua.NOI_DUNG_THANG);
+                if(i==0) {
+                    chuThongBaoKetQua.setNoiDung(ThongSo.ThongBaoKetQua.NOI_DUNG_THANG);
+                    soundManager.playSfx(SoundManager.Sfx.WIN);
+                }
                 else chuThongBaoKetQua.setNoiDung(ThongSo.ThongBaoKetQua.NOI_DUNG_THUA);
                 /**
                  * Lấy lá bài của người chơi khác

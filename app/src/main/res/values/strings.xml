@@ -131,4 +131,8 @@
     <string name="nhan">Nhận</string>
     <string name="xem">Xem</string>
     <string name="co_loi_xay_ra">Có lỗi xảy ra, vuy lòng thử lại</string>
+    <string name="cai_dat">Cài đặt</string>
+    <string name="SU_KIEN">SỰ KIỆN</string>
+    <string name="CHOI">CHƠI</string>
+    <string name="nap_xu">Kiếm thêm xu</string>
 </resources>

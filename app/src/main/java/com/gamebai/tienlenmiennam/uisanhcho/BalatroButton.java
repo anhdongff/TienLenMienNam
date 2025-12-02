@@ -16,6 +16,7 @@ import androidx.appcompat.widget.AppCompatTextView;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.gamebai.tienlenmiennam.R;
+import com.gamebai.tienlenmiennam.hotro.SoundManager;
 
 public class BalatroButton extends AppCompatTextView {
     private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -35,6 +36,7 @@ public class BalatroButton extends AppCompatTextView {
 
     // các chức năng khác
     private boolean shadowEnabled = true;
+    private SoundManager soundManager;
     private boolean pressable = true;
     public BalatroButton(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -68,6 +70,7 @@ public class BalatroButton extends AppCompatTextView {
         // Cho phép vẽ shadow
         setLayerType(LAYER_TYPE_SOFTWARE, null);
         setClipToOutline(false);
+        soundManager=SoundManager.getInstance(context);
     }
 
     public boolean isAutoLines() {
@@ -305,6 +308,7 @@ public class BalatroButton extends AppCompatTextView {
             case MotionEvent.ACTION_UP:
                 if(pressable&&isEnabled()) {
                     pressed = false;
+                    soundManager.playSfx(SoundManager.Sfx.BUTTON_CLICK);
                     startScaleAnimation(1.0f);
                     invalidate();
                     performClick(); // gọi sự kiện click

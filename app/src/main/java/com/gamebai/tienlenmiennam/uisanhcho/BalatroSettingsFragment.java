@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.gamebai.tienlenmiennam.R;
+import com.gamebai.tienlenmiennam.hotro.SoundManager;
 
 /**
  * Fragment hiển thị giao diện cài đặt với các nút chức năng.
@@ -31,6 +32,7 @@ public class BalatroSettingsFragment extends BalatroDialogFragment {
     }
 
     private OnSettingActionSelectedListener listener;
+    private SoundManager soundManager=SoundManager.getInstance(getContext());
 
     public BalatroSettingsFragment() {
         // Bắt buộc phải có constructor rỗng
@@ -44,12 +46,17 @@ public class BalatroSettingsFragment extends BalatroDialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.balatro_setting_dialog, container, false);
-
-        view.findViewById(R.id.AmThanhButton).setOnClickListener(v -> {
+        BalatroButton amThanhButton = view.findViewById(R.id.AmThanhButton);
+        BalatroButton amNhacButton = view.findViewById(R.id.AmNhacButton);
+        amThanhButton.setText("Âm thanh: "+(soundManager.isSfxEnabled() ? "Bật" : "Tắt"));
+        amNhacButton.setText("Âm nhạc: "+(soundManager.isMusicEnabled() ? "Bật" : "Tắt"));
+        amThanhButton.setOnClickListener(v -> {
             if (listener != null) listener.onActionSelected(Action.AM_THANH);
+            amThanhButton.setText("Âm thanh: "+(soundManager.isSfxEnabled() ? "Bật" : "Tắt"));
         });
-        view.findViewById(R.id.AmNhacButton).setOnClickListener(v -> {
+        amNhacButton.setOnClickListener(v -> {
             if (listener != null) listener.onActionSelected(Action.AM_NHAC);
+            amNhacButton.setText("Âm nhạc: "+(soundManager.isMusicEnabled() ? "Bật" : "Tắt"));
         });
         view.findViewById(R.id.MaQuaButton).setOnClickListener(v -> {
             if (listener != null) listener.onActionSelected(Action.MA_QUA);

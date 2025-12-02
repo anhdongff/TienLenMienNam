@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.gamebai.tienlenmiennam.shader.ShaderView
+        android:id="@+id/shaderView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
+        android:id="@+id/balatroButtonBackgroundCenter"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:colorFont="@color/white"
+        app:colorNormal="@color/balatro_dark_gray_for_btn"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.20"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.92"
+        app:layout_constraintWidth_percent="0.55"
+        app:pressable="false" />
+
+    <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
+        android:id="@+id/balatroButtonChoi"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="@string/CHOI"
+        app:colorFont="@color/white"
+        app:colorNormal="@color/balatro_red"
+        app:fontSize="26dp"
+        app:layout_constraintBottom_toBottomOf="@+id/balatroButtonBackgroundCenter"
+        app:layout_constraintEnd_toEndOf="@+id/balatroButtonBackgroundCenter"
+        app:layout_constraintHeight_percent="0.15"
+        app:layout_constraintHorizontal_bias="0.03"
+        app:layout_constraintStart_toStartOf="@+id/balatroButtonBackgroundCenter"
+        app:layout_constraintTop_toTopOf="@+id/balatroButtonBackgroundCenter"
+        app:layout_constraintWidth_percent="0.15" />
+
+    <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
+        android:id="@+id/balatroButtonSuKien"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="@string/SU_KIEN"
+        app:colorFont="@color/white"
+        app:colorNormal="@color/balatro_green"
+        app:fontSize="26dp"
+        app:layout_constraintBottom_toBottomOf="@+id/balatroButtonBackgroundCenter"
+        app:layout_constraintEnd_toEndOf="@+id/balatroButtonBackgroundCenter"
+        app:layout_constraintHeight_percent="0.15"
+        app:layout_constraintHorizontal_bias="0.97"
+        app:layout_constraintStart_toStartOf="@+id/balatroButtonBackgroundCenter"
+        app:layout_constraintTop_toTopOf="@+id/balatroButtonBackgroundCenter"
+        app:layout_constraintWidth_percent="0.15" />
+
+    <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
+        android:id="@+id/balatroButtonBackgroundLeft"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:colorNormal="@color/balatro_dark_gray_for_btn"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/balatroButtonBackgroundCenter"
+        app:layout_constraintHeight_percent="0.17"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.92"
+        app:layout_constraintWidth_percent="0.15"
+        app:pressable="false" />
+    <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
+        android:id="@+id/balatroButtonBackgroundRight"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.17"
+        app:layout_constraintStart_toEndOf="@+id/balatroButtonBackgroundCenter"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.92"
+        app:layout_constraintWidth_percent="0.15"
+        app:colorNormal="@color/balatro_dark_gray_for_btn"
+        app:pressable="false"/>
+
+    <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
+        android:id="@+id/balatroButtonBanBe"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="@string/ban_be"
+        app:layout_constraintBottom_toBottomOf="@+id/balatroButtonBackgroundLeft"
+        app:layout_constraintEnd_toEndOf="@+id/balatroButtonBackgroundLeft"
+        app:layout_constraintStart_toStartOf="@+id/balatroButtonBackgroundLeft"
+        app:layout_constraintTop_toTopOf="@+id/balatroButtonBackgroundLeft"
+        app:layout_constraintVertical_bias="0.25"
+        app:layout_constraintHeight_percent="0.12"
+        app:layout_constraintWidth_percent="0.12"
+        app:colorNormal="@color/balatro_light_gray_for_btn"
+        app:colorFont="@color/white"
+        app:fontSize="20dp"/>
+
+    <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
+        android:id="@+id/balatroButtonCaiDat"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="@string/cai_dat"
+        app:colorFont="@color/white"
+        app:colorNormal="@color/balatro_light_gray_for_btn"
+        app:fontSize="20dp"
+        app:layout_constraintBottom_toBottomOf="@+id/balatroButtonBackgroundRight"
+        app:layout_constraintEnd_toEndOf="@+id/balatroButtonBackgroundRight"
+        app:layout_constraintHeight_percent="0.12"
+        app:layout_constraintStart_toStartOf="@+id/balatroButtonBackgroundRight"
+        app:layout_constraintTop_toTopOf="@+id/balatroButtonBackgroundRight"
+        app:layout_constraintVertical_bias="0.25"
+        app:layout_constraintWidth_percent="0.12" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="818dp"
+        android:layout_height="282dp"
+        app:layout_constraintBottom_toTopOf="@+id/balatroButtonBackgroundCenter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/shaderView"
+        app:srcCompat="@drawable/balatro_moded_logo" />
+
+    <com.gamebai.tienlenmiennam.uisanhcho.BalatroButton
+        android:id="@+id/balatroButtonNapTien"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/nap_xu"
+        app:colorFont="@color/white"
+        app:colorNormal="@color/balatro_yellow"
+        app:fontSize="15dp"
+        app:layout_constraintBottom_toTopOf="@+id/balatroButtonBackgroundCenter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/textViewTenNguoiChoi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:fontFamily="@font/m6x11plus"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toStartOf="@+id/balatroButtonSuKien"
+        app:layout_constraintStart_toEndOf="@+id/balatroButtonChoi"
+        app:layout_constraintTop_toTopOf="@+id/balatroButtonSuKien" />
+    />
+
+    <TextView
+        android:id="@+id/textViewTien"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:fontFamily="@font/m6x11plus"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/balatroButtonChoi"
+        app:layout_constraintEnd_toStartOf="@+id/balatroButtonSuKien"
+        app:layout_constraintStart_toEndOf="@+id/balatroButtonChoi" />
+    />
+</androidx.constraintlayout.widget.ConstraintLayout>

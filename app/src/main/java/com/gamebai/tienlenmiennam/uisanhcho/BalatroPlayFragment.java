@@ -17,7 +17,8 @@ public class BalatroPlayFragment extends BalatroDialogFragment {
     public enum Action {
         JOIN_WITH_CODE,
         QUICK_PLAY,
-        CREATE_ROOM
+        CREATE_ROOM,
+        PLAY_WITH_BOTS
     }
 
     public interface OnPlayActionSelectedListener {
@@ -39,6 +40,7 @@ public class BalatroPlayFragment extends BalatroDialogFragment {
         BalatroButton balatroButtonPlay = view.findViewById(R.id.balatroButtonPlay);
         BalatroButton balatroButtonCreateRoom = view.findViewById(R.id.balatroButtonCreateRoom);
         BalatroButton balatroButtonQuayLai = view.findViewById(R.id.balatroButtonQuayLai);
+        BalatroButton balatroButtonPlayWithBots = view.findViewById(R.id.balatroButtonPlayWithBots);
 
         balatroButtonPlay.setOnClickListener(v -> {
             if (listener == null) return;
@@ -67,6 +69,14 @@ public class BalatroPlayFragment extends BalatroDialogFragment {
             if (listener != null) {
                 // Hành động: Tạo phòng
                 listener.onActionSelected(Action.CREATE_ROOM, null);
+                dismiss();
+            }
+        });
+
+        balatroButtonPlayWithBots.setOnClickListener(v -> {
+            if (listener != null) {
+                // Hành động: Tạo phòng
+                listener.onActionSelected(Action.PLAY_WITH_BOTS, null);
                 dismiss();
             }
         });
