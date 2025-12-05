@@ -16,6 +16,7 @@ import androidx.core.content.res.ResourcesCompat;
 
 import com.gamebai.tienlenmiennam.R;
 import com.gamebai.tienlenmiennam.datamodel.QuanHeNguoiChoi;
+import com.gamebai.tienlenmiennam.hotro.FirebaseUtil;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
@@ -101,7 +102,7 @@ public class BalatroFriendFragment extends BalatroDialogFragment {
             TextView onlineTextView = itemView.findViewById(R.id.onlineTextView);
             BalatroButton huyKetBanButton = itemView.findViewById(R.id.balatroButtonHuyKetBan);
 
-            tenTextView.setText(friend.getTenBanBe());
+            tenTextView.setText(friend.getTenBanBe()+(friend.getFacebook()!=null&&!friend.getFacebook().isEmpty()?(" ("+friend.getTenFacebook()+")"):""));
             tienTextView.setText(friend.getTien()+" "+getString(R.string.xu));
             onlineTextView.setText(friend.isOnline() ? "online" : "offline");
 
@@ -175,6 +176,25 @@ public class BalatroFriendFragment extends BalatroDialogFragment {
         rightPanel.removeAllViews();
         View searchView = inflater.inflate(R.layout.balatro_friend_search, rightPanel, false);
         rightPanel.addView(searchView);
+
+        if (!FirebaseUtil.isFacebookLinked()) {
+            View facebookLoginView = inflater.inflate(R.layout.balatro_friend_action_item, rightPanel, false);
+            TextView facebookTextView = facebookLoginView.findViewById(R.id.tenTextView);
+            TextView noiDungTextView=facebookLoginView.findViewById(R.id.tienTextView);
+            noiDungTextView.setText(R.string.ket_noi_facebook_de_tim_ban);
+            facebookTextView.setText(R.string.khong_tim_duoc_ban);
+            BalatroButton facebookButton = facebookLoginView.findViewById(R.id.balatroButtonAction);
+            facebookButton.setText(R.string.ket_noi);
+            facebookButton.setOnClickListener(v -> {
+                if (!FirebaseUtil.isFacebookLinked()) {
+                    facebookButton.setEnabled(false);
+                    action.connectFacebook();
+                }else {
+                    Snackbar.make(v, R.string.facebook_da_ket_noi, Snackbar.LENGTH_SHORT).show();
+                }
+            });
+            rightPanel.addView(facebookLoginView);
+        }
 
         BalatroEditText searchEditText = searchView.findViewById(R.id.balatroEditTextSearch);
         BalatroButton searchButton = searchView.findViewById(R.id.balatroButtonTimKiem);
@@ -281,5 +301,7 @@ public class BalatroFriendFragment extends BalatroDialogFragment {
         void onAction(Action action, QuanHeNguoiChoi quanHeNguoiChoi, View view);
 
         void searchFriend(String name, SearchFriendCallback callback);
+        /** kết nối với facebook và tự động đồng bộ bạn bè đã kết nối facebook */
+        void connectFacebook();
     }
 }

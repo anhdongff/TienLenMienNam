@@ -19,6 +19,7 @@ import java.util.List;
 public class QuanHeNguoiChoi {
     private String id;
     private List<String> UserIds;
+    private List<String> Facebook;
     private long ThoiGianTao;
     private int TrangThai;
     private String tenBanBe;
@@ -26,6 +27,7 @@ public class QuanHeNguoiChoi {
     private boolean online;
     private long lastInviteTime;
     private boolean inGame;
+    private String tenFacebook;
     DatabaseReference banBeReference;
     ValueEventListener banBeOnlineListener;
     public QuanHeNguoiChoi() {
@@ -34,6 +36,22 @@ public class QuanHeNguoiChoi {
 
     public long getLastInviteTime() {
         return lastInviteTime;
+    }
+
+    public String getTenFacebook() {
+        return tenFacebook;
+    }
+
+    public void setTenFacebook(String tenFacebook) {
+        this.tenFacebook = tenFacebook;
+    }
+
+    public List<String> getFacebook() {
+        return Facebook;
+    }
+
+    public void setFacebook(List<String> facebook) {
+        Facebook = facebook;
     }
 
     public void setLastInviteTime(long lastInviteTime) {
@@ -125,8 +143,25 @@ public class QuanHeNguoiChoi {
         this.UserIds = other.UserIds;
         this.ThoiGianTao = other.ThoiGianTao;
         this.TrangThai = other.TrangThai;
+        if(other.Facebook!=null&&!other.Facebook.isEmpty()){
+            this.Facebook=other.Facebook;
+        }
     }
 
+    /**
+     * lấy index của người chơi trong danh sách ban be
+     * @param userId
+     * @return -1 nếu không tìm thấy
+     */
+    public int getUserIdIndex(String userId) {
+        if(userId.equals(UserIds.get(0))){
+            return 0;
+        }
+        if(userId.equals(UserIds.get(1))){
+            return 1;
+        }
+        return -1;
+    }
     public DatabaseReference getBanBeReference() {
         return banBeReference;
     }

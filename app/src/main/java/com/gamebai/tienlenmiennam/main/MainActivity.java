@@ -5,12 +5,16 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.provider.Contacts;
 import android.provider.Settings;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,14 +29,23 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.gamebai.tienlenmiennam.R;
 import com.gamebai.tienlenmiennam.api.ApiService;
 import com.gamebai.tienlenmiennam.api.ApiUtility;
+import com.gamebai.tienlenmiennam.api.NoiDungAccessTokenFacebook;
 import com.gamebai.tienlenmiennam.api.NoiDungMaQua;
 import com.gamebai.tienlenmiennam.api.NoiDungSuKien;
 import com.gamebai.tienlenmiennam.api.PhanHoiDonGian;
@@ -70,6 +83,8 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.Timestamp;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
@@ -89,6 +104,8 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.gson.Gson;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -115,6 +132,8 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseFirestore firestore;
     private FirebaseAuth auth;
     private FirebaseDatabase realtimeDatabase;
+    /** callback dùng cho login facebook */
+    private CallbackManager callbackManager;
     /** tham chiếu đến node NguoiChoiTimTran/{UserID} trong realtime database */
     private DatabaseReference nguoiChoiTimTranReference;
     private DatabaseReference nguoiChoiReference;
@@ -233,9 +252,44 @@ public class MainActivity extends AppCompatActivity {
         //kởi tạo AdMob
         MobileAds.initialize(this, initializationStatus -> {});
         taiQuangCao();
+        //đăng nhập facebook
+        callbackManager = CallbackManager.Factory.create();
+        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                handleFacebookAccessToken(loginResult.getAccessToken());
+            }
+
+            @Override
+            public void onCancel() {
+                Toast.makeText(MainActivity.this, "Kết nối Facebook đã bị hủy.", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(@NonNull FacebookException e) {
+                Toast.makeText(MainActivity.this, "Lỗi kết nối Facebook: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
         //game
         gamePanel=new GamePanel(this);
         game=gamePanel.getGame();
+        // --- BẮT ĐẦU ĐOẠN CODE LẤY KEY HASH (key debug) ---
+//        try {
+//            PackageInfo info = getPackageManager().getPackageInfo(
+//                    getPackageName(),
+//                    PackageManager.GET_SIGNATURES);
+//            for (Signature signature : info.signatures) {
+//                MessageDigest md = MessageDigest.getInstance("SHA");
+//                md.update(signature.toByteArray());
+//                String keyHash = Base64.encodeToString(md.digest(), Base64.DEFAULT);
+//                Log.d("KeyHash", "KeyHash:" + keyHash);
+//            }
+//        } catch (PackageManager.NameNotFoundException e) {
+//            Log.e("KeyHash", "PackageManager.NameNotFoundException: " + e.getMessage());
+//        } catch (NoSuchAlgorithmException e) {
+//            Log.e("KeyHash", "NoSuchAlgorithmException: " + e.getMessage());
+//        }
+        // --- KẾT THÚC ĐOẠN CODE LẤY KEY HASH ---
         // viết lệnh chèn dữ liệu có sẵn vào firestore
         // Đoạn mã để đồng bộ dữ liệu từ Firestore sang Realtime Database
 //        firestore.collection("TaiKhoan").get().addOnSuccessListener(queryDocumentSnapshots -> {
@@ -676,6 +730,15 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }
                         });
+            }
+
+            /**
+             * kết nối với facebook và tự động đồng bộ bạn bè đã kết nối facebook
+             */
+            @Override
+            public void connectFacebook() {
+                LoginManager.getInstance().logInWithReadPermissions(MainActivity.this,
+                        java.util.Arrays.asList("public_profile", "email", "user_friends"));
             }
         });
         fragment.show(getSupportFragmentManager(),"BalatroFriend");
@@ -1417,6 +1480,8 @@ public class MainActivity extends AppCompatActivity {
                                                                 data.put(NguoiChoi.TEN_TRUONG_EMAIL,user.getEmail());
                                                                 data.put(NguoiChoi.TEN_TRUONG_ID_GAME,"-1");
                                                                 data.put(NguoiChoi.TEN_TRUONG_TIEN,700);
+                                                                data.put(NguoiChoi.TEN_TRUONG_SO_QUANG_CAO_CO_THE_XEM_TRONG_NGAY,5);
+                                                                data.put(NguoiChoi.TEN_TRUONG_SO_QUANG_CAO_DA_XEM_TRONG_NGAY,0);
                                                                 firestore.collection(NguoiChoi.TEN_COLLECTION)
                                                                         .document(user.getUid())
                                                                         .set(data).addOnSuccessListener(task2->{
@@ -1559,6 +1624,7 @@ public class MainActivity extends AppCompatActivity {
         hashMapOnline.put("TrangThai","online");
         hashMapOnline.put("Ten",nguoiChoi.getTenDangNhap());
         hashMapOnline.put("LoiMoi",null);
+        hashMapOnline.put("Tien",nguoiChoi.getTien());
         HashMap<String,Object> hashMapOffline=new HashMap<>();
         hashMapOffline.put("TrangThai","offline");
         nguoiChoiReference.updateChildren(hashMapOnline).addOnSuccessListener(v->{
@@ -1830,7 +1896,9 @@ public class MainActivity extends AppCompatActivity {
                         String banBeId = quanHeNguoiChoi.getUserIds().get(0).equals(user.getUid())
                                 ? quanHeNguoiChoi.getUserIds().get(1)
                                 : quanHeNguoiChoi.getUserIds().get(0);
-
+                        if(quanHeNguoiChoi.getFacebook()!=null&&!quanHeNguoiChoi.getFacebook().isEmpty()){
+                            quanHeNguoiChoi.setTenFacebook(quanHeNguoiChoi.getFacebook().get(quanHeNguoiChoi.getUserIdIndex(banBeId)));
+                        }
                         switch (dc.getType()) {
                             case ADDED:
                                 if (!danhSachBanBe.containsKey(banBeId)) {
@@ -1851,6 +1919,9 @@ public class MainActivity extends AppCompatActivity {
                                                         try {
                                                             if(snapshot.child("Ten").exists()){
                                                                 String ten=snapshot.child("Ten").getValue(String.class);
+                                                                if(quanHeNguoiChoi.getFacebook()!=null&&!quanHeNguoiChoi.getFacebook().isEmpty()){
+                                                                    ten+=" ("+quanHeNguoiChoi.getFacebook().get(quanHeNguoiChoi.getUserIdIndex(banBeId))+")";
+                                                                }
                                                                 quanHeNguoiChoi.setTenBanBe(ten);
                                                             }
                                                             if(snapshot.child("Tien").exists()){
@@ -1871,10 +1942,13 @@ public class MainActivity extends AppCompatActivity {
                                 QuanHeNguoiChoi currentQuanHe = danhSachBanBe.get(banBeId);
                                 QuanHeNguoiChoi newQuanHe = dc.getDocument().toObject(QuanHeNguoiChoi.class);
                                 if (currentQuanHe != null) {
-                                    if(currentQuanHe.getTrangThai()!=newQuanHe.getTrangThai()&&
-                                        newQuanHe.getTrangThai()==1){
-                                        currentQuanHe.copyFrom(newQuanHe);
-                                        currentQuanHe.startListener();
+                                    if(newQuanHe.getTrangThai()==1){
+                                        if (currentQuanHe.getTrangThai()!=newQuanHe.getTrangThai()) {
+                                            currentQuanHe.copyFrom(newQuanHe);
+                                            currentQuanHe.startListener();
+                                        }else{
+                                            currentQuanHe.copyFrom(newQuanHe);
+                                        }
                                     }
                                 }
                                 break;
@@ -1915,6 +1989,9 @@ public class MainActivity extends AppCompatActivity {
 //                    getString(R.string.loi)+" "+task.getMessage(),Snackbar.LENGTH_SHORT).show();
 //            dangXuat();
 //        });
+        //unlink facebook
+//        FirebaseUser user=auth.getCurrentUser();
+//        user.unlink(FacebookAuthProvider.PROVIDER_ID);
         vaoSanhCho();
     }
 
@@ -2180,5 +2257,90 @@ public class MainActivity extends AppCompatActivity {
         if(soundManager.isMusicEnabled()){
             soundManager.pauseMusic();
         }
+    }
+    // Thêm phương thức này vào trong lớp MainActivity
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Chuyển kết quả trả về cho Facebook SDK xử lý
+        if (callbackManager != null) {
+            callbackManager.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+    // Thêm phương thức này vào trong lớp MainActivity
+    private void handleFacebookAccessToken(AccessToken token) {
+        manHinhDangTai.hienThi("Đang liên kết tài khoản Facebook...");
+
+        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null) {
+            manHinhDangTai.an();
+            Toast.makeText(this, "Bạn cần đăng nhập để thực hiện việc này.", Toast.LENGTH_SHORT).show();
+            dangXuat(false);
+            return;
+        }
+
+        user.linkWithCredential(credential)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // Liên kết thành công, lưu facebookId vào Firestore
+                        String facebookUserId = token.getUserId();
+                        firestore.collection("TaiKhoan").document(user.getUid())
+                                .update("FacebookId", facebookUserId)
+                                .addOnSuccessListener(aVoid -> {
+                                    manHinhDangTai.an();
+                                    Toast.makeText(MainActivity.this, "Kết nối Facebook thành công!", Toast.LENGTH_SHORT).show();
+                                    user.getIdToken(true).addOnSuccessListener(getTokenResult -> {
+                                        String idToken = getTokenResult.getToken();
+                                        NoiDungAccessTokenFacebook body=new NoiDungAccessTokenFacebook(token.getToken());
+                                        apiService.dongBoBanBeFacebook("Bearer " + idToken, body)
+                                                .enqueue(new retrofit2.Callback<PhanHoiDonGian>() {
+                                                    @Override
+                                                    public void onResponse(@NonNull retrofit2.Call<PhanHoiDonGian> call, @NonNull retrofit2.Response<PhanHoiDonGian> response) {
+                                                        if (response.isSuccessful() && response.body() != null) {
+                                                            Toast.makeText(MainActivity.this, "Đồng bộ bạn bè thành công!", Toast.LENGTH_SHORT).show();
+                                                        } else {
+                                                            try {
+                                                                if(response.errorBody() != null) {
+                                                                    String errorBody = response.errorBody().string();
+                                                                    Gson gson = new Gson();
+                                                                    PhanHoiDonGian errorResponse = gson.fromJson(errorBody, PhanHoiDonGian.class);
+                                                                    Toast.makeText(MainActivity.this, "Lỗi đồng bộ: " + errorResponse.getLoi(), Toast.LENGTH_LONG).show();
+                                                                } else {
+                                                                    Toast.makeText(MainActivity.this, "Lỗi đồng bộ bạn bè Facebook.", Toast.LENGTH_LONG).show();
+                                                                }
+                                                            } catch (Exception e) {
+                                                                Toast.makeText(MainActivity.this, "Lỗi đồng bộ bạn bè Facebook.", Toast.LENGTH_LONG).show();
+                                                            }
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onFailure(@NonNull retrofit2.Call<PhanHoiDonGian> call, @NonNull Throwable t) {
+                                                        Toast.makeText(MainActivity.this, "Lỗi kết nối khi đồng bộ bạn bè.", Toast.LENGTH_LONG).show();
+                                                    }
+                                                });
+                                    }).addOnFailureListener(e -> {
+                                        manHinhDangTai.an();
+                                        Toast.makeText(MainActivity.this, "Không thể lấy token người dùng để đồng bộ.", Toast.LENGTH_LONG).show();
+                                    });
+                                })
+                                .addOnFailureListener(e -> {
+                                    manHinhDangTai.an();
+                                    Log.e("FacebookLink", "Lỗi khi cập nhật facebookId", e);
+                                    Toast.makeText(MainActivity.this, "Kết nối thành công nhưng lỗi cập nhật thông tin.", Toast.LENGTH_SHORT).show();
+                                });
+
+                    } else {
+                        manHinhDangTai.an();
+                        Log.w("FacebookLink", "Lỗi khi liên kết tài khoản", task.getException());
+                        if (task.getException() instanceof FirebaseAuthUserCollisionException) {
+                            Toast.makeText(MainActivity.this, "Tài khoản Facebook này đã được dùng cho một người dùng khác hoặc email chính của tài khoản này đã tồn tại trong hệ thống.", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(MainActivity.this, "Lỗi liên kết tài khoản.", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
     }
 }

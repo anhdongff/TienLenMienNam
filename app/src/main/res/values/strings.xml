@@ -135,4 +135,11 @@
     <string name="SU_KIEN">SỰ KIỆN</string>
     <string name="CHOI">CHƠI</string>
     <string name="nap_xu">Kiếm thêm xu</string>
+    <string name="ket_noi">Kết nối</string>
+    <string name="ket_noi_facebook_de_tim_ban">Kết nối Facebook để đồng bộ bạn bè</string>
+    <string name="facebook_da_ket_noi">Bạn đã kết nối tài khoản facebook</string>
+    <string name="fb_login_protocol_scheme">fb1486411345778719</string>
+    <string name="facebook_app_id">1486411345778719</string>
+    <string name="facebook_client_token">414fe135157a1a95211b3546deb346c5</string>
+    <string name="khong_tim_duoc_ban">Không tìm thấy bạn bè?</string>
 </resources>

@@ -28,5 +28,7 @@ public interface ApiService {
     @POST("NhanThuongSuKien")
     Call<PhanHoiDonGian> nhanThuongSuKien(@Header("Authorization") String token,
                                          @Body NoiDungSuKien noiDungNhanThuongSuKien);
-
+    @POST("DongBoBanBeFacebook")
+    Call<PhanHoiDonGian> dongBoBanBeFacebook(@Header("Authorization") String token,
+                                          @Body NoiDungAccessTokenFacebook noiDungNhanThuongSuKien);
 }
