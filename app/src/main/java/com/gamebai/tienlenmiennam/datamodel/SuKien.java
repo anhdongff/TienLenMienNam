@@ -40,7 +40,7 @@ public class SuKien {
         this.TieuDe = other.TieuDe;
         this.TrangThai = other.TrangThai;
     }
-    // 🔹 Getter & Setter (Firestore cần các hàm này để map dữ liệu)
+    // 🔹 Getter & Setter
 
     public long getThoiGianBatDau() {
         return ThoiGianBatDau;
