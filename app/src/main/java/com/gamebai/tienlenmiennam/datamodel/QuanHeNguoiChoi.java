@@ -102,7 +102,7 @@ public class QuanHeNguoiChoi {
      * lấy trạng thái giữa 2 người chơi
      * 1 - đã hấp nhận
      * 0 - đang chờ
-     * @return
+     * @return (int)
      */
     public int getTrangThai() {
         return TrangThai;
